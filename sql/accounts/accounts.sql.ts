@@ -25,6 +25,21 @@ export const getAccounts = () => {
                 ref_user_id = :userID;`
 };
 
+export const getAccountByID = () => {
+    return `SELECT 
+                id,
+                uuid,
+                name,
+                type,
+                description
+            FROM
+                v_accounts
+            WHERE
+                ref_user_id = :userID
+                AND uuid = :uuid
+            LIMIT 1;`
+};
+
 export const updateAccount = () => {
     return `CALL manage_accounts
             (
