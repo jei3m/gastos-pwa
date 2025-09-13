@@ -42,7 +42,7 @@ export default function EditAccount() {
 					router.push('/auth/login')
 				}
 			})
-	}, [])
+	}, []);
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -53,12 +53,14 @@ export default function EditAccount() {
 					name: account[0].name,
 					type: account[0].type.toLowerCase(),
 					description: account[0].description
-				})
+				});
+				setIsLoading(false);
 			})
 			.catch((error) => {
-				throw Error(error.message)
+				setIsLoading(false);
+				throw Error(error.message);
 			})
-	}, [])
+	}, []);
 
 	const form = useForm<z.infer<typeof createAccountSchema>>({
 		resolver: zodResolver(createAccountSchema),
