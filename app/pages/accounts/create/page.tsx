@@ -1,107 +1,156 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { createAccount } from "@/store/accounts.store";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { fetchSession } from "@/utils/session";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 } from "@/components/ui/select";
 import { TypographyH3 } from "@/components/custom/typography";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { createAccountSchema } from "@/schema/acccounts.schema";
 
 export default function CreateAccount() {
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<string[]>([]);
-  const router = useRouter();
+	const [isLoading, setIsLoading] = useState(false);
+	const router = useRouter();
 
-  async function handleSubmit(e:React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setErrors([]);
+	// Validate user session
+	useEffect(() => {
+		fetchSession()
+			.then(({session}) => {
+				if (!session) {
+					router.push('/auth/login')
+				}
+			})
+	},[])
 
-    const form = new FormData(e.currentTarget);
-    // const email = form.get("email") as string;
-    // const password = form.get("password") as string;
+	const form = useForm<z.infer<typeof createAccountSchema>>({
+		resolver: zodResolver(createAccountSchema),
+		defaultValues: {
+			name: "",
+			type: "",
+			description: ""
+		}
+	})
 
-    // const { error } = await authClient.signIn.email({
-    //   email: email,
-    //   password: password,
-    //   rememberMe: true,
-    //   callbackURL: '/pages/transactions',
-    // });
+	async function onSubmit(values: z.infer<typeof createAccountSchema>) {
+		setIsLoading(true);
 
-    // if (error) {
-    //   setErrors([error.message || "Unknown Error"]);
-    //   setLoading(false);
-    // };
-    
-    setLoading(false);
-  };
+		createAccount(values)
+			.then((account) => {
+				router.push('/pages/transactions')
+				console.log(account.responseMessage);
+				setIsLoading(false);
+			})
+			.catch((error) => {
+				console.error(error);
+				setIsLoading(false);
+			})
+	}
 
-  return (
-    <main className='flex flex-col space-y-4 p-3'>
-      <TypographyH3 className="font-bold text-center">
-        Create New Account
-      </TypographyH3>
-      <form onSubmit={handleSubmit} className='flex flex-col space-y-4'>
-        <div>
-          <Label htmlFor="name" className="text-md font-medium">
-            Account Name
-          </Label>
-          <Input
-            id="name"
-            name="name"
-            type="name"
-            required
-            className="mt-1 h-9 
-            rounded-lg border-2 
-            border-black bg-white"
-          />
-        </div>
-        <div>
-          <Label htmlFor="type" className="text-md font-medium">
-            Account Type
-          </Label>
-          <Select>
-            <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
-              <SelectValue placeholder="Select Account Type..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="cash">Cash</SelectItem>
-              <SelectItem value="digital">Digital</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="description" className="text-md font-medium">
-            Description
-          </Label>
-          <Textarea
-            id="description"
-            name="description"
-            rows={2}
-            required
-            className="mt-1 rounded-lg 
-            border-2 border-black 
-            bg-white text-[16px]"
-          />
-        </div>
-      </form>
-      <div className='flex flex-row justify-between'>
-        <Button 
-          onClick={() => router.back()}
-          className="bg-red-500 border-2 hover:none">
-          Cancel
-        </Button>
-        <Button className="border-2">
-          Submit
-        </Button>
-      </div>
-    </main>
-  );
+	return (
+		<main className='flex flex-col space-y-4 p-3'>
+			<TypographyH3 className="font-bold text-center">
+				Create New Account
+			</TypographyH3>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-4'>
+				 	<FormField
+						control={form.control}
+						name="name"
+						render={({ field }) => (
+							<FormItem className="-space-y-1">
+								<FormLabel className="text-md font-medium">
+									Account Name
+								</FormLabel>
+								<FormControl>
+									<Input
+										required 
+										placeholder="Account Name..." 
+										{...field} 
+										className="h-9 
+										rounded-lg border-2 
+										border-black bg-white"
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="type"
+						render={({ field }) => (
+							<FormItem className="-space-y-1">
+								<FormLabel className="text-md font-medium">
+									Account Type
+								</FormLabel>
+								<FormControl>
+									<Select onValueChange={field.onChange}>
+										<SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
+											<SelectValue placeholder="Select Account Type..." />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="cash">Cash</SelectItem>
+											<SelectItem value="digital">Digital</SelectItem>
+										</SelectContent>
+									</Select>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="description"
+						render={({ field }) => (
+							<FormItem className="-space-y-1">
+								<FormLabel className="text-md font-medium">
+									Description
+								</FormLabel>
+								<FormControl>
+									<Textarea 
+										placeholder="Description..." 
+										{...field} 
+										className="h-9 
+										rounded-lg border-2 
+										border-black bg-white"
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<div className='flex flex-row justify-between'>
+						<Button
+							onClick={() => router.back()}
+							className="bg-red-500 border-2 hover:none"
+						>
+							Cancel
+						</Button>
+						<Button className="border-2" type="submit" disabled={isLoading}>
+							{isLoading ? "Submitting..." : "Submit"}
+						</Button>
+					</div>
+				</form>
+			</Form>
+		</main>
+	);
 };
