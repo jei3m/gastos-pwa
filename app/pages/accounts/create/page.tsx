@@ -52,7 +52,7 @@ export default function CreateAccount() {
 
 	async function onSubmit(values: z.infer<typeof createAccountSchema>) {
 		setIsLoading(true);
-
+		
 		createAccount(values)
 			.then((account) => {
 				router.push('/pages/transactions')
@@ -142,10 +142,15 @@ export default function CreateAccount() {
 						<Button
 							onClick={() => router.back()}
 							className="bg-red-500 border-2 hover:none"
+							disabled={isLoading}
 						>
 							Cancel
 						</Button>
-						<Button className="border-2" type="submit" disabled={isLoading}>
+						<Button 
+							className="border-2" 
+							type="submit" 
+							disabled={isLoading}
+						>
 							{isLoading ? "Submitting..." : "Submit"}
 						</Button>
 					</div>
