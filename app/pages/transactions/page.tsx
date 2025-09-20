@@ -8,6 +8,7 @@ import { fetchSession } from '@/utils/session';
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -24,10 +25,12 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import { TypographyH4 } from '@/components/custom/typography';
+import { Button } from '@/components/ui/button';
 
 export default function Transactions() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeTab, setActiveTab] = useState('daily');
+  const [activeTab, setActiveTab] = useState('weekly');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [userEmail, setUserEmail] = useState("");
   const router = useRouter();
@@ -154,7 +157,7 @@ export default function Transactions() {
   }, [activeTab])
 
   return (
-    <main className='flex flex-col space-y-2 min-h-screen pb-12'>
+    <main className='flex flex-col space-y-4 min-h-screen pb-12'>
       {/* Date Card Section */}
       {isScrolled ?         
         <section 
@@ -215,7 +218,7 @@ export default function Transactions() {
           transition-all duration-150 
           ease-in-out'
         >
-          <Card className="mt-0 w-full border-2 ">
+          <Card className="mt-0 border-2 ">
             <CardHeader
               className='flex
               flex-col 
@@ -266,37 +269,30 @@ export default function Transactions() {
             <CardContent className='flex flex-col gap-y-4'>
               <div className='flex flex-col'>
                 <h3 className='text-gray-600 font-normal text-lg'>
-                  Balance
+                  Total Balance
                 </h3>
                 <h1 className='text-2xl font-extrabold'>
                   PHP 1,200.00
                 </h1>
               </div>
-              <div className='flex flex-row justify-between w-full'>
-                <div className='flex flex-col'>
-                  <h4 className='text-gray-600 font-normal text-md'>
-                    Total Income
-                  </h4>
-                  <h1 className='text-xl font-bold text-green-500'>
-                    PHP 1,200.00
-                  </h1>
-                </div>
-                <div className='flex flex-col'>
-                  <h4 className='text-gray-600 font-normal text-md'>
-                    Total Expenses
-                  </h4>
-                  <h1 className='text-xl font-bold text-red-500'>
-                    PHP 1,200.00
-                  </h1>
-                </div>
-              </div>
             </CardContent>
+            <CardFooter className='-mb-1 w-full flex flex-row justify-center space-x-2'>
+              <Button className='w-[50%]'>
+                Income
+              </Button>
+              <Button className='w-[50%]' variant="destructive">
+                Expense
+              </Button>
+            </CardFooter>
           </Card>
         </section>
       }
 
       {/* Transactions Section */}
       <section className='flex flex-col space-y-2 px-3 mb-2'>
+        <TypographyH4>
+          Transactions
+        </TypographyH4>
         {transactions && ( 
           <>
             {transactions.map((transaction, index) => (
