@@ -21,11 +21,29 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { 
+	createAccountSchema, 
+	updateAccountSchema 
+} from "@/schema/acccounts.schema";
+import { 
+	deleteAccount, 
+	editAccount, 
+	fetchAccountByID 
+} from "@/store/accounts.store";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { createAccountSchema, updateAccountSchema } from "@/schema/acccounts.schema";
-import { editAccount, fetchAccountByID } from "@/store/accounts.store";
+import { Trash2 } from "lucide-react";
 
 export default function EditAccount() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +76,7 @@ export default function EditAccount() {
 			})
 			.catch((error) => {
 				setIsLoading(false);
-				throw Error(error.message);
+				throw Error(error.responseMessage);
 			})
 	}, []);
 
@@ -85,11 +103,56 @@ export default function EditAccount() {
 			})
 	};
 
+	const handleDelete = (uuid: string) => {
+		setIsLoading(true);
+		deleteAccount(uuid)
+			.then(() => {
+				router.push('/pages/transactions');
+				setIsLoading(false);
+			})
+			.catch((error) => {
+				setError(error.responseMessage);
+				setIsLoading(false);
+			})
+	};
+
 	return (
 		<main className='flex flex-col m-auto space-y-4 p-3 max-w-[500px]'>
-			<TypographyH3 className="font-bold text-center">
-				Edit Account
-			</TypographyH3>
+			<div className="flex flex-row space-x-2 items-center">
+				<TypographyH3 className="font-bold text-center">
+					Edit Account
+				</TypographyH3>
+				<Dialog>
+					<DialogTrigger className="text-red-500" disabled={isLoading}>
+						<Trash2 size={20}/>
+					</DialogTrigger>
+					<DialogContent 
+						className="border-2 bg-primary [&>button]:hidden"
+						onOpenAutoFocus={(e) => e.preventDefault()}
+					>
+						<DialogHeader className="text-left">
+							<DialogTitle>Are you sure?</DialogTitle>
+							<DialogDescription className="text-gray-800">
+								This action cannot be undone. It will be permanently deleted.
+							</DialogDescription>
+						</DialogHeader>
+						<DialogFooter className="flex flex-row justify-between">
+							<DialogClose asChild>
+								<Button variant="outline" className="border-2">
+									Cancel
+								</Button>		
+							</DialogClose>
+							<Button 
+								variant="destructive" 
+								className="border-2"
+								onClick={() => handleDelete(uuid)}
+							>
+								Yes, I'm sure
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+			</div>
 			<Form {...form}>
 				<form className='flex flex-col space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
 					<FormField
@@ -158,7 +221,7 @@ export default function EditAccount() {
 					/>
 					{error && 
 						<div className="text-red-500 font-medium">
-							Error! Kupal Ka boss
+							{error}
 						</div>
 					}
 					<div className='flex flex-row justify-between'>
