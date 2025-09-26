@@ -125,7 +125,7 @@ function Navbar() {
 						}
 						<Button
 							onClick={handleNewAccount}
-							className='w-full bg-gray-300 text-black'
+							className='w-full text-white'
 							disabled={isLoading}
 						>
 							<PlusIcon className='-mr-1' /> New Account
