@@ -36,6 +36,7 @@ function Navbar() {
 	const pathname = usePathname();
 	const disableSelect = pathname !== '/pages/transactions';
 	const [accounts, setAccounts] = useState<Account[]>([]);
+	const [selectedAccountID, setSelectedAccountID] = useState('');
 	const isMobile = useIsMobile();
 
 	const handleNewAccount = () => {
@@ -46,7 +47,20 @@ function Navbar() {
 	const handleEdit = (uuid: string) => {
 		setOpen(false);
 		router.push(`/pages/accounts/${uuid}`);
-	}
+	};
+
+	const handleSelect = (uuid: string) => {
+		localStorage.setItem('accountID', uuid);
+		setSelectedAccountID(uuid);
+		setOpen(false)
+	};
+
+	useEffect(() => {
+		const localAccountID = localStorage.getItem('accountID');
+		if (localAccountID) {
+			setSelectedAccountID(localAccountID)
+		};
+	}, [selectedAccountID]);
 
 	useEffect(() => {
 		fetchAccounts()
@@ -90,7 +104,13 @@ function Navbar() {
 				</Link>
 
 				{/* Select Accounts Dropdown */}
-				<Select open={open} onOpenChange={setOpen} disabled={disableSelect}>
+				<Select 
+					open={open} 
+					onOpenChange={setOpen} 
+					disabled={disableSelect} 
+					onValueChange={handleSelect}
+					value={selectedAccountID}
+				>
 					<SelectTrigger
 						className="w-[180px] 
 						bg-primary 
@@ -110,22 +130,22 @@ function Navbar() {
 							:
 								<>
 									{accounts.map((account, index) => (
-									<ContextMenu key={index}>
-										<ContextMenuTrigger>
-											<SelectItem value={account.uuid}>
-												{account.name}
-											</SelectItem>
-										</ContextMenuTrigger>
-										<ContextMenuContent className='bg-primary rounded-md'>
-											<ContextMenuItem 
-												className="flex items-center px-2 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded-sm"
-													onClick={() => handleEdit(account.uuid)}
-												>
-												<Edit className="mr-2 h-4 w-4" />
-												Edit
-											</ContextMenuItem>
-										</ContextMenuContent>
-									</ContextMenu>
+										<ContextMenu key={index}>
+											<ContextMenuTrigger>
+												<SelectItem value={account.uuid}>
+													{account.name}
+												</SelectItem>
+											</ContextMenuTrigger>
+											<ContextMenuContent className='bg-primary rounded-md'>
+												<ContextMenuItem 
+													className="flex items-center px-2 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded-sm"
+														onClick={() => handleEdit(account.uuid)}
+													>
+													<Edit className="mr-2 h-4 w-4" />
+													Edit
+												</ContextMenuItem>
+											</ContextMenuContent>
+										</ContextMenu>
 									))}
 								</>
 							}
