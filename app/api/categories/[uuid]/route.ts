@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { db } from "@/utils/db";
+import { connection, db } from "@/utils/db";
 import { success, fail } from "@/utils/helpers";
 import { responseRow } from "@/types/response.types";
 import { fetchUserID } from '@/lib/auth-session';
@@ -49,7 +49,9 @@ export async function PUT(
                 ? error.message
                 : 'Failed to Update Category'
         );
-    };
+    } finally {
+        connection.release();
+    }
 };
 
 export async function DELETE(
@@ -90,5 +92,7 @@ export async function DELETE(
                 ? error.message
                 : 'Failed to Delete Category'
         )
-    };
+    } finally {
+        connection.release();
+    }
 };

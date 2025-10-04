@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { db } from "@/utils/db";
+import { connection, db } from "@/utils/db";
 import { success, fail } from "@/utils/helpers";
 import { responseRow } from "@/types/response.types";
 import { fetchUserID } from '@/lib/auth-session';
@@ -34,6 +34,8 @@ export async function GET(
                 ? error.message
                 : 'Failed to Fetch Account'
         )
+    } finally {
+        connection.release();
     }
 };
 
@@ -84,6 +86,8 @@ export async function PUT(
                 ? error.message
                 : 'Failed to Update Account'
         )
+    } finally {
+        connection.release();
     }
 };
 
@@ -126,5 +130,7 @@ export async function DELETE(
                 ? error.message
                 : 'Failed to Delete Account'
         )
+    } finally {
+        connection.release();
     }
 };

@@ -11,6 +11,7 @@ import {
 } from '@/utils/helpers';
 import { responseRow } from '@/types/response.types';
 import { fetchUserID } from '@/lib/auth-session';
+import { connection } from '@/utils/db';
 
 // Create New Account
 export async function POST(req: NextRequest) {
@@ -55,6 +56,8 @@ export async function POST(req: NextRequest) {
 				? error.message
 				: 'Failed to Create Tests'
 		);
+	} finally {
+		connection.release();
 	}
 };
 
@@ -77,5 +80,7 @@ export async function GET() {
 				? error.message 
 				: "Failed to Fetch Accounts"
 		);
+	} finally {
+		connection.release();
 	}
 };

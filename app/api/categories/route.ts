@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import crypto from 'crypto';
-import { db } from "@/utils/db";
+import { connection, db } from "@/utils/db";
 import { success, fail } from "@/utils/helpers";
 import { responseRow } from "@/types/response.types";
 import { createCategory, getCategories } from "@/sql/categories/categories.sql";
@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
                 ? error.message
                 : 'Failed to Create Categery'
         );
+    } finally {
+        connection.release();
     }
 };
 
@@ -68,5 +70,7 @@ export async function GET() {
                 ? error.message
                 : 'Failed to Fetch Categories'
         );
+    } finally {
+        connection.release();
     }
 };
