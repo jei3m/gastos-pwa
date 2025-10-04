@@ -8,6 +8,9 @@ export default function TransactionsLayout({
     <div className="max-w-[600px] m-auto">
       <Navbar/>
       {children}
+      <Dock
+        showLabels={true}
+      />
     </div>
   );
 };
