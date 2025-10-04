@@ -161,7 +161,7 @@ export default function Transactions() {
   }, [activeTab])
 
   return (
-    <main className='flex flex-col space-y-4 min-h-screen'>
+    <main className='flex flex-col space-y-4 min-h-screen pb-12'>
       {/* Date Card Section */}
       {isScrolled ?         
         <section 
