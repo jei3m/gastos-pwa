@@ -34,10 +34,13 @@ function Navbar() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [open, setOpen] = useState(false);
 	const pathname = usePathname();
-	const disableSelect = pathname !== '/pages/transactions';
 	const [accounts, setAccounts] = useState<Account[]>([]);
 	const [selectedAccountID, setSelectedAccountID] = useState('');
 	const isMobile = useIsMobile();
+
+	const disableSelect = [
+		pathname.startsWith('/pages/accounts')
+	].includes(true);
 
 	const handleNewAccount = () => {
 		setOpen(false)
