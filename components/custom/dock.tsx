@@ -19,7 +19,7 @@ const dockItems: DockItem[] = [
   { 
     label: 'categories', 
     icon: Tags, 
-    route:'/pages/transactions/add' 
+    route:'/pages/categories' 
   },
 ];
 export const Dock: React.FC<DockProps> = ({ 
