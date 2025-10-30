@@ -9,6 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import {
 	Card,
 	CardContent,
+	CardDescription,
 	CardFooter,
 	CardHeader,
 	CardTitle,
@@ -23,22 +24,22 @@ import {
 // Icon Imports
 import {
 	ArrowDown,
-	ArrowDownLeft,
 	ArrowUp,
-	ArrowUpRight,
+	BanknoteArrowDownIcon,
+	BanknoteArrowUpIcon,
 	Calendar,
 	ChevronLeft,
 	ChevronRight
 } from 'lucide-react';
-import { TypographyH4 } from '@/components/custom/typography';
-import { Button } from '@/components/ui/button';
+import { TypographyH4, TypographyH5 } from '@/components/custom/typography';
 import { Separator } from '@/components/ui/separator';
 
 export default function page() {
+	const [isScrolled, setIsScrolled] = useState(false);
 	const [activeTab, setActiveTab] = useState('weekly');
 	const [categoryType, setCategoryType] = useState('expense');
 	const [currentDate, setCurrentDate] = useState(new Date());
-	const [userEmail, setUserEmail] = useState("");
+	// const [userEmail, setUserEmail] = useState("");
 	const router = useRouter();
 	const isMobile = useIsMobile();
 
@@ -52,6 +53,35 @@ export default function page() {
 	//     })
 	// }, []);
 
+	// Set isScrolled
+	useEffect(() => {
+		const onScroll = () => {
+			setIsScrolled(window.scrollY > 40);
+		};
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => window.removeEventListener('scroll', onScroll);
+	}, []);
+
+	const categories = [
+		{
+			title: "Food",
+			type: "expense",
+			amount: "10,100.00",
+			icon: BanknoteArrowUpIcon
+		},
+		{
+			title: "Transportation",
+			type: "expense",
+			amount: "10,100.00",
+			icon: BanknoteArrowUpIcon
+		},
+		{
+			title: "Cashback",
+			type: "income",
+			amount: "10,100.00",
+			icon: BanknoteArrowDownIcon
+		}		
+	];
 
 	// Function to handle previous or next 
 	const handleDateChange = (direction: 'prev' | 'next') => {
@@ -155,104 +185,203 @@ export default function page() {
 	}, [activeTab])
 
 	return (
-		<main className={`flex flex-col space-y-4 min-h-screen
+		<main className={`flex flex-col space-y-2 min-h-screen
       ${isMobile ? 'pb-15' : 'pb-18'}
     `}>
 			{/* Date Card Section */}
-			<section
-				className='
-					pt-2 px-3 
-					transition-all duration-150 
-					ease-in-out'
-			>
-				<Card className="mt-0 border-2 ">
-					<CardHeader
-						className='flex
-							flex-col 
-							justify-center 
-							items-center -mt-2'
-					>
-						{/* Tabs Selection */}
-						<div className='flex items-center gap-x-2'>
-							<Calendar />
-							<Tabs defaultValue='daily' value={activeTab} onValueChange={setActiveTab}>
-								<TabsList className='bg-white'>
-									{tabItems.map((item, index) => (
-										<TabsTrigger
-											value={item.value}
-											key={index}
-										>
-											{/* Capitalized first letter of item.value */}
-											{item.value.charAt(0).toUpperCase() + item.value.slice(1)}
-										</TabsTrigger>
-									))}
-								</TabsList>
-							</Tabs>
-						</div>
+			{isScrolled ? (
+				<section
+          className={`sticky top-0 z-10 
+            transition-all duration-150 
+            ease-in-out
+            ${isMobile ? 'px-0' : 'px-3'}
+          `}
+				>
+					<Card className="rounded-none border-b-2">
+						<CardHeader
+							className='flex
+								flex-col 
+								justify-center 
+								items-center -mt-2'
+						>
+							{/* Tabs Selection */}
+							<div className='flex items-center gap-x-2'>
+								<Calendar />
+								<Tabs defaultValue='daily' value={activeTab} onValueChange={setActiveTab}>
+									<TabsList className='bg-white'>
+										{tabItems.map((item, index) => (
+											<TabsTrigger
+												value={item.value}
+												key={index}
+											>
+												{/* Capitalized first letter of item.value */}
+												{item.value.charAt(0).toUpperCase() + item.value.slice(1)}
+											</TabsTrigger>
+										))}
+									</TabsList>
+								</Tabs>
+							</div>
 
-						{/* Date Display and Date Change */}
-						<div className='w-full'>
-							<div className="flex 
-								justify-between 
-								items-center
-								font-semibold"
+							{/* Date Display and Date Change */}
+							<div className='w-full'>
+								<div className="flex 
+									justify-between 
+									items-center
+									font-semibold"
+								>
+									<ChevronLeft
+										className='cursor-pointer'
+										onClick={() => handleDateChange('prev')}
+									/>
+									{dateDisplay}
+									<ChevronRight
+										className='cursor-pointer'
+										onClick={() => handleDateChange('next')}
+									/>
+								</div>
+							</div>
+						</CardHeader>
+
+						{/* Line Separator */}
+						<Separator />
+
+						<CardFooter className='w-full flex flex-row justify-center space-x-2'>
+							<div className='
+								bg-primary 
+								w-[50%] flex flex-row
+								justify-between items-center text-white
+								border-2 rounded-xl h-16 container p-2'
 							>
-								<ChevronLeft
-									className='cursor-pointer'
-									onClick={() => handleDateChange('prev')}
-								/>
-								{dateDisplay}
-								<ChevronRight
-									className='cursor-pointer'
-									onClick={() => handleDateChange('next')}
-								/>
+								<div>
+									<ArrowDown size={32} />
+								</div>
+								<div className='text-right -space-y-1'>
+									<div className='text-md'>
+										Income
+									</div>
+									<div className='text-2xl font-bold'>
+										10,100
+									</div>
+								</div>
 							</div>
-						</div>
-					</CardHeader>
-
-					{/* Line Separator */}
-					<Separator />
-
-					<CardFooter className='w-full flex flex-row justify-center space-x-2'>
-						<div className='
-							bg-primary 
-							w-[50%] flex flex-row
-							justify-between items-center text-white
-							border-2 rounded-xl h-16 container p-2'
+							<div className='
+								bg-red-500
+								w-[50%] flex flex-row
+								justify-between items-center text-white
+								border-2 rounded-xl h-16 container p-2'
+							>
+								<div>
+									<ArrowUp size={32} />
+								</div>
+								<div className='text-right -space-y-1'>
+									<div className='text-md'>
+										Expense
+									</div>
+									<div className='text-2xl font-bold'>
+										10,100
+									</div>
+								</div>
+							</div>
+						</CardFooter>
+					</Card>
+				</section>
+			):(
+				<section
+					className='
+						pt-2 px-3 
+						transition-all duration-150 
+						ease-in-out'
+				>
+					<Card className="mt-0 border-2 ">
+						<CardHeader
+							className='flex
+								flex-col 
+								justify-center 
+								items-center -mt-2'
 						>
-							<div>
-								<ArrowDown size={32} />
+							{/* Tabs Selection */}
+							<div className='flex items-center gap-x-2'>
+								<Calendar />
+								<Tabs defaultValue='daily' value={activeTab} onValueChange={setActiveTab}>
+									<TabsList className='bg-white'>
+										{tabItems.map((item, index) => (
+											<TabsTrigger
+												value={item.value}
+												key={index}
+											>
+												{/* Capitalized first letter of item.value */}
+												{item.value.charAt(0).toUpperCase() + item.value.slice(1)}
+											</TabsTrigger>
+										))}
+									</TabsList>
+								</Tabs>
 							</div>
-							<div className='text-right -space-y-1'>
-								<div className='text-md'>
-									Income
-								</div>
-								<div className='text-2xl font-bold'>
-									10,100
-								</div>
-							</div>
-						</div>
-						<div className='
-							bg-red-500
-							w-[50%] flex flex-row
-							justify-between items-center text-white
-							border-2 rounded-xl h-16 container p-2'
-						>
-							<div>
-								<ArrowUp size={32} />
-							</div>
-							<div className='text-right -space-y-1'>
-								<div className='text-md'>
-									Expense
-								</div>
-								<div className='text-2xl font-bold'>
-									10,100
+
+							{/* Date Display and Date Change */}
+							<div className='w-full'>
+								<div className="flex 
+									justify-between 
+									items-center
+									font-semibold"
+								>
+									<ChevronLeft
+										className='cursor-pointer'
+										onClick={() => handleDateChange('prev')}
+									/>
+									{dateDisplay}
+									<ChevronRight
+										className='cursor-pointer'
+										onClick={() => handleDateChange('next')}
+									/>
 								</div>
 							</div>
-						</div>
-					</CardFooter>
-				</Card>
-			</section>
+						</CardHeader>
+
+						{/* Line Separator */}
+						<Separator />
+
+						<CardFooter className='w-full flex flex-row justify-center space-x-2'>
+							<div className='
+								bg-primary 
+								w-[50%] flex flex-row
+								justify-between items-center text-white
+								border-2 rounded-xl h-16 container p-2'
+							>
+								<div>
+									<ArrowDown size={32} />
+								</div>
+								<div className='text-right -space-y-1'>
+									<div className='text-md'>
+										Income
+									</div>
+									<div className='text-2xl font-bold'>
+										10,100
+									</div>
+								</div>
+							</div>
+							<div className='
+								bg-red-500
+								w-[50%] flex flex-row
+								justify-between items-center text-white
+								border-2 rounded-xl h-16 container p-2'
+							>
+								<div>
+									<ArrowUp size={32} />
+								</div>
+								<div className='text-right -space-y-1'>
+									<div className='text-md'>
+										Expense
+									</div>
+									<div className='text-2xl font-bold'>
+										10,100
+									</div>
+								</div>
+							</div>
+						</CardFooter>
+					</Card>
+				</section>
+			)}
+
 			{/* Categories Section */}
 			<section className='flex flex-col space-y-2 px-3 mb-2'>
 				<Tabs defaultValue='expense' value={categoryType} onValueChange={setCategoryType}>
@@ -272,6 +401,46 @@ export default function page() {
 						</TabsList>
 					</div>
 				</Tabs>
+				{categories ? (
+					<>
+						{categories.map((category, index) => (
+							<Card key={index} className='border-2 p-[10px]'>
+								<CardContent className='flex flex-row justify-between items-center -p-1'>
+									<div className='flex flex-row space-x-2 items-center'>
+										<div className={`
+											p-1.5 rounded-lg border-2 
+											${category.type === 'expense'
+												? 'bg-red-500'
+												: 'bg-primary'
+											}
+										`}>
+											<category.icon size={30} />									
+										</div>
+										<div>
+											<TypographyH5 className='font-semibold'>
+												{category.title}
+											</TypographyH5>									
+										</div>
+									</div>
+									<div className='text-right'>
+										<CardDescription>
+											Total Amount:
+										</CardDescription>	
+										<CardTitle>
+											PHP {category.amount}
+										</CardTitle>										
+									</div>
+								</CardContent>
+							</Card>
+						))}
+					</>
+				) : (
+					<>
+						<TypographyH4>
+							No Categories
+						</TypographyH4>
+					</>
+				)}
 			</section>
 		</main>
 	)
