@@ -69,6 +69,23 @@ export function TypographyH4({
   )
 };
 
+export function TypographyH5({
+  children,
+  className,
+  ...props    
+}: HTMLAttributes<HTMLHeadingElement> & { children?: ReactNode }) {
+  return (
+    <h5 {...props}
+      className={cn(
+        'scroll-m-20 text-lg font-regular tracking-tight',
+        className
+      )}
+    >
+      {children}
+    </h5>
+  )
+};
+
 export function TypographyP({
   children,
   className,
