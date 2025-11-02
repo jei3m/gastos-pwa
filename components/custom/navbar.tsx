@@ -44,7 +44,7 @@ function Navbar() {
 
 	const handleNewAccount = () => {
 		setOpen(false)
-		router.push('/pages/accounts/create')
+		router.push('/pages/accounts/add')
 	};
 
 	const handleEdit = (uuid: string) => {
