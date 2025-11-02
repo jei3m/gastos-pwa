@@ -8,6 +8,7 @@ CREATE PROCEDURE `manage_categories`(
     IN p_user_id CHAR(36),
     IN p_name VARCHAR(15),
     IN p_type ENUM('Income','Expense'),
+    IN p_icon VARCHAR(20),
 
     OUT p_response JSON
 )
@@ -30,13 +31,15 @@ BEGIN
                     uuid,
                     ref_user_id,
                     name,
-                    type
+                    type,
+                    icon
                 )
                 VALUES(
                     p_uuid,
                     p_user_id,
                     p_name,
-                    p_type
+                    p_type,
+                    p_icon
                 );
 
                 SET v_affected_rows = ROW_COUNT();
@@ -74,7 +77,8 @@ BEGIN
                 UPDATE categories
                 SET 
                     name = p_name,
-                    type = p_type
+                    type = p_type,
+                    icon = p_icon
                 WHERE
                     ref_user_id = p_user_id
                     AND uuid = p_uuid
