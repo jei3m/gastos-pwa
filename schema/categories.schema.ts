@@ -6,5 +6,8 @@ export const createCategorySchema = z.object({
     }),
     type: z.string().min(1, {
         message: 'Please select a category type',
+    }),
+    icon: z.string().min(1, {
+        message: 'Please select a category icon',
     })
 });
