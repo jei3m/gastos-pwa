@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { tabItems, categoryTypes } from '@/lib/data';
 import { fetchSession } from '@/utils/session';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Category } from '@/types/categories.types';
+import { icons } from '@/lib/icons';
 // ShadCN Components
 import {
 	Card,
@@ -24,8 +26,6 @@ import {
 import {
 	ArrowDown,
 	ArrowUp,
-	BanknoteArrowDownIcon,
-	BanknoteArrowUpIcon,
 	Calendar,
 	ChevronLeft,
 	ChevronRight,
@@ -34,12 +34,16 @@ import {
 import { TypographyH4, TypographyH5 } from '@/components/custom/typography';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { fetchCategories } from '@/store/categories.store';
+import { toast } from 'sonner';
+import Link from 'next/link';
 
-export default function page() {
+export default function Categories() {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [activeTab, setActiveTab] = useState('weekly');
 	const [categoryType, setCategoryType] = useState('expense');
 	const [currentDate, setCurrentDate] = useState(new Date());
+	const [categories, setCategories] = useState<Category[]>([]);
 	const router = useRouter();
 	const isMobile = useIsMobile();
 
@@ -50,7 +54,7 @@ export default function page() {
 				router.push('/auth/login')
 			};
 		});
-	}, []);
+	}, [router]);
 
 	// Set isScrolled
 	useEffect(() => {
@@ -61,37 +65,11 @@ export default function page() {
 		return () => window.removeEventListener('scroll', onScroll);
 	}, []);
 
-	const categories = [
-		{
-			title: "Food",
-			type: "Expense",
-			amount: "10,100.00",
-			icon: "BanknoteArrowUpIcon"
-		},
-		{
-			title: "Transportation",
-			type: "Expense",
-			amount: "10,100.00",
-			icon: "BanknoteArrowUpIcon"
-		},
-		{
-			title: "Cashback",
-			type: "Income",
-			amount: "10,100.00",
-			icon: "BanknoteArrowDownIcon"
-		}
-	];
 
 	// Convert string to React component
 	const getIconComponent = (iconName: string) => {
-		switch(iconName) {
-			case 'BanknoteArrowUpIcon':
-				return BanknoteArrowUpIcon;
-			case 'BanknoteArrowDownIcon':
-				return BanknoteArrowDownIcon;
-			default:
-				return BanknoteArrowUpIcon; // fallback
-		}
+		const iconKey = iconName;
+		return icons[iconKey as keyof typeof icons];
 	};
 
 	// Returns true or false
@@ -197,12 +175,24 @@ export default function page() {
 	useEffect(() => {
 		console.log(`Date Start: ${dateStart}`);
 		console.log(`Date End: ${dateEnd}`);
-	}, [activeTab])
+	}, [dateStart, dateEnd])
 
 	// Reset currentDate every tab change
 	useEffect(() => {
 		setCurrentDate(new Date())
 	}, [activeTab])
+
+	useEffect(() => {
+		fetchCategories(categoryType)
+			.then((categories) => {
+				setCategories(categories);
+			})
+			.catch((error) => {
+				if (error instanceof Error) {
+					toast.error(error.message)
+				}
+			})
+	}, [categoryType]);
 
 	return (
 		<main className={`flex flex-col space-y-2 min-h-screen
@@ -421,53 +411,58 @@ export default function page() {
 						</TabsList>
 					</div>
 				</Tabs>
-				{categories ? (
+				{categories.length > 0 ? (
 					<>
 						{categories.map((category, index) => (
-							<Card key={index} className='border-2 p-[10px]'>
-								<CardContent className='flex flex-row justify-between items-center -p-1'>
-									<div className='flex flex-row space-x-2 items-center'>
-										<div className={`
-											p-1.5 rounded-lg border-2 
-											${isExpense(category.type)
-												? 'bg-red-500'
-												: 'bg-primary'
-											}
-										`}>
-											{createElement(getIconComponent(category.icon), { size: 30 })}									
-										</div>
-										<div>
-											<TypographyH5 className='font-semibold'>
-												{category.title}
-											</TypographyH5>									
-										</div>
-									</div>
-									<div className='text-right'>
-										<CardDescription>
-											Total Amount:
-										</CardDescription>	
-										<CardTitle
-											className={`
-												${
-													isExpense(category.type)
-														? 'text-red-500'
-														: 'text-primary'
+							<Link key={index} href={`/pages/categories/${category.uuid}`}>
+								<Card className='border-2 p-[10px]'>
+									<CardContent className='flex flex-row justify-between items-center -p-1'>
+										<div className='flex flex-row space-x-2 items-center'>
+											<div className={`
+												p-1.5 rounded-lg border-2 
+												${isExpense(category.type)
+													? 'bg-red-500'
+													: 'bg-primary'
 												}
-											`}
-										>
-											{isExpense(category.type) ? '-' : '+'} PHP {category.amount}
-										</CardTitle>										
-									</div>
-								</CardContent>
-							</Card>
+											`}>
+												{createElement(getIconComponent(category.icon), { size: 30 })}									
+											</div>
+											<div>
+												<TypographyH5 className='font-semibold'>
+													{category.name}
+												</TypographyH5>									
+											</div>
+										</div>
+										<div className='text-right'>
+											<CardDescription>
+												Total Amount:
+											</CardDescription>	
+											<CardTitle
+												className={`
+													${
+														isExpense(category.type)
+															? 'text-red-500'
+															: 'text-primary'
+													}
+												`}
+											>
+												{isExpense(category.type) ? '-' : '+'} PHP {category.amount ?? 0.00}
+											</CardTitle>										
+										</div>
+									</CardContent>
+								</Card>
+							</Link>
 						))}
 					</>
 				) : (
-					<>
-						<TypographyH4>
+					<div className="flex flex-col items-center justify-center py-10">
+						<TypographyH4 className='text-gray-400 font-semibold text-center'>
 							No Categories
 						</TypographyH4>
-					</>
+						<p className="text-gray-500 text-sm text-center">
+							Start by adding your first category
+						</p>
+					</div>
 				)}
 				<Button onClick={handleAddCategory}>
 					<PlusIcon size={40} className='-mr-1'/> Add New Category
