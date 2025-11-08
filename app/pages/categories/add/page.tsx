@@ -36,11 +36,13 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { icons } from "@/lib/icons";
 import { SquareDashed } from "lucide-react";
+import { useAccount } from '@/context/account-context';
 
 export default function CreateCategory() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const router = useRouter();
+	const { selectedAccountID } = useAccount();
 
 	// Validate user session
 	useEffect(() => {
@@ -48,6 +50,7 @@ export default function CreateCategory() {
 			.then(({ session }) => {
 				if (!session) {
 					router.push('/auth/login');
+					return;
 				}
 			})
 	}, [router]);
@@ -57,9 +60,16 @@ export default function CreateCategory() {
 		defaultValues: {
 			name: "",
 			type: "",
-			icon: ""
+			icon: "",
+			accountID: ""
 		}
 	});
+
+	useEffect(() => {
+		if (selectedAccountID) {
+			form.setValue('accountID', selectedAccountID);
+		};
+	}, [form]);
 
 	async function onSubmit(values: z.infer<typeof createCategorySchema>) {
 		setIsLoading(true);
