@@ -60,25 +60,7 @@ export default function EditAccount() {
 					router.push('/auth/login')
 				}
 			})
-	}, []);
-
-	useEffect(() => {
-		setIsLoading(true);
-		
-		fetchAccountByID(uuid)
-			.then((account) => {
-				form.reset({
-					name: account[0].name,
-					type: account[0].type.toLowerCase(),
-					description: account[0].description
-				});
-				setIsLoading(false);
-			})
-			.catch((error) => {
-				setIsLoading(false);
-				throw Error(error.responseMessage);
-			})
-	}, []);
+	}, [router]);
 
 	const form = useForm<z.infer<typeof createAccountSchema>>({
 		resolver: zodResolver(createAccountSchema),
@@ -116,6 +98,24 @@ export default function EditAccount() {
 			})
 	};
 
+	useEffect(() => {
+		setIsLoading(true);
+		
+		fetchAccountByID(uuid)
+			.then((account) => {
+				form.reset({
+					name: account[0].name,
+					type: account[0].type.toLowerCase(),
+					description: account[0].description
+				});
+				setIsLoading(false);
+			})
+			.catch((error) => {
+				setIsLoading(false);
+				throw Error(error.responseMessage);
+			})
+	}, [uuid, form]);
+
 	return (
 		<main className='flex flex-col m-auto space-y-4 p-3 max-w-[500px]'>
 			<div className="flex flex-row space-x-2 items-center">
@@ -147,7 +147,7 @@ export default function EditAccount() {
 								className="border-2"
 								onClick={() => handleDelete(uuid)}
 							>
-								Yes, I'm sure
+								Yes, I&apos;m sure
 							</Button>
 						</DialogFooter>
 					</DialogContent>

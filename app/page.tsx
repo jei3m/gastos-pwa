@@ -15,7 +15,7 @@ export default function Page() {
         router.push('/auth/login');
       };
     });
-  },[])
+  },[router])
 
   return (
     <div className="h-full flex flex-col justify-center items-center">

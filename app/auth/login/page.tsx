@@ -16,7 +16,7 @@ export default function Login() {
   useEffect(() => {
     fetchSession().then(({session}) => {
       if (session) {
-          router.push('/pages/transactions')
+        router.push('/pages/transactions')
       } 
     });
   },[router]);

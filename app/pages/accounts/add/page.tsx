@@ -39,7 +39,7 @@ export default function CreateAccount() {
 					router.push('/auth/login')
 				}
 			})
-	},[])
+	},[router])
 
 	const form = useForm<z.infer<typeof createAccountSchema>>({
 		resolver: zodResolver(createAccountSchema),

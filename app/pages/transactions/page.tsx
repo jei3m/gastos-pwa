@@ -35,7 +35,6 @@ export default function Transactions() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState('weekly');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [userEmail, setUserEmail] = useState("");
   const router = useRouter();
   const isMobile = useIsMobile();
 
@@ -45,9 +44,8 @@ export default function Transactions() {
       if (!session) {
         router.push('/auth/login')
       }
-      setUserEmail(session?.user.email ?? '');
     })
-  }, []);
+  }, [router]);
 
   // Set isScrolled
   useEffect(() => {
@@ -153,7 +151,7 @@ export default function Transactions() {
   useEffect(() => {
     console.log(`Date Start: ${dateStart}`);
     console.log(`Date End: ${dateEnd}`);
-  },[activeTab])
+  },[dateStart, dateEnd])
 
   // Reset currentDate every tab change
   useEffect(() => {
