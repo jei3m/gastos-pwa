@@ -26,6 +26,22 @@ BEGIN
     main: BEGIN
         CASE p_action_type
             WHEN 'create' THEN
+                -- Validate duplicate category name
+                IF EXISTS (
+                    SELECT 1
+                    FROM categories
+                    WHERE
+                        ref_user_id = p_user_id
+                        AND name = p_name
+                    LIMIT 1
+                ) THEN
+                    SET p_response = JSON_OBJECT(
+                        'responseCode', 409,
+                        'responseMessage', 'A category with this name already exists'
+                    );
+                    LEAVE main;
+                END IF;
+
                 -- INSERT statement
                 INSERT INTO categories(
                     uuid,
@@ -69,6 +85,23 @@ BEGIN
                     SET p_response = JSON_OBJECT(
                         'responseCode', 404,
                         'responseMessage', 'Category not found with the specified UUID'
+                    );
+                    LEAVE main;
+                END IF;
+
+                -- Validate duplicate category name
+                IF EXISTS (
+                    SELECT 1
+                    FROM categories
+                    WHERE
+                        ref_user_id = p_user_id
+                        AND name = p_name
+                        AND uuid <> p_uuid
+                    LIMIT 1
+                ) THEN
+                    SET p_response = JSON_OBJECT(
+                        'responseCode', 409,
+                        'responseMessage', 'A category with this name already exists'
                     );
                     LEAVE main;
                 END IF;
