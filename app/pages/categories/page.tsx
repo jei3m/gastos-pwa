@@ -37,6 +37,7 @@ import { Button } from '@/components/ui/button';
 import { fetchCategories } from '@/store/categories.store';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useAccount } from '@/context/account-context';
 
 export default function Categories() {
 	const [isScrolled, setIsScrolled] = useState(false);
@@ -44,6 +45,7 @@ export default function Categories() {
 	const [categoryType, setCategoryType] = useState('expense');
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [categories, setCategories] = useState<Category[]>([]);
+	const { selectedAccountID } = useAccount();
 	const router = useRouter();
 	const isMobile = useIsMobile();
 
@@ -182,17 +184,22 @@ export default function Categories() {
 		setCurrentDate(new Date())
 	}, [activeTab])
 
+	// Fetch categories when categoryType, router, or selectedAccountID changes
 	useEffect(() => {
-		fetchCategories(categoryType)
-			.then((categories) => {
-				setCategories(categories);
-			})
-			.catch((error) => {
-				if (error instanceof Error) {
-					toast.error(error.message)
-				}
-			})
-	}, [categoryType]);
+		if (selectedAccountID) {
+			fetchCategories(categoryType, selectedAccountID)
+				.then((categories) => {
+					setCategories(categories);
+				})
+				.catch((error) => {
+					if (error instanceof Error) {
+						toast.error(error.message)
+					}
+				})
+		} else {
+			toast.error("Please select an account first");
+		}
+	}, [categoryType, router, selectedAccountID]);
 
 	return (
 		<main className={`flex flex-col space-y-2 min-h-screen
