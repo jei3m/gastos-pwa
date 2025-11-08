@@ -2,7 +2,9 @@ export interface Category {
     id: number,
     uuid: string,
     name: string,
-    type: string
+    type: string,
+    amount: number,
+    icon: string
 };
 
 export interface CreateCategory {
@@ -12,5 +14,6 @@ export interface CreateCategory {
 
 export interface EditCategory {
     name: string,
-    type: string
+    type: string,
+    icon: string
 };
