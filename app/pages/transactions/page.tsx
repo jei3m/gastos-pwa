@@ -26,10 +26,11 @@ import {
   ArrowUpRight,
   Calendar,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { TypographyH4 } from '@/components/custom/typography';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 export default function Transactions() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -285,8 +286,7 @@ export default function Transactions() {
               </div>
             </CardHeader>
 
-            {/* Line Separator */}
-            <div className='w-full border-t border-gray-300' />
+            <Separator />
 
             <CardContent className='flex flex-col gap-y-4'>
               <div className='flex flex-col'>
@@ -299,7 +299,10 @@ export default function Transactions() {
               </div>
             </CardContent>
             <CardFooter className='w-full flex flex-row justify-center space-x-2'>
-              <Button className='w-[50%] flex flex-row -space-x-1'>
+              <Button 
+                className='w-[50%] flex flex-row -space-x-1'
+                onClick={() => router.push('/pages/transactions/add?type=income')}
+              >
                 <ArrowDownLeft strokeWidth={3}/> 
                 <span>
                   Income
@@ -308,6 +311,7 @@ export default function Transactions() {
               <Button 
                 variant='destructive'
                 className='w-[50%] flex flex-row -space-x-1' 
+                onClick={() => router.push('/pages/transactions/add?type=expense')}
               >
                 <ArrowUpRight strokeWidth={3}/> 
                 <span>
@@ -356,7 +360,6 @@ export default function Transactions() {
             ))}
           </>
         )}
-
       </section>
     </main>
   );
