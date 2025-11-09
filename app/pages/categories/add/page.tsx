@@ -69,7 +69,7 @@ export default function CreateCategory() {
 		if (selectedAccountID) {
 			form.setValue('accountID', selectedAccountID);
 		};
-	}, [form]);
+	}, [form, selectedAccountID]);
 
 	async function onSubmit(values: z.infer<typeof createCategorySchema>) {
 		setIsLoading(true);
