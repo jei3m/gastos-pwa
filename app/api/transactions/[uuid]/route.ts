@@ -21,6 +21,8 @@ export async function PUT(
           note,
           amount,
           type,
+          time,
+          date,
           accountID,
           categoryID
         } = await req.json();
@@ -35,6 +37,8 @@ export async function PUT(
               note,
               amount,
               type,
+              time,
+              date,
               accountID,
               categoryID,
             }

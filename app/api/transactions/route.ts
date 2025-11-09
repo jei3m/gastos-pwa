@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
       note,
       amount,
       type,
+      time,
+      date,
       accountID,
       categoryID,
     } = await req.json();
@@ -32,6 +34,8 @@ export async function POST(req: NextRequest) {
         note,
         amount,
         type,
+        time,
+        date,
         accountID,
         categoryID,
       }
