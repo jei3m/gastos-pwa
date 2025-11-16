@@ -83,6 +83,14 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+html {
+  @apply overflow-x-hidden;
+}
+
+body {
+  @apply !min-w-full;
+}
+
 @layer base {
   html, body {
     @apply h-full;
