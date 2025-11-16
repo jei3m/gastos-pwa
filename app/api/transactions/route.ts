@@ -9,7 +9,8 @@ import { responseRow } from '@/types/response.types';
 import { fetchUserID } from '@/lib/auth-session';
 import { connection } from '@/utils/db';
 import {
-	createTransaction
+	createTransaction,
+  getTransactions
 } from '@/sql/transactions/transactions.sql';
 
 // Create New Transaction
@@ -65,5 +66,35 @@ export async function POST(req: NextRequest) {
     );
   } finally {
     connection.release();
+  }
+};
+
+export async function GET(request: Request) {
+  try {
+    const url = new URL(request.url);
+    const accountID = url.searchParams.get('accountID');
+    const dateStart = url.searchParams.get('dateStart');
+    const dateEnd = url.searchParams.get('dateEnd');
+    const [rows] = await db.query(
+      getTransactions(),
+      {
+        userID: await fetchUserID(),
+        accountID,
+        dateStart,
+        dateEnd,
+      }
+    );
+
+    return success({data: rows});
+
+  } catch (error) {
+    return fail(
+      500,
+      error instanceof Error
+        ? error.message
+        : "Failed to Fetch Transactions"
+    )
+  } finally {
+    connection.release()
   }
 };
