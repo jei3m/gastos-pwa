@@ -4,7 +4,8 @@ export interface Category {
     name: string,
     type: string,
     amount: number,
-    icon: string
+    icon: string,
+    totalAmount: number,
 };
 
 export interface CreateCategory {
