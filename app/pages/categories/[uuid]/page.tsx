@@ -98,7 +98,7 @@ export default function EditCategory() {
 				setIsLoading(false);
 			})
 			.catch((error) => {
-				setError(error.responseMessage);
+				setError(error.message);
 				setIsLoading(false);
 			})
 	};
@@ -118,6 +118,7 @@ export default function EditCategory() {
 				setIsLoading(false);
 			})
 			.catch((error) => {
+				toast.error(error.message);
 				setError(error.message);
 				setIsLoading(false);
 			})
