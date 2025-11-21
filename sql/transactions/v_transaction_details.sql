@@ -6,8 +6,8 @@ SELECT
   t.note,
   t.amount,
   t.type,
-  t.time,
-  t.date,
+  DATE_FORMAT(t.time, '%H:%i') AS time,
+  DATE_FORMAT(t.date, '%Y-%m-%d') AS date,
   c.uuid AS refCategoriesID,
   t.ref_user_id AS refUserID
 FROM
