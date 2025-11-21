@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
       type,
       time,
       date,
-      accountID,
-      categoryID,
+      refAccountsID,
+      refCategoriesID,
     } = await req.json();
 
     const [resultCreate] = await db.query<responseRow[]>(
@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
         type,
         time,
         date,
-        accountID,
-        categoryID,
+        refAccountsID,
+        refCategoriesID,
       }
     );
 
