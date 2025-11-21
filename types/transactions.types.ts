@@ -23,11 +23,24 @@ export interface CreateTransaction {
 };
 
 export interface EditTransaction {
+  uuid: string,
+  note: string,
+  time: string,
+  type: "" | "income" | "expense",
+  amount: string,
+  category: string,
+  date: string,
+  refCategoriesID: string,
+  refAccountsID: string,
+  refUserID: string
+};
+
+export interface EditTransactionPayload {
+  amount: number,
   note: string;
-  amount: number;
-  type: string;
-  time: string;
-  date: string;
-  accountID: string;
-  categoryID: string;
+  type: "" | "income" | "expense",
+  refCategoriesID: string,
+  refAccountsID: string,
+  date: string,
+  time: string,
 };
