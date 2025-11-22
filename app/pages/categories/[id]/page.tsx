@@ -54,7 +54,7 @@ export default function EditCategory() {
 	const [error, setError] = useState("");
 	const router = useRouter();
 	const params = useParams();
-	const uuid = params.uuid as string;
+	const id = params.id as string;
 
 	// Validate user session
 	useEffect(() => {
@@ -77,7 +77,7 @@ export default function EditCategory() {
 
 	async function onSubmit(values: z.infer<typeof editCategorySchema>) {
 		setIsLoading(true);
-		editCategory(uuid, values)
+		editCategory(id, values)
 			.then((category) => {
 				toast.success(category.responseMessage);
 				router.push('/pages/categories');
@@ -90,9 +90,9 @@ export default function EditCategory() {
 			})
 	};
 
-	const handleDelete = (uuid: string) => {
+	const handleDelete = (id: string) => {
 		setIsLoading(true);
-		deleteCategory(uuid)
+		deleteCategory(id)
 			.then(() => {
 				router.push('/pages/categories');
 				setIsLoading(false);
@@ -106,7 +106,7 @@ export default function EditCategory() {
 	// Fetch category data and populate the form
 	useEffect(() => {
 		setIsLoading(true);
-		fetchCategoryByID(uuid)
+		fetchCategoryByID(id)
 			.then((category) => {
 				if (category && category.length > 0) {
 					form.reset({
@@ -122,7 +122,7 @@ export default function EditCategory() {
 				setError(error.message);
 				setIsLoading(false);
 			})
-	}, [uuid, form]);
+	}, [id, form]);
 
 	return (
 		<main className='flex flex-col space-y-4 p-3'>
@@ -153,7 +153,7 @@ export default function EditCategory() {
 							<Button
 								variant="destructive"
 								className="border-2"
-								onClick={() => handleDelete(uuid)}
+								onClick={() => handleDelete(id)}
 							>
 								Yes, I&apos;m sure
 							</Button>
