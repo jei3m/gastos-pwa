@@ -196,7 +196,7 @@ export default function AddTransactionForm() {
                     </SelectTrigger>
                     <SelectContent className="border-2">
                       {categories.map((category, index) => (
-                        <SelectItem key={index} value={category.uuid}>
+                        <SelectItem key={index} value={category.id}>
                           {category.name}
                         </SelectItem>
                       ))}

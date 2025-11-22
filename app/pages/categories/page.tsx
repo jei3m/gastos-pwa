@@ -421,7 +421,7 @@ export default function Categories() {
 				{categories.length > 0 ? (
 					<>
 						{categories.map((category, index) => (
-							<Link key={index} href={`/pages/categories/${category.uuid}`}>
+							<Link key={index} href={`/pages/categories/${category.id}`}>
 								<Card className='border-2 p-[10px]'>
 									<CardContent className='flex flex-row justify-between items-center -p-1'>
 										<div className='flex flex-row space-x-2 items-center'>
