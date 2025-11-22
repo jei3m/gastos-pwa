@@ -83,7 +83,7 @@ export default function Transactions() {
         <TypographyH4>
           Transactions
         </TypographyH4>
-        {transactions.length > 0 ? (
+        { transactions && transactions.length > 0 ? (
           <>
             {transactions.map((transaction, index) => (
               <Card key={index} className='border-2'>
