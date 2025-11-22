@@ -128,24 +128,28 @@ function Navbar() {
 								</div>
 							:
 								<>
-									{accounts.map((account, index) => (
-										<ContextMenu key={index}>
-											<ContextMenuTrigger>
-												<SelectItem value={account.id}>
-													{account.name}
-												</SelectItem>
-											</ContextMenuTrigger>
-											<ContextMenuContent className='bg-primary rounded-md'>
-												<ContextMenuItem 
-													className="flex items-center px-2 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded-sm"
-														onClick={() => handleEdit(account.id)}
-													>
-													<Edit className="mr-2 h-4 w-4" />
-													Edit
-												</ContextMenuItem>
-											</ContextMenuContent>
-										</ContextMenu>
-									))}
+									{accounts && (
+										<>
+											{accounts.map((account, index) => (
+												<ContextMenu key={index}>
+													<ContextMenuTrigger>
+														<SelectItem value={account.id}>
+															{account.name}
+														</SelectItem>
+													</ContextMenuTrigger>
+													<ContextMenuContent className='bg-primary rounded-md'>
+														<ContextMenuItem 
+															className="flex items-center px-2 py-1 text-sm cursor-pointer hover:bg-gray-100 rounded-sm"
+																onClick={() => handleEdit(account.id)}
+															>
+															<Edit className="mr-2 h-4 w-4" />
+															Edit
+														</ContextMenuItem>
+													</ContextMenuContent>
+												</ContextMenu>
+											))}										
+										</>
+									)}
 								</>
 							}
 							<Button
