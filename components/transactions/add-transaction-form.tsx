@@ -185,11 +185,15 @@ export default function AddTransactionForm() {
                       <SelectValue placeholder="Select Category..." />
                     </SelectTrigger>
                     <SelectContent className="border-2">
-                      {categories.map((category, index) => (
-                        <SelectItem key={index} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
+                      {categories && (
+                        <>
+                          {categories.map((category, index) => (
+                            <SelectItem key={index} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ))}                        
+                        </>
+                      )}
                     </SelectContent>
                   </Select>
                 </FormControl>
