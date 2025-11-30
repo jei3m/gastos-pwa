@@ -5,6 +5,8 @@ export interface Category {
     amount: number,
     icon: string,
     totalAmount: number,
+    refUserID: string,
+    refAccountsID: string,
 };
 
 export interface CreateCategory {
