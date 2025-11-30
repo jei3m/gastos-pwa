@@ -26,6 +26,7 @@ export const config = {
   	runtime: "nodejs",
 	matcher: [
         "/pages/transactions/:path*",
+        "/pages/categories/:path*",
         "/pages/accounts/:path*",
         "/api/((?!auth).*)"
 	]
