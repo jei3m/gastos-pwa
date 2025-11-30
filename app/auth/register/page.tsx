@@ -41,6 +41,7 @@ export default function Register() {
 
     if (error) {
       setErrors([error.message || "Unknown Error"]);
+      toast.error(error.message);
       setLoading(false);
     } else {
       toast.success("User is registered successfully!");
