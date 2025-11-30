@@ -157,7 +157,7 @@ export default function EditTransactionForm() {
     form.setValue('refAccountsID', selectedAccountID);
     fetchCategories(activeTab, selectedAccountID)
       .then((categories) => {
-        setCategories(categories);
+        setCategories(categories[0]?.details);
       })
       .catch((error) => {
         if (error instanceof Error) {
@@ -280,11 +280,16 @@ export default function EditTransactionForm() {
                       <SelectValue placeholder="Select Category..." />
                     </SelectTrigger>
                     <SelectContent className="border-2">
-                      {categories.map((category, index) => (
-                          <SelectItem key={index} value={category.id}>
-                            {category.name}
-                          </SelectItem>
-                      ))}
+                      {categories && (
+                        <>
+                          {categories.map((category, index) => (
+                              <SelectItem key={index} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                          ))}                        
+                        </>
+                      )}
+
                     </SelectContent>
                   </Select>
                 </FormControl>
