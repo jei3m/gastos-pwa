@@ -3,7 +3,6 @@ import { useState, useEffect, createElement } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchSession } from "@/utils/session";
 import {
 	Select,
 	SelectContent,
@@ -43,17 +42,6 @@ export default function CreateCategory() {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const router = useRouter();
 	const { selectedAccountID } = useAccount();
-
-	// Validate user session
-	useEffect(() => {
-		fetchSession()
-			.then(({ session }) => {
-				if (!session) {
-					router.push('/auth/login');
-					return;
-				}
-			})
-	}, [router]);
 
 	const form = useForm<z.infer<typeof createCategorySchema>>({
 		resolver: zodResolver(createCategorySchema),
