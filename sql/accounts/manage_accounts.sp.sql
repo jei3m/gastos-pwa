@@ -68,13 +68,13 @@ main: BEGIN
             (
                 SELECT 1
                 FROM accounts
-                WHERE uidid = p_id
+                WHERE id = p_id
                 LIMIT 1
             )
             THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 404,
-                    'responseMessage', 'Account not found with the specified UUID'
+                    'responseMessage', 'Account not found with the specified id'
                 );
                 LEAVE main;
             END IF;
@@ -107,7 +107,7 @@ main: BEGIN
             END IF;
 
         WHEN 'delete' THEN
-            -- Validated account uuid
+            -- Validated account id
             IF NOT EXISTS
             (
                 SELECT 1
@@ -118,7 +118,7 @@ main: BEGIN
             THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 404,
-                    'responseMessage', 'Account not found with the specified UUID'
+                    'responseMessage', 'Account not found with the specified id'
                 );
                 LEAVE main;
             END IF;
@@ -127,7 +127,7 @@ main: BEGIN
             DELETE FROM
                 accounts
             WHERE 
-                uuid = p_uuid
+                id = p_id
                 AND ref_user_id = p_user_id
             LIMIT 1;
 
