@@ -2,7 +2,6 @@
 import { createElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { tabItems, categoryTypes } from '@/lib/data';
-import { fetchSession } from '@/utils/session';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Category } from '@/types/categories.types';
 import { icons } from '@/lib/icons';
@@ -46,18 +45,11 @@ export default function Categories() {
 	const [categoryType, setCategoryType] = useState('expense');
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [categories, setCategories] = useState<Category[]>([]);
+	const [totalIncome, setTotalIncome] = useState<string>("");
+	const [totalExpense, setTotalExpense] = useState<string>("");
 	const { selectedAccountID } = useAccount();
 	const router = useRouter();
 	const isMobile = useIsMobile();
-
-	// Validate user session
-	useEffect(() => {
-		fetchSession().then(({ session }) => {
-			if (!session) {
-				router.push('/auth/login')
-			};
-		});
-	}, [router]);
 
 	// Set isScrolled
 	useEffect(() => {
@@ -175,11 +167,6 @@ export default function Categories() {
 	// Declaration of variables for filtering and display
 	const { dateStart, dateEnd, dateDisplay } = getDateRange();
 
-	useEffect(() => {
-		console.log(`Date Start: ${dateStart}`);
-		console.log(`Date End: ${dateEnd}`);
-	}, [dateStart, dateEnd])
-
 	// Reset currentDate every tab change
 	useEffect(() => {
 		setCurrentDate(new Date())
@@ -189,9 +176,11 @@ export default function Categories() {
 	useEffect(() => {
 		if (selectedAccountID) {
 			setIsLoading(true);
-			fetchCategories(categoryType, selectedAccountID)
+			fetchCategories(categoryType, selectedAccountID, dateStart, dateEnd)
 				.then((categories) => {
-					setCategories(categories);
+					setTotalIncome(categories[0]?.totalIncome || "0.00");
+					setTotalExpense(categories[0]?.totalExpense || "0.00");
+					setCategories(categories[0]?.details || []);
 				})
 				.catch((error) => {
 					if (error instanceof Error) {
@@ -204,7 +193,7 @@ export default function Categories() {
 		} else {
 			toast.error("Please select an account first");
 		}
-	}, [categoryType, router, selectedAccountID]);
+	}, [categoryType, router, selectedAccountID, dateStart, dateEnd]);
 
 	return (
 		<main className={`flex flex-col space-y-2 min-h-screen
@@ -282,7 +271,7 @@ export default function Categories() {
 										Income
 									</div>
 									<div className='text-2xl font-bold'>
-										10,100
+										{totalIncome || "0.00"}
 									</div>
 								</div>
 							</div>
@@ -300,7 +289,7 @@ export default function Categories() {
 										Expense
 									</div>
 									<div className='text-2xl font-bold'>
-										10,100
+										{totalExpense || "0.00"}
 									</div>
 								</div>
 							</div>
@@ -377,7 +366,7 @@ export default function Categories() {
 										Income
 									</div>
 									<div className='text-2xl font-bold'>
-										10,100
+										{totalIncome || "0.00"}
 									</div>
 								</div>
 							</div>
@@ -395,7 +384,7 @@ export default function Categories() {
 										Expense
 									</div>
 									<div className='text-2xl font-bold'>
-										10,100
+										{totalExpense || "0.00"}
 									</div>
 								</div>
 							</div>
