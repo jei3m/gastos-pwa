@@ -147,7 +147,6 @@ export default function EditTransactionForm() {
       .finally(() => {
         setIsLoading(false);
       });
-    
   }, [id, setActiveTab]);
 
   // Fetch categories
@@ -217,7 +216,7 @@ export default function EditTransactionForm() {
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>    
+        </Dialog>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="-mt-1">
@@ -286,7 +285,7 @@ export default function EditTransactionForm() {
                               <SelectItem key={index} value={category.id}>
                                 {category.name}
                               </SelectItem>
-                          ))}                        
+                          ))}
                         </>
                       )}
 
@@ -383,7 +382,10 @@ export default function EditTransactionForm() {
                       {...field}
                       className="h-9
                       rounded-lg border-2
-                      border-black bg-white"
+                      border-black bg-white
+                      [appearance:textfield] 
+                      [&::-webkit-outer-spin-button]:appearance-none 
+                      [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </FormControl>
                   <FormMessage />
