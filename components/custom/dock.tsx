@@ -39,7 +39,7 @@ export const Dock: React.FC<DockProps> = ({
         };
       default:
         return {
-          container: 'p-0 mb-2',
+          container: 'p-0 pb-2',
           item: 'p-2 min-w-14',
           icon: 'h-7 w-7',
           text: 'text-[10px] -mt-1'
