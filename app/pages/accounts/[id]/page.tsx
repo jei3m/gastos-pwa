@@ -66,7 +66,6 @@ export default function EditAccount() {
 		editAccount(id, values)
 			.then((account) => {
 				router.push('/pages/transactions');
-				console.log(account.responseMessage)
 				toast.success(account.responseMessage);
 				setIsLoading(false);				
 			})

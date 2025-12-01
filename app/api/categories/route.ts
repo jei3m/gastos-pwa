@@ -74,13 +74,6 @@ export async function GET(request: Request) {
 			}
 		);
 
-		console.log(
-			accountID,
-			filter,
-			dateStart,
-			dateEnd,
-		)
-
 		return success({
 			data: selectQuery
 		});
