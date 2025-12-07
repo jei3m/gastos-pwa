@@ -75,13 +75,19 @@ export async function GET(request: Request) {
     const accountID = url.searchParams.get('accountID');
     const dateStart = url.searchParams.get('dateStart');
     const dateEnd = url.searchParams.get('dateEnd');
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const limit = 10;
+    const offset = (page - 1) * limit;
+
     const [rows] = await db.query(
       getTransactions(),
       {
         userID: await fetchUserID(),
         accountID,
-        dateStart,
-        dateEnd,
+        dateStart: dateStart || null,
+        dateEnd: dateEnd || null,
+        limit,
+        offset
       }
     );
 
