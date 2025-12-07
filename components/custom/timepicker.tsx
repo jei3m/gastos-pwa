@@ -9,6 +9,7 @@ interface TimePickerProps {
   value?: Date
   onChange?: (date: Date) => void
   placeholder?: string
+  disabled?: boolean
 }
 
 export const timeStringToDate = (timeString?: string): Date | undefined => {
@@ -25,7 +26,7 @@ export const dateToTimeString = (date: Date): string => {
   return `${hours}:${minutes}`;
 };
 
-export function TimePicker({ value, onChange, placeholder = "Select Time..." }: TimePickerProps) {
+export function TimePicker({ value, onChange, placeholder = "Select Time...", disabled = false }: TimePickerProps) {
   const [open, setOpen] = useState(false)
   const [hour, setHour] = useState<number>(12)
   const [minute, setMinute] = useState<number>(0)
@@ -78,7 +79,7 @@ export function TimePicker({ value, onChange, placeholder = "Select Time..." }: 
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild disabled={disabled}>
         <Button
           variant="outline"
           type="button"
