@@ -7,7 +7,7 @@ SELECT
     name,
     type,
     description,
-    total_balance AS total_balance
+    total_balance AS totalBalance
 FROM 
     accounts;
 /* END Select Query */
