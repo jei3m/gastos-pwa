@@ -22,12 +22,11 @@ export const createTransaction = async(transaction: CreateTransaction) => {
 };
 
 export const fetchTransactions = async(
-  selectedAccountID: string, 
-  dateStart: string, 
-  dateEnd: string
+  selectedAccountID: string,
+  page: number,
 ) => {
   try {
-    const res = await fetch(`/api/transactions?accountID=${selectedAccountID}&dateStart=${dateStart}&dateEnd=${dateEnd}`)
+    const res = await fetch(`/api/transactions?accountID=${selectedAccountID}&page=${page}`)
     const data = await res.json();
     return(data.data);
   } catch (error) {
@@ -39,7 +38,7 @@ export const fetchTransactions = async(
 };
 
 export const fetchTransactionByID = async(
-  uuid: string, 
+  uuid: string,
 ) => {
   try {
     const res = await fetch(`/api/transactions/${uuid}`)
@@ -50,6 +49,21 @@ export const fetchTransactionByID = async(
       throw Error(error.message)
     };
     throw Error("Failed to Fetch Transaction")
+  }
+};
+
+export const fetchTransactionsCount = async(
+  selectedAccountID: string
+) => {
+  try {
+    const res = await fetch(`/api/transactions/count?accountID=${selectedAccountID}`)
+    const data = await res.json();
+    return(data.data);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw Error(error.message)
+    };
+    throw Error("Failed to Fetch Transactions")
   }
 };
 
