@@ -376,7 +376,6 @@ export default function EditTransactionForm() {
             <FormField
               control={form.control}
               name="time"
-              disabled={isLoading}
               render={({ field }) => (
                 <FormItem className="-space-y-1 w-full">
                   <FormLabel className="text-md font-medium">
@@ -391,6 +390,7 @@ export default function EditTransactionForm() {
                           field.onChange(timeString);
                         }
                       }}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
