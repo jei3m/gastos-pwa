@@ -15,10 +15,10 @@ export const createAccounts = () => {
 export const getAccounts = () => {
     return `SELECT 
                 id,
-                id,
                 name,
                 type,
-                description
+                description,
+                totalBalance
             FROM
                 v_accounts
             WHERE
@@ -31,7 +31,8 @@ export const getAccountByID = () => {
                 id,
                 name,
                 type,
-                description
+                description,
+                totalBalance
             FROM
                 v_accounts
             WHERE

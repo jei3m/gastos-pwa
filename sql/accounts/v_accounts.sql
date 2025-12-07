@@ -6,7 +6,8 @@ SELECT
     ref_user_id,
     name,
     type,
-    description
+    description,
+    total_balance AS total_balance
 FROM 
     accounts;
 /* END Select Query */

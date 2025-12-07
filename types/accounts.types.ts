@@ -3,6 +3,7 @@ export interface Account {
     name: string,
     type: string,
     description: string
+    totalBalance: string;
 };
 
 export interface CreateAccount {
