@@ -405,6 +405,11 @@ export default function Categories() {
 								<TabsTrigger
 									value={type.toLowerCase()}
 									key={index}
+									className={`${
+										type === 'Expense'
+											? 'data-[state=active]:bg-red-400'
+											: 'data-[state=active]:bg-green-300'
+									}`}
 								>
 									{type}
 								</TabsTrigger>
