@@ -178,11 +178,11 @@ export default function Transactions() {
         <TypographyH4>
           Transactions
         </TypographyH4>
-        {isLoading ? (
+        {isLoading || !account || !transactions ? (
           <PulseLoader/>
         ):(
           <>
-            {transactions && transactions.length > 0 ? (
+            {transactions.length > 0 ? (
               <>
                 {transactions.map((transaction, index) => (
                   <Card key={index} className='border-2'>
