@@ -11,7 +11,8 @@ WITH transactions_cte AS (
         t.type,
         t.time,
         t.ref_user_id,
-        t.ref_accounts_id
+        t.ref_accounts_id,
+        ROW_NUMBER() OVER (PARTITION BY t.date ORDER BY t.time ASC) as time_order
 	FROM transactions t
     LEFT JOIN categories c on t.ref_categories_id = c.id
 	GROUP BY
@@ -24,9 +25,6 @@ WITH transactions_cte AS (
         t.time,
         t.ref_user_id,
         t.ref_accounts_id
-    ORDER BY
-		t.date DESC,
-        t.time DESC
 )
 SELECT
     date,
