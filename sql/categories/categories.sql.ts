@@ -22,6 +22,7 @@ export const getCategories = () => {
                         v_transactions_table
                     WHERE
                         ref_user_id = :userID
+                        AND ref_accounts_id = :accountID
                         AND type = 'income'
                         AND (:dateStart IS NULL OR :dateStart <= date)
                         AND (:dateEnd IS NULL OR :dateEnd >= date)
@@ -33,6 +34,7 @@ export const getCategories = () => {
                         v_transactions_table
                     WHERE
                         ref_user_id = :userID
+                        AND ref_accounts_id = :accountID
                         AND type = 'expense'
                         AND (:dateStart IS NULL OR :dateStart <= date)
                         AND (:dateEnd IS NULL OR :dateEnd >= date)
