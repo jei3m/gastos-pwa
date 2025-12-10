@@ -63,15 +63,15 @@ export const getCategories = () => {
                 )
             SELECT
                 c.type,
-                si.total_income AS totalIncome,
-                se.total_expense AS totalExpense,
+                COALESCE(si.total_income, 0) AS totalIncome,
+                COALESCE(se.total_expense, 0) AS totalExpense,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id', c.id,
                         'icon', c.icon,
                         'name', c.name,
                         'type', c.type,
-                        'totalAmount', cd.amount,
+                        'totalAmount', COALESCE(cd.amount, 0),
                         'refUserID', c.ref_user_id,
                         'refAccountsID', c.ref_accounts_id
                     )
@@ -86,7 +86,7 @@ export const getCategories = () => {
             LEFT JOIN sum_income si
                 ON c.ref_accounts_id = si.ref_accounts_id 
                 AND c.ref_user_id = si.ref_user_id 
-            JOIN sum_expense se
+            LEFT JOIN sum_expense se
                 ON c.ref_accounts_id = se.ref_accounts_id 
                 AND c.ref_user_id = se.ref_user_id 
             WHERE
