@@ -15,46 +15,15 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState('weekly');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const isMobile = useIsMobile();
-
-  // Function to handle previous or next
   const newDate = new Date(currentDate);
-  const today = new Date();
-  const handleDateChange = (direction: 'prev' | 'next') => {
-
-    if (activeTab === 'daily') {
-      newDate.setDate(
-        newDate.getDate() + (direction === 'prev' ? -1 : 1)
-      );
-    } else if (activeTab === 'weekly') {
-      newDate.setDate(
-        newDate.getDate() + (direction === 'prev' ? -7 : 7)
-      );
-    } else if (activeTab === 'monthly') {
-      newDate.setMonth(
-        newDate.getMonth() + (direction === 'prev' ? -1 : 1)
-      );
-    } else if (activeTab === 'yearly') {
-      newDate.setFullYear(
-        newDate.getFullYear() + (direction === 'prev' ? -1 : 1)
-      );
-    }
-
-    // Prevent moving to future dates
-    if (newDate > today && direction === 'next') {
-      return;
-    }
-
-    setCurrentDate(newDate);
-  };
+  const isMobile = useIsMobile();
 
   // Return dateStart, dateEnd, and dateDisplay
   const getDateRange = () => {
     const toISODate = (d: Date) => d.toISOString().slice(0, 10);
-    const date = new Date(currentDate);
 
     if (activeTab === 'weekly') {
-      const dateStart = new Date(date),
+      const dateStart = new Date(newDate),
         dayOfWeek = dateStart.getDay(),
         diff = dateStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1),
         dateEnd = new Date(dateStart);
@@ -82,10 +51,10 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
       }
     } else if (activeTab === 'monthly') {
       const dateStart = new Date(
-        Date.UTC(date.getFullYear(), date.getMonth(), 1)
+        Date.UTC(newDate.getFullYear(), newDate.getMonth(), 1)
       )
       const dateEnd = new Date(
-        Date.UTC(date.getFullYear(), date.getMonth() + 1, 0)
+        Date.UTC(newDate.getFullYear(), newDate.getMonth() + 1, 0)
       );
 
       return {
@@ -102,10 +71,10 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
       };
     } else {
       const dateStart = new Date(
-        Date.UTC(date.getFullYear(), 0, 1)
+        Date.UTC(newDate.getFullYear(), 0, 1)
       )
       const dateEnd = new Date(
-        Date.UTC(date.getFullYear(), 11, 31)
+        Date.UTC(newDate.getFullYear(), 11, 31)
       );
 
       return {
@@ -125,6 +94,38 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
   // Declaration of variables for filtering and display
   const { dateStart, dateEnd, dateDisplay } = getDateRange();
 
+  // Function to handle previous or next
+  const handleDateChange = (direction: 'prev' | 'next') => {
+    const convertedDateEnd = new Date(dateEnd); // string to date
+    const today = new Date();
+
+    // Prevent moving to future dates
+    if (convertedDateEnd > today && direction === 'next') {
+      console.log('Validation Triggered')
+      return;
+    }
+
+    if (activeTab === 'daily') {
+      newDate.setDate(
+        newDate.getDate() + (direction === 'prev' ? -1 : 1)
+      );
+    } else if (activeTab === 'weekly') {
+      newDate.setDate(
+        newDate.getDate() + (direction === 'prev' ? -7 : 7)
+      );
+    } else if (activeTab === 'monthly') {
+      newDate.setMonth(
+        newDate.getMonth() + (direction === 'prev' ? -1 : 1)
+      );
+    } else if (activeTab === 'yearly') {
+      newDate.setFullYear(
+        newDate.getFullYear() + (direction === 'prev' ? -1 : 1)
+      );
+    }
+
+    setCurrentDate(newDate);
+  };
+
   // Call onDateRangeChange whenever the date range changes
   useEffect(() => {
     if (onDateRangeChange) {
@@ -141,6 +142,7 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
   return (
     <>
       {isScrolled ?
