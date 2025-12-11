@@ -1,13 +1,12 @@
 "use client"
 import { useEffect, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { TypographyH4 } from '@/components/custom/typography';
 import { fetchTransactions, fetchTransactionsCount } from '@/store/transactions.store';
-import { Transaction, TransactionDetails } from '@/types/transactions.types';
+import { Transaction } from '@/types/transactions.types';
 import { toast } from 'sonner';
 import { useAccount } from '@/context/account-context';
-import Link from 'next/link';
 import PulseLoader from '@/components/custom/pulse-loader';
 import { Button } from '@/components/ui/button';
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
@@ -16,6 +15,8 @@ import { Separator } from '@/components/ui/separator';
 import { fetchAccountByID } from '@/store/accounts.store';
 import { Account } from '@/types/accounts.types';
 import { Skeleton } from '@/components/ui/skeleton';
+import TransactionCard from '@/components/transactions/transaction-card';
+import { formatAmount } from '@/utils/format-amount';
 
 export default function Transactions() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -182,7 +183,7 @@ export default function Transactions() {
                 </h1>               
               ):(
                 <h1 className='text-2xl font-extrabold'>
-                  PHP {account?.totalBalance}
+                  PHP {formatAmount(account?.totalBalance)}
                 </h1> 
               )}
             </div>
@@ -219,7 +220,7 @@ export default function Transactions() {
       {/* Transactions Section */}
       <section className='flex flex-col space-y-2 px-3 mb-2'>
         <TypographyH4>
-          Transactions
+          Recent Transactions
         </TypographyH4>
         {isLoading || !account ? (
           <PulseLoader/>
@@ -228,55 +229,10 @@ export default function Transactions() {
             {transactions && transactions.length > 0 ? (
               <>
                 {transactions.map((transaction, index) => (
-                  <Card key={index} className='border-2'>
-                    <CardHeader>
-                      <CardTitle className='flex justify-between'>
-                        <span>
-                          {new Date(transaction.date).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric'
-                          })}
-                        </span>
-                        <span
-                          className={
-                            `${
-                              transaction.total.startsWith('-')
-                                ? 'text-red-500'
-                                : 'text-primary'
-                            }`
-                          }
-                        >
-                          PHP {transaction.total}
-                        </span>
-                      </CardTitle>
-                    </CardHeader>
-                    <div className='w-full border-t border-gray-300' />
-                    <CardContent className='-mb-4'>
-                      {transaction.details.map((detail: TransactionDetails, index: number) => (
-                        <Link key={index} href={`transactions/${detail.id}`}>
-                          <div className='space-y-3 flex flex-row items-center justify-between'>
-                              <div className='flex flex-col text-sm'>
-                                <span>
-                                  {detail.category}
-                                </span>
-                                <span className='text-gray-600'>
-                                  {detail.note}
-                                </span>
-                              </div>
-                              <span className={`text-sm ${detail.type === 'income' ? 'text-primary' : 'text-red-500'}`}>
-                              PHP
-                                {
-                                  detail.type === 'income'
-                                    ? ' +'
-                                    : ' -'
-                                }
-                              {detail.amount.toFixed(2)}
-                              </span>                      
-                          </div>
-                        </Link>
-                      ))}
-                    </CardContent>
-                  </Card>
+                  <TransactionCard 
+                    transaction={transaction}
+                    key={index}
+                  />
                 ))}
                 {isMoreLoading && (
                   <PulseLoader className='mt-0'/>
