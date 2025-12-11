@@ -1,15 +1,19 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { tabItems } from '@/lib/data';
 import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Button } from '../ui/button';
+import { Calendar } from "@/components/ui/calendar";
+import { DateRange } from 'react-day-picker';
 
 interface DateTransactionCardProps {
   onDateRangeChange?: (dateStart: string, dateEnd: string, dateDisplay: string) => void;
   content?: ReactNode
-}
+};
 
 function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -17,10 +21,36 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
   const [currentDate, setCurrentDate] = useState(new Date());
   const newDate = new Date(currentDate);
   const isMobile = useIsMobile();
+  const [isCustomRange, setIsCustomRange] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: undefined,
+    to: undefined,
+  });
 
   // Return dateStart, dateEnd, and dateDisplay
   const getDateRange = () => {
     const toISODate = (d: Date) => d.toISOString().slice(0, 10);
+
+    if (isCustomRange && dateRange?.from && dateRange?.to) {
+      return {
+        dateStart: toISODate(dateRange?.from),
+        dateEnd: toISODate(dateRange?.to),
+        dateDisplay: `${dateRange?.from.toLocaleDateString(
+          'en-US',
+          {
+            month: 'long',
+            day: 'numeric'
+          })} -
+					${dateRange?.to.toLocaleDateString(
+            'en-US',
+            {
+              month: 'long',
+              day: 'numeric'
+            }
+          )}`
+      };
+    };
 
     if (activeTab === 'weekly') {
       const dateStart = new Date(newDate),
@@ -91,18 +121,33 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
     }
   };
 
-  // Declaration of variables for filtering and display
+  // Variables for date handling: filtering, display, etc
   const { dateStart, dateEnd, dateDisplay } = getDateRange();
+  const convertedDateEnd = new Date(dateEnd); // string to date
+  const today = new Date();
+
+  // Disabled state for prev and next buttons
+  const disabled = useMemo(() => {
+    if (isCustomRange) {
+      return { prev: true, next: true };
+    }
+    if (convertedDateEnd >= today) {
+      return { prev: false, next: true };
+    }
+    return { prev: false, next: false };
+  }, [isCustomRange, convertedDateEnd, today]);
 
   // Function to handle previous or next
   const handleDateChange = (direction: 'prev' | 'next') => {
-    const convertedDateEnd = new Date(dateEnd); // string to date
-    const today = new Date();
-
     // Prevent moving to future dates
-    if (convertedDateEnd > today && direction === 'next') {
+    if (disabled.next && direction === 'next') {
       return;
-    }
+    };
+
+    // Prevent moving if Custom Range is applied
+    if (isCustomRange && disabled.prev && disabled.next) {
+      return;
+    };
 
     if (activeTab === 'daily') {
       newDate.setDate(
@@ -125,6 +170,24 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
     setCurrentDate(newDate);
   };
 
+  // Custom Date Range Handling
+  const handleCancelCustomRange = (value?: string) => {
+    setIsCustomRange(false);
+    setDateRange({
+      from: undefined,
+      to: undefined
+    });
+    setActiveTab(value || "weekly");
+    setDatePickerOpen(false);
+  };
+  const handleApplyCustomRange = () => {
+    if (dateRange?.from && dateRange?.to) {
+      setActiveTab("");
+      setIsCustomRange(true);
+      setDatePickerOpen(false);
+    }
+  };
+
   // Call onDateRangeChange whenever the date range changes
   useEffect(() => {
     if (onDateRangeChange) {
@@ -143,134 +206,111 @@ function DateSelectCard({ content, onDateRangeChange }: DateTransactionCardProps
   }, []);
 
   return (
-    <>
-      {isScrolled ?
-        <section
-          className={`sticky top-0 z-10
-            transition-all duration-150
-            ease-in-out
-            ${isMobile ? 'px-0' : 'px-3'}
+      <section
+        className={`
+          transition-all duration-150
+          ease-in-out
+          ${isScrolled
+              ? 'sticky top-0 z-10' 
+              : 'pt-2 px-3'}
+        `}
+      >
+        <Card className={`
+            ${
+              isScrolled
+              ? 'border-0 -mt-2 rounded-none' 
+              : 'border-2 mt-0'
+            }
           `}
         >
-          <Card
-            className={`
-              -mt-2
-              border-0
-              rounded-none
-              w-full rounded-lg
-              ${!isMobile && 'border-2'}
-            `}
+          <CardHeader
+            className='flex
+            flex-col
+            justify-center
+            items-center -mt-2'
           >
-            <CardHeader
-              className='flex
-              flex-col
-              justify-center
-              items-center'
-            >
-              {/* Tabs Selection */}
-              <div className='flex items-center gap-x-2'>
-                <Calendar />
-                <Tabs defaultValue='daily' value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className='bg-white'>
-                    {tabItems.map((item, index) => (
-                      <TabsTrigger
-                        value={item.value}
-                        key={index}
-                      >
-                        {/* Capitalized first letter of item.value */}
-                        {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                </Tabs>
-              </div>
+            <div className='flex justify-center items-center gap-x-2'>
+              {/* Date Range Selection */}
+              <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                <PopoverTrigger asChild>
+                  <div className={`${isCustomRange ? 'bg-green-300' : ''} p-[3px] flex justify-center items-center rounded-sm`}>
+                    <CalendarIcon />
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                  <div className='p-0 flex flex-col'>
+                    <Calendar
+                      mode="range"
+                      selected={dateRange}
+                      onSelect={setDateRange}
+                    />
+                    <div className="p-2 flex gap-2 -mt-3">
+                      <Button size="sm" onClick={() => handleCancelCustomRange()} className="flex-1 bg-red-500 text-xs">
+                        {isCustomRange ? 'Clear' : 'Cancel'}
+                      </Button>
+                      <Button size="sm" onClick={handleApplyCustomRange} className="flex-1 text-xs">
+                        Apply
+                      </Button> 
+                    </div>                      
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-              {/* Date Display and Date Change */}
-              <div className='w-full'>
-                <div className="flex
-                    justify-between
-                    items-center
-                    font-semibold"
-                >
-                  <ChevronLeft
-                    className='cursor-pointer'
-                    onClick={() => handleDateChange('prev')}
-                  />
-                  {dateDisplay}
-                  <ChevronRight
-                    className='cursor-pointer'
-                    onClick={() => handleDateChange('next')}
-                  />
-                </div>
+              {/* Tabs Selection */}
+              <Tabs 
+                defaultValue='daily' 
+                value={activeTab} 
+                onValueChange={(value) => {
+                  setActiveTab(value);
+                  handleCancelCustomRange(value);
+                }}
+              >
+                <TabsList className='bg-white'>
+                  {tabItems.map((item, index) => (
+                    <TabsTrigger
+                      value={item.value}
+                      key={index}
+                    >
+                      {/* Capitalized first letter of item.value */}
+                      {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            </div>
+
+            {/* Date Display and Date Change */}
+            <div className='w-full'>
+              <div className="flex
+                  justify-between
+                  items-center
+                  font-semibold"
+              >
+                <ChevronLeft
+                  className={`cursor-pointer ${disabled.prev && 'opacity-50'}`}
+                  onClick={() => handleDateChange('prev')}
+                />
+                {dateDisplay}
+                <ChevronRight
+                  className={`cursor-pointer ${disabled.next && 'opacity-50'}`}
+                  onClick={() => handleDateChange('next')}
+                />
               </div>
-            </CardHeader>
-          </Card>
-          {isMobile && (
-            <div className='w-full border-t-2 border-black' />
+            </div>
+          </CardHeader>
+          {content && !isScrolled && (
+            <>
+              <Separator />
+              <CardContent className='flex flex-col gap-y-2'>
+                {content}
+              </CardContent>
+            </>
           )}
-        </section>
-        :
-        <section
-          className='pt-2 px-3
-          transition-all duration-150
-          ease-in-out'
-        >
-          <Card className="mt-0 border-2 ">
-            <CardHeader
-              className='flex
-              flex-col
-              justify-center
-              items-center -mt-2'
-            >
-              {/* Tabs Selection */}
-              <div className='flex items-center gap-x-2'>
-                <Calendar />
-                <Tabs defaultValue='daily' value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className='bg-white'>
-                    {tabItems.map((item, index) => (
-                      <TabsTrigger
-                        value={item.value}
-                        key={index}
-                      >
-                        {/* Capitalized first letter of item.value */}
-                        {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                </Tabs>
-              </div>
-
-              {/* Date Display and Date Change */}
-              <div className='w-full'>
-                <div className="flex
-                    justify-between
-                    items-center
-                    font-semibold"
-                >
-                  <ChevronLeft
-                    className='cursor-pointer'
-                    onClick={() => handleDateChange('prev')}
-                  />
-                  {dateDisplay}
-                  <ChevronRight
-                    className='cursor-pointer'
-                    onClick={() => handleDateChange('next')}
-                  />
-                </div>
-              </div>
-            </CardHeader>
-            {content && (
-              <>
-                <Separator />
-                <CardContent className='flex flex-col gap-y-2'>
-                  {content}
-                </CardContent>
-              </>
-            )}
-          </Card>
-        </section>
-      }
-    </>
+        </Card>
+        {isMobile && isScrolled && (
+          <div className='w-full border-t-2 border-black' />
+        )}
+      </section>
   )
 }
 
