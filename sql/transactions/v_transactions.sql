@@ -36,15 +36,22 @@ SELECT
 		ELSE
 			CAST(SUM(CASE WHEN type = 'income' THEN amount ELSE -amount END) AS CHAR)
     END AS total,
-    JSON_ARRAYAGG(
-        JSON_OBJECT(
-            'id', id,
-            'category', name,
-            'note', note,
-            'amount', amount,
-            'type', type,
-            'time', time
-        )
+    CAST(
+        CONCAT(
+            '[',
+				GROUP_CONCAT(
+					JSON_OBJECT(
+						'id', id,
+						'category', name,
+						'note', note,
+						'amount', amount,
+						'type', type,
+						'time', time
+					)
+					ORDER BY time DESC             
+				),
+            ']'
+        ) AS JSON
     ) AS details,
     ref_user_id AS userID,
     ref_accounts_id AS accountID
