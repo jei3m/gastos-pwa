@@ -1,22 +1,15 @@
-"use client"
+"use client";
 import { useEffect, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { TypographyH4 } from '@/components/custom/typography';
 import { fetchTransactions, fetchTransactionsCount } from '@/lib/store/transactions.store';
 import { Transaction } from '@/types/transactions.types';
 import { toast } from 'sonner';
 import { useAccount } from '@/context/account-context';
 import PulseLoader from '@/components/custom/pulse-loader';
-import { Button } from '@/components/ui/button';
-import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { Separator } from '@/components/ui/separator';
 import { fetchAccountByID } from '@/lib/store/accounts.store';
 import { Account } from '@/types/accounts.types';
-import { Skeleton } from '@/components/ui/skeleton';
 import TransactionCard from '@/components/transactions/transaction-card';
-import { formatAmount } from '@/utils/format-amount';
 import TotalAmountSection from '@/components/transactions/total-amount-section';
 
 export default function Transactions() {
@@ -28,8 +21,7 @@ export default function Transactions() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isMoreLoading, setIsMoreLoading] = useState<boolean>(false);
   const isMobile = useIsMobile();
-  const { selectedAccountID, refetchAccountsData  } = useAccount();
-  const router = useRouter();
+  const { selectedAccountID } = useAccount();
 
   // Scroll to top on load
   useEffect(() => {
