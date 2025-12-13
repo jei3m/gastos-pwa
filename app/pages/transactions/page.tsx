@@ -19,7 +19,7 @@ import TransactionCard from '@/components/transactions/transaction-card';
 import { formatAmount } from '@/utils/format-amount';
 
 export default function Transactions() {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [account, setAccount] = useState<Account>();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transactionsCount, setTransactionsCount] = useState<number>(0);
@@ -34,6 +34,7 @@ export default function Transactions() {
   useEffect(() => {
     window.scrollTo(0, 0);
     window.scroll(0, 0);
+		setIsScrolled(false);
   }, []);
 
   // Fetch Account Data
