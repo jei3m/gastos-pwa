@@ -10,16 +10,47 @@ import {
   getSelectedAccountID, 
   setAccountIDInStorage 
 } from '@/utils/account';
+import { Account } from '@/types/accounts.types';
+import { fetchAccounts } from '@/lib/store/accounts.store';
+import { toast } from 'sonner';
 
 type AccountContextType = {
   selectedAccountID: string | null;
   setSelectedAccount: (uuid: string) => void;
+  refetchAccountsData: () => Promise<void>;
+  isAccountsLoading: boolean;
+  accounts: Account[]
 };
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
 
 export function AccountProvider({ children }: { children: ReactNode }) {
   const [selectedAccountID, setSelectedAccountID] = useState<string | null>(null);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+	const [isAccountsLoading, setIsAccountsLoading] = useState(true);
+
+  const fetchAccountsData = async () => {
+    setIsAccountsLoading(true);
+    await fetchAccounts()
+      .then((data) => {
+        setAccounts(data);
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      })
+      .finally(() => {
+        setIsAccountsLoading(false);
+      });
+  };
+  
+  // Fetch on initial load
+  useEffect(() => {
+    fetchAccountsData()
+  },[]);
+
+  const refetchAccountsData = () => {
+    return fetchAccountsData()
+  };
 
   useEffect(() => {
     // Initialize the selected account from localStorage
@@ -33,11 +64,19 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AccountContext.Provider value={{ selectedAccountID, setSelectedAccount }}>
+    <AccountContext.Provider 
+      value={{ 
+        selectedAccountID, 
+        setSelectedAccount,
+        refetchAccountsData,
+        isAccountsLoading,
+        accounts
+      }}
+    >
       {children}
     </AccountContext.Provider>
   );
-}
+};
 
 export function useAccount() {
   const context = useContext(AccountContext);
@@ -45,4 +84,4 @@ export function useAccount() {
     throw new Error('useAccount must be used within an AccountProvider');
   }
   return context;
-}
+};
