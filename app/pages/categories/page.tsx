@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { categoryTypes } from '@/lib/data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Category } from '@/types/categories.types';
-import { icons } from '@/lib/icons';
 import {
 	Tabs,
 	TabsList,
@@ -25,6 +24,7 @@ import DateSelectCard from '@/components/custom/date-select-card';
 import PulseLoader from '@/components/custom/pulse-loader';
 import { formatAmount } from '@/utils/format-amount';
 import CategoryCard from '@/components/categories/category-card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Categories() {
 	const [isScrolled, setIsScrolled] = useState(false);
@@ -45,17 +45,6 @@ export default function Categories() {
     window.scroll(0, 0);
 		setIsScrolled(false);
   }, []);
-
-	// Convert string to React component
-	const getIconComponent = (iconName: string) => {
-		const iconKey = iconName;
-		return icons[iconKey as keyof typeof icons];
-	};
-
-	// Returns true or false
-	const isExpense = (type: string) => {
-		return type === 'Expense';
-	};
 
 	const handleAddCategory = () => {
 		router.push('/pages/categories/add');
@@ -122,7 +111,11 @@ export default function Categories() {
 							Balance
 						</h3>
 						<h1 className='text-2xl font-extrabold'>
-							PHP {formatAmount(calculateBalance())}
+							{
+								isLoading
+									? <Skeleton className='h-[30px] w-[140px] bg-gray-300' />
+									: `PHP ${formatAmount(calculateBalance())}`
+							}
 						</h1>
 					</div>
 					<div className='flex space-x-2'>
@@ -140,7 +133,11 @@ export default function Categories() {
 									Income
 								</div>
 								<div className='text-2xl font-bold'>
-									{formatAmount(totalIncome)}
+									{
+										isLoading
+											? <Skeleton className='h-[30px] w-[100px] bg-green-300' />
+											: `${formatAmount(totalIncome)}`
+									}
 								</div>
 							</div>
 						</div>
@@ -158,7 +155,11 @@ export default function Categories() {
 									Expense
 								</div>
 								<div className='text-2xl font-bold'>
-									{formatAmount(totalExpense)}
+									{
+										isLoading
+											? <Skeleton className='h-[30px] w-[100px] bg-red-300' />
+											: `${formatAmount(totalExpense)}`
+									}
 								</div>
 							</div>
 						</div>
@@ -191,32 +192,32 @@ export default function Categories() {
 					</div>
 				</Tabs>
 				{isLoading ? (
-						<PulseLoader />
-					):(
-						<>
-							{categories && categories.length > 0 ? (
-								<>
-									{categories.map((category, index) => (
-										<CategoryCard 
-											key={index}
-											category={category}
-										/>
-									))}
-								</>
-							) : (
-								<div className="flex flex-col items-center justify-center py-10">
-									<TypographyH4 className='text-gray-400 font-semibold text-center'>
-										No Categories
-									</TypographyH4>
-									<p className="text-gray-500 text-sm text-center">
-										Start by adding your first category
-									</p>
-								</div>
-							)}
-							<Button onClick={handleAddCategory}>
-								<PlusIcon size={40} className='-mr-1'/> Add New Category
-							</Button>
-						</>				
+					<PulseLoader/>
+				): (
+					<>
+						{categories && categories.length > 0 ? (
+							<>
+								{categories.map((category, index) => (
+									<CategoryCard 
+										key={index}
+										category={category}
+									/>
+								))}
+							</>
+						) : (
+							<div className="flex flex-col items-center justify-center py-10">
+								<TypographyH4 className='text-gray-400 font-semibold text-center'>
+									No Categories
+								</TypographyH4>
+								<p className="text-gray-500 text-sm text-center">
+									Start by adding your first category
+								</p>
+							</div>
+						)}
+						<Button onClick={handleAddCategory}>
+							<PlusIcon size={40} className='-mr-1'/> Add New Category
+						</Button>   
+					</>     
 				)}
 			</section>
 		</main>
