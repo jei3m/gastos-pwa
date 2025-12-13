@@ -67,7 +67,7 @@ export default function TotalAmountSection({
             </h3>
             {isLoading || !account ? (
               <h1 className='text-2xl font-extrabold flex'>
-                <Skeleton className='h-10 w-full bg-gray-300'/>
+                <Skeleton className='h-10 w-[50%] bg-gray-300'/>
               </h1>               
             ):(
               <h1 className='text-2xl font-extrabold'>
