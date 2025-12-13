@@ -17,6 +17,7 @@ import { Account } from '@/types/accounts.types';
 import { Skeleton } from '@/components/ui/skeleton';
 import TransactionCard from '@/components/transactions/transaction-card';
 import { formatAmount } from '@/utils/format-amount';
+import TotalAmountSection from '@/components/transactions/total-amount-section';
 
 export default function Transactions() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
@@ -27,7 +28,7 @@ export default function Transactions() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isMoreLoading, setIsMoreLoading] = useState<boolean>(false);
   const isMobile = useIsMobile();
-  const { selectedAccountID  } = useAccount();
+  const { selectedAccountID, refetchAccountsData  } = useAccount();
   const router = useRouter();
 
   // Scroll to top on load
@@ -131,86 +132,12 @@ export default function Transactions() {
       ${isMobile ? 'pb-18' : 'pb-20'}
     `}>
       {/* Total Amount Section */}
-      <section
-        className={`
-          transition-all duration-150
-          ease-in-out
-          ${isScrolled
-              ? 'sticky top-0 z-10' 
-              : 'pt-2 px-3'}
-        `}
-      >
-        <Card className={`
-            ${
-              isScrolled
-              ? `-mt-2 ${isMobile ? 'border-0 rounded-none' : 'border-2'}` 
-              : 'border-2 mt-0'
-            }
-          `}
-        >
-          <CardHeader>
-            <div className='flex flex-rows items-center justify-between'>
-              <div className='text-xl font-bold'>
-                {
-                  account 
-                    ? account?.name 
-                    : <Skeleton className='h-4 w-[140px] bg-gray-300' />
-                }
-              </div>
-              <div className='text-md text-gray-600 font-normal'>
-                {
-                  account 
-                    ? account?.type 
-                    : <Skeleton className='h-4 w-[140px] bg-gray-300' />
-                }
-              </div>
-            </div>
-          </CardHeader>
-          <Separator className='-mt-2'/>
-          <CardContent className='space-y-2'>
-            <div className='flex flex-col'>
-              <h3 className='text-gray-600 font-normal text-lg'>
-                Balance
-              </h3>
-              {isLoading || !account ? (
-                <h1 className='text-2xl font-extrabold flex'>
-                  <Skeleton className='h-10 w-full bg-gray-300'/>
-                </h1>               
-              ):(
-                <h1 className='text-2xl font-extrabold'>
-                  PHP {formatAmount(account?.totalBalance)}
-                </h1> 
-              )}
-            </div>
-            {!isScrolled && (
-              <div className='w-full flex flex-row justify-center space-x-2'>
-                <Button
-                  className='w-[50%] flex flex-row -space-x-1'
-                  onClick={() => router.push(`/pages/transactions/add?type=income`)}
-                >
-                  <ArrowDownLeft strokeWidth={3}/>
-                  <span>
-                    Income
-                  </span>
-                </Button>
-                <Button
-                  variant='destructive'
-                  className='w-[50%] flex flex-row -space-x-1'
-                  onClick={() => router.push(`/pages/transactions/add?type=expense`)}
-                >
-                  <ArrowUpRight strokeWidth={3}/>
-                  <span>
-                    Expense
-                  </span>
-                </Button>
-              </div>              
-            )}
-          </CardContent>
-        </Card> 
-        {isMobile && isScrolled && (
-          <div className='w-full border-t-2 border-black' />
-        )} 
-      </section>
+      <TotalAmountSection 
+        isLoading={isLoading}
+        isScrolled={isScrolled}
+        account={account}
+        isMobile={isMobile}
+      />
 
       {/* Transactions Section */}
       <section className='flex flex-col space-y-2 px-3 mb-2'>
