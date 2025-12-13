@@ -98,12 +98,6 @@ export default function Transactions() {
     setPage(1);
   }, [selectedAccountID]);
 
-  // If transactions already exist, stop isLoading
-  useEffect(() => {
-    if (!transactions) return;
-    setIsLoading(false);
-  }, [transactions])
-
   // Handle scroll for pagination
   useEffect(() => {
     const handleScroll = () => {
