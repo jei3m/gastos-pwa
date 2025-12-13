@@ -1,41 +1,33 @@
 "use client";
-import { createElement, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { categoryTypes } from '@/lib/data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Category } from '@/types/categories.types';
 import { icons } from '@/lib/icons';
-// ShadCN Components
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardTitle,
-} from '@/components/ui/card';
-
 import {
 	Tabs,
 	TabsList,
 	TabsTrigger
 } from "@/components/ui/tabs";
-
 // Icon Imports
 import {
 	ArrowDown,
 	ArrowUp,
 	PlusIcon
 } from 'lucide-react';
-import { TypographyH4, TypographyH5 } from '@/components/custom/typography';
+import { TypographyH4 } from '@/components/custom/typography';
 import { Button } from '@/components/ui/button';
 import { fetchCategories } from '@/lib/store/categories.store';
 import { toast } from 'sonner';
-import Link from 'next/link';
 import { useAccount } from '@/context/account-context';
 import DateSelectCard from '@/components/custom/date-select-card';
 import PulseLoader from '@/components/custom/pulse-loader';
 import { formatAmount } from '@/utils/format-amount';
+import CategoryCard from '@/components/categories/category-card';
 
 export default function Categories() {
+	const [isScrolled, setIsScrolled] = useState(false);
   const [dateStart, setDateStart] = useState<string>('');
   const [dateEnd, setDateEnd] = useState<string>('');
 	const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +43,7 @@ export default function Categories() {
   useEffect(() => {
     window.scrollTo(0, 0);
     window.scroll(0, 0);
+		setIsScrolled(false);
   }, []);
 
 	// Convert string to React component
@@ -105,12 +98,23 @@ export default function Categories() {
 		}
 	}, [selectedAccountID, categoryType, dateStart, dateEnd]);
 
+  // Set isScrolled
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 40);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
 	return (
 		<main className={`flex flex-col space-y-2 min-h-screen
       ${isMobile ? 'pb-15' : 'pb-18'}
     `}>
 			{/* Date Card Section */}
-			<DateSelectCard 
+			<DateSelectCard
+				isScrolled={isScrolled}
 				onDateRangeChange={handleDateRangeChange}
 				content={<>
 					<div className='flex flex-col'>
@@ -193,44 +197,10 @@ export default function Categories() {
 							{categories && categories.length > 0 ? (
 								<>
 									{categories.map((category, index) => (
-										<Link key={index} href={`/pages/categories/${category.id}`}>
-											<Card className='border-2 p-[10px]'>
-												<CardContent className='flex flex-row justify-between items-center -p-1'>
-													<div className='flex flex-row space-x-2 items-center'>
-														<div className={`
-															p-1.5 rounded-lg border-2 
-															${isExpense(category.type)
-																? 'bg-red-500'
-																: 'bg-primary'
-															}
-														`}>
-															{createElement(getIconComponent(category.icon), { size: 30 })}									
-														</div>
-														<div>
-															<TypographyH5 className='font-semibold'>
-																{category.name}
-															</TypographyH5>									
-														</div>
-													</div>
-													<div className='text-right'>
-														<CardDescription>
-															Total Amount:
-														</CardDescription>	
-														<CardTitle
-															className={`
-																${
-																	isExpense(category.type)
-																		? 'text-red-500'
-																		: 'text-primary'
-																}
-															`}
-														>
-															PHP {isExpense(category.type) ? '-' : '+'}{formatAmount(category.totalAmount) ?? 0.00}
-														</CardTitle>										
-													</div>
-												</CardContent>
-											</Card>
-										</Link>
+										<CategoryCard 
+											key={index}
+											category={category}
+										/>
 									))}
 								</>
 							) : (
