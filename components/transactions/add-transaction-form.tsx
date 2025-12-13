@@ -22,12 +22,12 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { transactionSchema } from "@/schema/transactions.schema";
-import { fetchCategories } from "@/store/categories.store";
+import { transactionSchema } from "@/lib/schema/transactions.schema";
+import { fetchCategories } from "@/lib/store/categories.store";
 import { useAccount } from "@/context/account-context";
 import { Category } from "@/types/categories.types";
 import { toast } from "sonner";
-import { createTransaction } from "@/store/transactions.store";
+import { createTransaction } from "@/lib/store/transactions.store";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -70,7 +70,8 @@ export default function AddTransactionForm() {
     };
     createTransaction(transactionData)
       .then((transaction) => {
-        router.push('/pages/transactions')
+        router.push('/pages/transactions');
+        form.reset();
         toast.success(transaction.responseMessage);
       })
       .catch((error) => {

@@ -3,8 +3,8 @@ import crypto from 'crypto';
 import { connection, db } from "@/utils/db";
 import { success, fail } from "@/utils/helpers";
 import { responseRow } from "@/types/response.types";
-import { createCategory, getCategories } from "@/sql/categories/categories.sql";
-import { fetchUserID } from "@/lib/auth-session";
+import { createCategory, getCategories } from "@/lib/sql/categories/categories.sql";
+import { fetchUserID } from "@/lib/auth/auth-session";
 
 export async function POST(req: NextRequest) {
 	try {

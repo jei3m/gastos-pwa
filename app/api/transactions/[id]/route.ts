@@ -5,12 +5,12 @@ import {
 	fail
 } from "@/utils/helpers";
 import { responseRow } from "@/types/response.types";
-import { fetchUserID } from '@/lib/auth-session';
+import { fetchUserID } from '@/lib/auth/auth-session';
 import {
 	deleteTransaction,
 	getTransactionByID,
 	updateTransaction
-} from "@/sql/transactions/transactions.sql";
+} from "@/lib/sql/transactions/transactions.sql";
 
 // Get Specific Transaction
 export async function GET(

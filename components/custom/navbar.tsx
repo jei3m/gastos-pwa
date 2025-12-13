@@ -5,7 +5,7 @@ import { Account } from '@/types/accounts.types';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useIsMobile } from "@/hooks/use-mobile"
-import { fetchAccounts } from '@/store/accounts.store';
+import { fetchAccounts } from '@/lib/store/accounts.store';
 import { Button } from '@/components/ui/button';
 import {
 	Select,

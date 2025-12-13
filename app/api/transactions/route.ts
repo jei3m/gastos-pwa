@@ -6,12 +6,12 @@ import {
 	fail
 } from '@/utils/helpers';
 import { responseRow } from '@/types/response.types';
-import { fetchUserID } from '@/lib/auth-session';
+import { fetchUserID } from '@/lib/auth/auth-session';
 import { connection } from '@/utils/db';
 import {
 	createTransaction,
   getTransactions
-} from '@/sql/transactions/transactions.sql';
+} from '@/lib/sql/transactions/transactions.sql';
 
 // Create New Transaction
 export async function POST(req: NextRequest) {

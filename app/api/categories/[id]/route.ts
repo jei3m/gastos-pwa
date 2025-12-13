@@ -2,12 +2,12 @@ import { NextRequest } from "next/server";
 import { connection, db } from "@/utils/db";
 import { success, fail } from "@/utils/helpers";
 import { responseRow } from "@/types/response.types";
-import { fetchUserID } from '@/lib/auth-session';
+import { fetchUserID } from '@/lib/auth/auth-session';
 import { 
 	getCategoryByID, 
 	deleteCategory, 
 	updateCategory 
-} from "@/sql/categories/categories.sql";
+} from "@/lib/sql/categories/categories.sql";
 
 export async function GET(
 	_req: Request,

@@ -29,8 +29,8 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { createCategory } from "@/store/categories.store";
-import { createCategorySchema } from "@/schema/categories.schema";
+import { createCategory } from "@/lib/store/categories.store";
+import { createCategorySchema } from "@/lib/schema/categories.schema";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { icons } from "@/lib/icons";

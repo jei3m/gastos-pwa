@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { TypographyH4, TypographyH5 } from '@/components/custom/typography';
 import { Button } from '@/components/ui/button';
-import { fetchCategories } from '@/store/categories.store';
+import { fetchCategories } from '@/lib/store/categories.store';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useAccount } from '@/context/account-context';

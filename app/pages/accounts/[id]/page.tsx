@@ -33,12 +33,12 @@ import {
 import { 
 	createAccountSchema, 
 	updateAccountSchema 
-} from "@/schema/acccounts.schema";
+} from "@/lib/schema/acccounts.schema";
 import { 
 	deleteAccount, 
 	editAccount, 
 	fetchAccountByID 
-} from "@/store/accounts.store";
+} from "@/lib/store/accounts.store";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

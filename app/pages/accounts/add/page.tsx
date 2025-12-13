@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createAccount } from "@/store/accounts.store";
+import { createAccount } from "@/lib/store/accounts.store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +25,7 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { createAccountSchema } from "@/schema/acccounts.schema";
+import { createAccountSchema } from "@/lib/schema/acccounts.schema";
 import { toast } from "sonner";
 
 export default function CreateAccount() {

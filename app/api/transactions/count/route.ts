@@ -3,11 +3,11 @@ import {
 	success,
 	fail
 } from '@/utils/helpers';
-import { fetchUserID } from '@/lib/auth-session';
+import { fetchUserID } from '@/lib/auth/auth-session';
 import { connection } from '@/utils/db';
 import {
   getTransactionsCount,
-} from '@/sql/transactions/transactions.sql';
+} from '@/lib/sql/transactions/transactions.sql';
 
 // Get Count of Transactions
 export async function GET(request: Request) {
