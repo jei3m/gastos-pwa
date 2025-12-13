@@ -44,6 +44,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAccount } from "@/context/account-context";
 
 export default function EditAccount() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +52,7 @@ export default function EditAccount() {
 	const router = useRouter();
 	const params = useParams();
 	const id = params.id as string;
+	const { refetchAccountsData } = useAccount();
 
 	const form = useForm<z.infer<typeof createAccountSchema>>({
 		resolver: zodResolver(createAccountSchema),
@@ -65,6 +67,7 @@ export default function EditAccount() {
 		setIsLoading(true);
 		editAccount(id, values)
 			.then((account) => {
+				refetchAccountsData();
 				router.push('/pages/transactions');
 				toast.success(account.responseMessage);
 				setIsLoading(false);				
