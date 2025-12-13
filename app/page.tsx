@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchSession } from "@/utils/session";
-import { Loader2 } from "lucide-react";
+import Loader from "@/components/custom/loader";
 
 export default function Page() {
   const router = useRouter();
@@ -18,8 +18,8 @@ export default function Page() {
   },[router])
 
   return (
-    <div className="h-full flex flex-col justify-center items-center">
-      <Loader2 className="text-green-600 w-14 h-14 animate-spin" />
-    </div>
+    <>
+      <Loader/>
+    </>
   )
 };
