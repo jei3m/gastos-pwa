@@ -29,7 +29,7 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { createCategory } from "@/lib/store/categories.store";
+import { createCategory } from "@/lib/tq-functions/categories.tq.functions";
 import { createCategorySchema } from "@/lib/schema/categories.schema";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";

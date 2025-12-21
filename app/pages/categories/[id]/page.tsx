@@ -40,7 +40,7 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { editCategory, fetchCategoryByID, deleteCategory } from "@/lib/store/categories.store";
+import { editCategory, fetchCategoryByID, deleteCategory } from "@/lib/tq-functions/categories.tq.functions";
 import { editCategorySchema } from "@/lib/schema/categories.schema";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";

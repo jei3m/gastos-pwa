@@ -2,12 +2,12 @@
 import { useEffect, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TypographyH4 } from '@/components/custom/typography';
-import { fetchTransactions, fetchTransactionsCount } from '@/lib/store/transactions.store';
+import { fetchTransactions, fetchTransactionsCount } from '@/lib/tq-functions/transactions.tq.functions';
 import { Transaction } from '@/types/transactions.types';
 import { toast } from 'sonner';
 import { useAccount } from '@/context/account-context';
 import PulseLoader from '@/components/custom/pulse-loader';
-import { fetchAccountByID } from '@/lib/store/accounts.store';
+import { fetchAccountByID } from '@/lib/tq-functions/accounts.tq.functions';
 import { Account } from '@/types/accounts.types';
 import TransactionCard from '@/components/transactions/transaction-card';
 import TotalAmountSection from '@/components/transactions/total-amount-section';

@@ -11,7 +11,7 @@ import {
   setAccountIDInStorage 
 } from '@/utils/account';
 import { Account } from '@/types/accounts.types';
-import { fetchAccounts } from '@/lib/store/accounts.store';
+import { fetchAccounts } from '@/lib/tq-functions/accounts.tq.functions';
 import { toast } from 'sonner';
 
 type AccountContextType = {

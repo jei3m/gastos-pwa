@@ -38,7 +38,7 @@ import {
 	deleteAccount, 
 	editAccount, 
 	fetchAccountByID 
-} from "@/lib/store/accounts.store";
+} from "@/lib/tq-functions/accounts.tq.functions";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
