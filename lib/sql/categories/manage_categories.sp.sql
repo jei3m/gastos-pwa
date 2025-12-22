@@ -6,7 +6,6 @@ CREATE PROCEDURE `manage_categories`(
     IN p_action_type ENUM('create', 'update', 'delete'),
     IN p_id CHAR(36),
     IN p_user_id CHAR(36),
-    IN p_accounts_id CHAR(36),
     IN p_name VARCHAR(15),
     IN p_type ENUM('Income','Expense'),
     IN p_icon VARCHAR(20),
@@ -47,7 +46,6 @@ BEGIN
                 INSERT INTO categories(
                     id,
                     ref_user_id,
-                    ref_accounts_id,
                     name,
                     type,
                     icon
@@ -55,7 +53,6 @@ BEGIN
                 VALUES(
                     p_id,
                     p_user_id,
-                    p_accounts_id,
                     p_name,
                     p_type,
                     p_icon
