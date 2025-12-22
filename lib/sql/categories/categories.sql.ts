@@ -4,7 +4,6 @@ export const createCategory = () => {
                 :actionType,
                 :id,
                 :userID,
-                :accountID,
                 :name,
                 :type,
                 :icon,
@@ -56,6 +55,7 @@ export const getCategories = () => {
                         v_transactions_table
                     WHERE
                         ref_user_id = :userID
+                        AND ref_accounts_id = :accountID
                         AND (:dateStart IS NULL OR date BETWEEN :dateStart AND :dateEnd)
                     GROUP BY
                         ref_categories_id,
@@ -73,32 +73,28 @@ export const getCategories = () => {
                         'type', c.type,
                         'totalAmount', COALESCE(cd.amount, 0),
                         'refUserID', c.ref_user_id,
-                        'refAccountsID', c.ref_accounts_id
+                        'refAccountsID', :accountID
                     )
                 ) AS details,
                 c.ref_user_id AS refUserID,
-                c.ref_accounts_id AS refAccountsID
+                :accountID AS refAccountsID
             FROM 
                 v_categories_table c
             LEFT JOIN category_details cd 
                 ON c.id = cd.ref_categories_id
                 AND c.ref_user_id = cd.ref_user_id
-            LEFT JOIN sum_income si
-                ON c.ref_accounts_id = si.ref_accounts_id 
-                AND c.ref_user_id = si.ref_user_id 
-            LEFT JOIN sum_expense se
-                ON c.ref_accounts_id = se.ref_accounts_id 
-                AND c.ref_user_id = se.ref_user_id 
+            INNER JOIN sum_income si
+                ON c.ref_user_id = si.ref_user_id 
+            INNER JOIN sum_expense se
+                ON c.ref_user_id = se.ref_user_id 
             WHERE
                 c.ref_user_id = :userID
-                AND c.ref_accounts_id = :accountID
                 AND (:filter IS NULL OR c.type = :filter)
             GROUP BY
                 c.type,
                 si.total_income,
                 se.total_expense,
-                c.ref_user_id,
-                c.ref_accounts_id;`;
+                c.ref_user_id;`;
 };
 
 export const getCategoryByID = () => {
