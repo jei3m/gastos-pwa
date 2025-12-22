@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, createElement } from "react";
+import { useState, createElement } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,16 +48,9 @@ export default function CreateCategory() {
 		defaultValues: {
 			name: "",
 			type: "",
-			icon: "",
-			accountID: ""
+			icon: ""
 		}
 	});
-
-	useEffect(() => {
-		if (selectedAccountID) {
-			form.setValue('accountID', selectedAccountID);
-		};
-	}, [form, selectedAccountID]);
 
 	async function onSubmit(values: z.infer<typeof createCategorySchema>) {
 		setIsLoading(true);
