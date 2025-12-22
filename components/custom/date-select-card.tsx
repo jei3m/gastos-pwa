@@ -1,3 +1,4 @@
+"use client";
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
