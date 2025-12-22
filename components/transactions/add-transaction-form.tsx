@@ -301,7 +301,10 @@ export default function AddTransactionForm() {
           </div>
           <div className='flex flex-row justify-between'>
             <Button
-              onClick={() => router.back()}
+              onClick={() => {
+                form.reset();
+                router.back();
+              }}
               className="bg-red-500 border-2 hover:none"
               disabled={isLoading}
               type="button"
