@@ -93,12 +93,15 @@ export default function EditCategory() {
 	const handleDelete = (id: string) => {
 		setIsLoading(true);
 		deleteCategory(id)
-			.then(() => {
+			.then((category) => {
+				toast.success(category.responseMessage);
 				router.push('/pages/categories');
-				setIsLoading(false);
 			})
 			.catch((error) => {
 				setError(error.message);
+				setIsLoading(false);
+			})
+			.finally(() => {
 				setIsLoading(false);
 			})
 	};
