@@ -18,6 +18,7 @@ interface DateTransactionCardProps {
 };
 
 function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransactionCardProps) {
+  const [isMounted, setIsMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('weekly');
   const [currentDate, setCurrentDate] = useState(new Date());
   const newDate = new Date(currentDate);
@@ -28,6 +29,11 @@ function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransact
     from: undefined,
     to: undefined,
   });
+
+  // Set mounted once component loads in the browser
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Return dateStart, dateEnd, and dateDisplay
   const getDateRange = () => {
@@ -196,113 +202,118 @@ function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransact
     }
   }, [dateStart, dateEnd, dateDisplay, onDateRangeChange]);
 
+  // Prevent rendering until the client has mounted
+  if (!isMounted) {
+    return null; 
+  };
+
   return (
-      <section
-        className={`
-          transition-all duration-150
-          ease-in-out
-          ${isScrolled
-              ? 'sticky top-0 z-10' 
-              : 'pt-2 px-3'}
+    <section
+      className={`
+        transition-all duration-150
+        ease-in-out
+        ${isScrolled
+            ? 'sticky top-0 z-10' 
+            : 'pt-2 px-3'}
+      `}
+    >
+      <Card className={`
+          ${
+            isScrolled
+            ? `-mt-2 ${isMobile ? 'border-0 rounded-none' : 'border-2'}` 
+            : 'border-2 mt-0'
+          }
         `}
       >
-        <Card className={`
-            ${
-              isScrolled
-              ? `-mt-2 ${isMobile ? 'border-0 rounded-none' : 'border-2'}` 
-              : 'border-2 mt-0'
-            }
-          `}
+        <CardHeader
+          className='flex
+          flex-col
+          justify-center
+          items-center -mt-2'
         >
-          <CardHeader
-            className='flex
-            flex-col
-            justify-center
-            items-center -mt-2'
-          >
-            <div className='flex justify-center items-center gap-x-2'>
-              {/* Date Range Selection */}
-              <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                <PopoverTrigger asChild>
-                  <div className={`${isCustomRange ? 'bg-green-300' : ''} p-[3px] flex justify-center items-center rounded-sm`}>
-                    <CalendarIcon />
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                  <div className='p-0 flex flex-col'>
-                    <Calendar
-                      mode="range"
-                      disabled={(date) => date > new Date()}
-                      selected={dateRange}
-                      onSelect={setDateRange}
-                    />
-                    <div className="p-2 flex gap-2 -mt-3">
-                      <Button size="sm" onClick={() => handleCancelCustomRange()} className="flex-1 bg-red-500 text-xs">
-                        {isCustomRange ? 'Clear' : 'Cancel'}
-                      </Button>
-                      <Button size="sm" onClick={handleApplyCustomRange} className="flex-1 text-xs">
-                        Apply
-                      </Button> 
-                    </div>                      
-                  </div>
-                </PopoverContent>
-              </Popover>
+          <div className='flex justify-center items-center gap-x-2'>
+            {/* Date Range Selection */}
+            <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+              <PopoverTrigger asChild>
+                <div className={`${isCustomRange ? 'bg-green-300' : ''} p-[3px] flex justify-center items-center rounded-sm`}>
+                  <CalendarIcon />
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                <div className='p-0 flex flex-col'>
+                  <Calendar
+                    mode="range"
+                    disabled={(date) => date > new Date()}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                  />
+                  <div className="p-2 flex gap-2 -mt-3">
+                    <Button size="sm" onClick={() => handleCancelCustomRange()} className="flex-1 bg-red-500 text-xs">
+                      {isCustomRange ? 'Clear' : 'Cancel'}
+                    </Button>
+                    <Button size="sm" onClick={handleApplyCustomRange} className="flex-1 text-xs">
+                      Apply
+                    </Button> 
+                  </div>                      
+                </div>
+              </PopoverContent>
+            </Popover>
 
-              {/* Tabs Selection */}
-              <Tabs 
-                defaultValue='daily' 
-                value={activeTab} 
-                onValueChange={(value) => {
-                  setActiveTab(value);
-                  handleCancelCustomRange(value);
-                }}
-              >
-                <TabsList className='bg-white'>
-                  {tabItems.map((item, index) => (
-                    <TabsTrigger
-                      value={item.value}
-                      key={index}
-                    >
-                      {/* Capitalized first letter of item.value */}
-                      {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            </div>
+            {/* Tabs Selection */}
+            <Tabs 
+              defaultValue='daily' 
+              value={activeTab} 
+              onValueChange={(value) => {
+                setActiveTab(value);
+                handleCancelCustomRange(value);
+              }}
+            >
+              <TabsList className='bg-white'>
+                {tabItems.map((item, index) => (
+                  <TabsTrigger
+                    value={item.value}
+                    key={index}
+                  >
+                    {/* Capitalized first letter of item.value */}
+                    {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
 
-            {/* Date Display and Date Change */}
-            <div className='w-full'>
-              <div className="flex
-                  justify-between
-                  items-center
-                  font-semibold"
-              >
-                <ChevronLeft
-                  className={`cursor-pointer ${disabled.prev && 'opacity-50'}`}
-                  onClick={() => handleDateChange('prev')}
-                />
-                {dateDisplay}
-                <ChevronRight
-                  className={`cursor-pointer ${disabled.next && 'opacity-50'}`}
-                  onClick={() => handleDateChange('next')}
-                />
-              </div>
+          {/* Date Display and Date Change */}
+          <div className='w-full'>
+            <div className="flex
+                justify-between
+                items-center
+                font-semibold"
+            >
+              <ChevronLeft
+                className={`cursor-pointer ${disabled.prev && 'opacity-50'}`}
+                onClick={() => handleDateChange('prev')}
+              />
+              {dateDisplay}
+              <ChevronRight
+                className={`cursor-pointer ${disabled.next && 'opacity-50'}`}
+                onClick={() => handleDateChange('next')}
+              />
             </div>
-          </CardHeader>
-          {content && !isScrolled && (
-            <>
-              <Separator />
-              <CardContent className='flex flex-col gap-y-2'>
-                {content}
-              </CardContent>
-            </>
-          )}
-        </Card>
-        {isMobile && isScrolled && (
-          <div className='w-full border-t-2 border-black' />
+          </div>
+        </CardHeader>
+        {content && !isScrolled && (
+          <>
+            <Separator />
+            <CardContent className='flex flex-col gap-y-2'>
+              {content}
+            </CardContent>
+          </>
         )}
-      </section>
+      </Card>
+      {isMobile && isScrolled && (
+        <div className='w-full border-t-2 border-black' />
+      )}
+    </section>
   )
 }
 
