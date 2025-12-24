@@ -1,5 +1,5 @@
 "use client";
-import { useState, createElement } from "react";
+import { useState, createElement, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,13 +35,12 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { icons } from "@/lib/icons";
 import { SquareDashed } from "lucide-react";
-import { useAccount } from '@/context/account-context';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function CreateCategory() {
-	const [isLoading, setIsLoading] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const router = useRouter();
-	const { selectedAccountID } = useAccount();
+	const queryClient = useQueryClient();
 
 	const form = useForm<z.infer<typeof createCategorySchema>>({
 		resolver: zodResolver(createCategorySchema),
@@ -52,20 +51,23 @@ export default function CreateCategory() {
 		}
 	});
 
-	async function onSubmit(values: z.infer<typeof createCategorySchema>) {
-		setIsLoading(true);
+	const {mutate: createCategoryMutation, isPending} = useMutation({
+		mutationFn: (values: z.infer<typeof createCategorySchema>) => createCategory(values),
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: ['categories']
+			});
+			toast.success(data.responseMessage);
+			form.reset();
+			router.push('/pages/categories');
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
 
-		createCategory(values)
-			.then((category) => {
-				toast.success(category.responseMessage);
-				router.push('/pages/categories');
-			})
-			.catch((error) => {
-				toast.error(error.message);
-			})
-			.finally(() => {
-				setIsLoading(false);
-			})
+	async function onSubmit(values: z.infer<typeof createCategorySchema>) {
+		createCategoryMutation(values);
 	};
 
 	return (
@@ -156,7 +158,10 @@ export default function CreateCategory() {
 									Category Type
 								</FormLabel>
 								<FormControl>
-									<Select onValueChange={field.onChange}>
+									<Select 
+										onValueChange={field.onChange} 
+										value={field.value}
+									>
 										<SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
 											<SelectValue placeholder="Select Category Type..." />
 										</SelectTrigger>
@@ -172,9 +177,12 @@ export default function CreateCategory() {
 					/>
 					<div className='flex flex-row justify-between'>
 						<Button
-							onClick={() => router.back()}
+							onClick={() => {
+								form.reset();
+								router.back();
+							}}
 							className="bg-red-500 border-2 hover:none"
-							disabled={isLoading}
+							disabled={isPending}
 							type="button"
 						>
 							Cancel
@@ -182,9 +190,9 @@ export default function CreateCategory() {
 						<Button
 							className="border-2"
 							type="submit"
-							disabled={isLoading}
+							disabled={isPending}
 						>
-							{isLoading ? "Submitting..." : "Submit"}
+							{isPending ? "Submitting..." : "Submit"}
 						</Button>
 					</div>
 				</form>
