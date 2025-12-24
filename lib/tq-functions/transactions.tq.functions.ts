@@ -84,7 +84,7 @@ export const fetchTransactionsCount = async(
   }
 };
 
-export const editTransactions = async(
+export const editTransaction = async(
   id: string,
   transaction: EditTransactionPayload
 ) => {
