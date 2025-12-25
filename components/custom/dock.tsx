@@ -56,14 +56,14 @@ export const Dock: React.FC<DockProps> = ({
   };
   const styles = getVariantStyles();
   return (
-    <div className={`${isMobile ? 'px-0' : 'px-3'} max-w-[600px]`}>
+    <div className={`${isMobile ? 'px-0' : 'px-3'}`}>
       <nav
         className={cn(
           `overflow-x-hidden flex flex-col justify-center 
             w-full bg-card fixed m-auto
           ${
             isMobile ? 'border-t-2 w-full bottom-0' 
-              : 'border-2 rounded-lg mb-2 max-w-[576px] m-auto bottom-2' 
+              : 'border-2 rounded-lg mb-2 max-w-[676px] m-auto bottom-2' 
           }`,
           orientation === 'horizontal' ? 'flex-row' : 'flex-col',
           styles.container,
