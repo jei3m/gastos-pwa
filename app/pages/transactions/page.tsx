@@ -94,7 +94,6 @@ export default function Transactions() {
                 {transactions.map((transaction, index) => (
                   <TransactionCard 
                     transaction={transaction}
-                    isMobile={isMobile}
                     key={index}
                   />
                 ))}
