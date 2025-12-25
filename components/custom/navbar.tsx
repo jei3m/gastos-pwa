@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -21,7 +21,6 @@ import {
 import { useAccount } from '@/context/account-context';
 
 function Navbar() {
-	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const pathname = usePathname();
 	const { 
@@ -42,12 +41,11 @@ function Navbar() {
 	};
 
 	return (
-		<div className={`${isMobile ? 'px-0' : 'px-3'} max-w-[600px]`}>
+		<div className={`${isMobile ? 'px-0' : 'px-3'} max-w-[750px]`}>
 			<nav
 				className={`
 					h-[50px]
 					p-2
-					w-full
 					flex
 					justify-between
 					items-center
