@@ -34,6 +34,8 @@ export const Dock: React.FC<DockProps> = ({
   orientation = 'horizontal',
   showLabels = false
 }) => {
+  const pathName = usePathname();
+  const isMobile = useIsMobile();
   const getVariantStyles = () => {
     switch (variant) {
       case 'compact':
@@ -45,7 +47,7 @@ export const Dock: React.FC<DockProps> = ({
         };
       default:
         return {
-          container: 'p-0 pb-2',
+          container: `p-0 ${isMobile ? 'pb-2' : 'pb-0'}`,
           item: 'p-2 min-w-14',
           icon: 'h-7 w-7',
           text: 'text-[10px] -mt-1'
@@ -53,8 +55,6 @@ export const Dock: React.FC<DockProps> = ({
     }
   };
   const styles = getVariantStyles();
-  const pathName = usePathname();
-  const isMobile = useIsMobile();
   return (
     <div className={`${isMobile ? 'px-0' : 'px-3'} max-w-[600px]`}>
       <nav
