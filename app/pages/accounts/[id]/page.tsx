@@ -113,7 +113,7 @@ export default function EditAccount() {
   const isDisabled = isEditPending || isDeletePending || isPending;
 
   return (
-    <main className="flex flex-col m-auto space-y-4 p-3 max-w-[500px]">
+    <main className="flex flex-col m-auto space-y-4 p-3">
       <div className="flex flex-row space-x-2 items-center">
         <TypographyH3 className="font-bold text-center">
           Edit Account
