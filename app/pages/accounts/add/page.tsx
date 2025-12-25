@@ -1,11 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createAccount } from "@/lib/tq-functions/accounts.tq.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchSession } from "@/utils/session";
 import {
 	Select,
 	SelectContent,
@@ -27,20 +25,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { createAccountSchema } from "@/lib/schema/acccounts.schema";
 import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { accountsQueryOptions } from "@/lib/tq-options/accounts.tq.options";
 
 export default function CreateAccount() {
-	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-
-	// Validate user session
-	useEffect(() => {
-		fetchSession()
-			.then(({session}) => {
-				if (!session) {
-					router.push('/auth/login')
-				}
-			})
-	},[router])
+	const queryClient = useQueryClient();
 
 	const form = useForm<z.infer<typeof createAccountSchema>>({
 		resolver: zodResolver(createAccountSchema),
@@ -49,22 +39,26 @@ export default function CreateAccount() {
 			type: "",
 			description: ""
 		}
-	})
+	});
+
+	const { mutate: createAccountMutation, isPending } = useMutation({
+		mutationFn: (values: z.infer<typeof createAccountSchema>) => createAccount(values),
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: accountsQueryOptions().queryKey
+			});
+			toast.success(data.responseMessage);
+			form.reset();
+			router.push('/pages/accounts');
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		}
+	});
 
 	async function onSubmit(values: z.infer<typeof createAccountSchema>) {
-		setIsLoading(true);
-		
-		createAccount(values)
-			.then((account) => {
-				router.push('/pages/transactions')
-				toast.success(account.responseMessage);
-				setIsLoading(false);
-			})
-			.catch((error) => {
-				toast.error(error.message);
-				setIsLoading(false);
-			})
-	}
+		createAccountMutation(values);
+	};
 
 	return (
 		<main className='flex flex-col space-y-4 p-3'>
@@ -141,18 +135,21 @@ export default function CreateAccount() {
 					/>
 					<div className='flex flex-row justify-between'>
 						<Button
-							onClick={() => router.back()}
+							onClick={() => {
+								form.reset();
+								router.back();
+							}}
 							className="bg-red-500 border-2 hover:none"
-							disabled={isLoading}
+							disabled={isPending}
 						>
 							Cancel
 						</Button>
 						<Button 
 							className="border-2" 
 							type="submit" 
-							disabled={isLoading}
+							disabled={isPending}
 						>
-							{isLoading ? "Submitting..." : "Submit"}
+							{isPending ? "Submitting..." : "Submit"}
 						</Button>
 					</div>
 				</form>
