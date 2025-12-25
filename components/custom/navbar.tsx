@@ -4,7 +4,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Button } from '@/components/ui/button';
 import {
 	Select,
 	SelectContent,
@@ -17,18 +16,8 @@ import {
 	TypographyH3,
 } from "@/components/custom/typography";
 import {
-	Edit,
 	Loader2,
-	PlusIcon
 } from 'lucide-react';
-import {
-	ContextMenu,
-	ContextMenuTrigger
-} from '../ui/context-menu';
-import {
-	ContextMenuContent,
-	ContextMenuItem
-} from '@radix-ui/react-context-menu';
 import { useAccount } from '@/context/account-context';
 
 function Navbar() {
@@ -46,16 +35,6 @@ function Navbar() {
 	const disableSelect = [
 		pathname.startsWith('/pages/accounts/')
 	].includes(true);
-
-	const handleNewAccount = () => {
-		setOpen(false)
-		router.push('/pages/accounts/add')
-	};
-
-	const handleEdit = (id: string) => {
-		setOpen(false);
-		router.push(`/pages/accounts/${id}`);
-	};
 
 	const handleSelect = (id: string) => {
 		setSelectedAccount(id);
@@ -106,7 +85,8 @@ function Navbar() {
 						className="w-[180px]
 						bg-primary
 						border-2 border-black
-						max-w-[120px]
+						min-w-[120px]
+						w-auto
 						text-sm"
 					>
 						<SelectValue placeholder="Accounts" />
