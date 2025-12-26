@@ -124,7 +124,7 @@ export default function Categories() {
 								<ArrowDown size={32} />
 							</div>
 							<div className='text-right -space-y-1'>
-								<div className='text-md'>
+								<div className='text-md lg:text-lg'>
 									Income
 								</div>
 								<div className='text-2xl font-bold'>
@@ -146,7 +146,7 @@ export default function Categories() {
 								<ArrowUp size={32} />
 							</div>
 							<div className='text-right -space-y-1'>
-								<div className='text-md'>
+								<div className='text-md lg:text-lg'>
 									Expense
 								</div>
 								<div className='text-2xl font-bold'>
@@ -191,7 +191,7 @@ export default function Categories() {
 				): (
 					<>
 						{categories && categories.length > 0 ? (
-							<div className='grid md:grid-cols-2 gap-2'>
+							<div className='grid lg:grid-cols-2 gap-2'>
 								{categories.map((category: Category) => (
 									<CategoryCard 
 										key={category.id}
