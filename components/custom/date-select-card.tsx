@@ -212,7 +212,7 @@ function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransact
       className={`
         transition-all duration-150
         ease-in-out
-        ${isScrolled
+        ${isScrolled && isMobile
             ? 'sticky top-0 z-10' 
             : 'pt-2 px-3'}
       `}
@@ -301,7 +301,7 @@ function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransact
             </div>
           </div>
         </CardHeader>
-        {content && !isScrolled && (
+        {content && (!isMobile || !isScrolled) && (
           <>
             <Separator />
             <CardContent className='flex flex-col gap-y-2'>

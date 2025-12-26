@@ -26,14 +26,14 @@ export default function TotalAmountSection({
       className={`
         transition-all duration-150
         ease-in-out
-        ${isScrolled
+        ${isScrolled && isMobile
             ? 'sticky top-0 z-10' 
             : 'pt-2 px-3'}
       `}
     >
       <Card className={`
           ${
-            isScrolled
+            isScrolled && isMobile
             ? `-mt-2 ${isMobile ? 'border-0 rounded-none' : 'border-2'}` 
             : 'border-2 mt-0'
           }
@@ -73,7 +73,7 @@ export default function TotalAmountSection({
               </h1> 
             )}
           </div>
-          {!isScrolled && (
+          {(!isMobile || !isScrolled) && (
             <div className='w-full flex flex-row justify-center space-x-2'>
               <Link href={`/pages/transactions/add?type=income`} className='w-full'>
                 <Button className='w-full flex flex-row -space-x-1'>
