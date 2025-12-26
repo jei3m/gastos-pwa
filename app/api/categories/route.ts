@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
 		const {
 			name,
 			type,
-			icon
+			icon,
+			description
 		} = await req.json();
 
 		const [resultCreate] = await db.query<responseRow[]>(
@@ -22,7 +23,8 @@ export async function POST(req: NextRequest) {
 				userID: await fetchUserID(),
 				name,
 				type,
-				icon
+				icon,
+				description,
 			}
 		);
 
