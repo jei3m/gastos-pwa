@@ -36,7 +36,6 @@ export default function Categories() {
 	const [totalIncome, setTotalIncome] = useState<string>("0.00");
 	const [totalExpense, setTotalExpense] = useState<string>("0.00");
 	const { selectedAccountID } = useAccount();
-	const router = useRouter();
 	const isMobile = useIsMobile();
 
   // Scroll to top on load
@@ -45,10 +44,6 @@ export default function Categories() {
     window.scroll(0, 0);
 		setIsScrolled(false);
   }, []);
-
-	const handleAddCategory = () => {
-		router.push('/pages/categories/add');
-	};
 
 	// Function to handle previous or next 
   const handleDateRangeChange = (start: string, end: string) => {
@@ -101,60 +96,62 @@ export default function Categories() {
 				isScrolled={isScrolled}
 				onDateRangeChange={handleDateRangeChange}
 				content={<>
-					<div className='flex flex-col'>
-						<h3 className='text-gray-600 font-normal text-lg'>
-							Balance
-						</h3>
-						<h1 className='text-2xl font-extrabold'>
-							{
-								isPending
-									? <Skeleton className='h-[30px] w-[140px] bg-gray-300' />
-									: `PHP ${formatAmount(calculateBalance())}`
-							}
-						</h1>
-					</div>
-					<div className='flex space-x-2'>
-						<div className='
-							bg-primary 
-							w-[50%] flex flex-row
-							justify-between items-center text-white
-							border-2 rounded-xl h-16 container p-2'
-						>
-							<div>
-								<ArrowDown size={32} />
-							</div>
-							<div className='text-right -space-y-1'>
-								<div className='text-md lg:text-lg'>
-									Income
-								</div>
-								<div className='text-2xl font-bold'>
-									{
-										isPending
-											? <Skeleton className='h-[30px] w-[100px] bg-green-300' />
-											: `${formatAmount(totalIncome)}`
-									}
-								</div>
-							</div>
+					<div className='flex flex-col md:flex-row gap-2 md:justify-between md:items-center'>
+						<div className='flex flex-col'>
+							<h3 className='text-gray-600 font-normal text-lg'>
+								Balance
+							</h3>
+							<h1 className='text-2xl font-extrabold'>
+								{
+									isPending
+										? <Skeleton className='h-[30px] w-[140px] bg-gray-300' />
+										: `PHP ${formatAmount(calculateBalance())}`
+								}
+							</h1>
 						</div>
-						<div className='
-							bg-red-500
-							w-[50%] flex flex-row
-							justify-between items-center text-white
-							border-2 rounded-xl h-16 container p-2'
-						>
-							<div>
-								<ArrowUp size={32} />
-							</div>
-							<div className='text-right -space-y-1'>
-								<div className='text-md lg:text-lg'>
-									Expense
+						<div className='w-full md:w-[64%] flex space-x-2'>
+							<div className='
+								bg-primary 
+								w-[50%] flex flex-row
+								justify-between items-center text-white
+								border-2 rounded-xl h-16 container p-2'
+							>
+								<div>
+									<ArrowDown size={32} />
 								</div>
-								<div className='text-2xl font-bold'>
-									{
-										isPending
-											? <Skeleton className='h-[30px] w-[100px] bg-red-300' />
-											: `${formatAmount(totalExpense)}`
-									}
+								<div className='text-right -space-y-1'>
+									<div className='text-md lg:text-lg'>
+										Income
+									</div>
+									<div className='text-xl font-bold'>
+										{
+											isPending
+												? <Skeleton className='h-[30px] w-[100px] bg-green-300' />
+												: `${formatAmount(totalIncome)}`
+										}
+									</div>
+								</div>
+							</div>
+							<div className='
+								bg-red-500
+								w-[50%] flex flex-row
+								justify-between items-center text-white
+								border-2 rounded-xl h-16 container p-2'
+							>
+								<div>
+									<ArrowUp size={32} />
+								</div>
+								<div className='text-right -space-y-1'>
+									<div className='text-md lg:text-lg'>
+										Expense
+									</div>
+									<div className='text-xl font-bold'>
+										{
+											isPending
+												? <Skeleton className='h-[30px] w-[100px] bg-red-300' />
+												: `${formatAmount(totalExpense)}`
+										}
+									</div>
 								</div>
 							</div>
 						</div>
@@ -196,6 +193,7 @@ export default function Categories() {
 									<CategoryCard 
 										key={category.id}
 										category={category}
+										hideAmount={false}
 									/>
 								))}
 							</div>
@@ -209,9 +207,6 @@ export default function Categories() {
 								</p>
 							</div>
 						)}
-						<Button onClick={handleAddCategory}>
-							<PlusIcon size={40} className='-mr-1'/> Add New Category
-						</Button>   
 					</>     
 				)}
 			</section>
