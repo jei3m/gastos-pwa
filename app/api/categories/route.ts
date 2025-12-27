@@ -3,8 +3,8 @@ import crypto from 'crypto';
 import { connection, db } from "@/utils/db";
 import { success, fail } from "@/utils/helpers";
 import { responseRow } from "@/types/response.types";
-import { createCategory, getCategories } from "@/sql/categories/categories.sql";
-import { fetchUserID } from "@/lib/auth-session";
+import { createCategory, getCategories } from "@/lib/sql/categories/categories.sql";
+import { fetchUserID } from "@/lib/auth/auth-session";
 
 export async function POST(req: NextRequest) {
 	try {
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 			name,
 			type,
 			icon,
-			accountID
+			description
 		} = await req.json();
 
 		const [resultCreate] = await db.query<responseRow[]>(
@@ -21,10 +21,10 @@ export async function POST(req: NextRequest) {
 				actionType: 'create',
 				id: crypto.randomUUID(),
 				userID: await fetchUserID(),
-				accountID,
 				name,
 				type,
-				icon
+				icon,
+				description,
 			}
 		);
 
@@ -73,13 +73,6 @@ export async function GET(request: Request) {
 				dateEnd,
 			}
 		);
-
-		console.log(
-			accountID,
-			filter,
-			dateStart,
-			dateEnd,
-		)
 
 		return success({
 			data: selectQuery

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,41 +23,37 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { transactionSchema } from "@/schema/transactions.schema";
-import { fetchCategories } from "@/store/categories.store";
+import { transactionSchema } from "@/lib/schema/transactions.schema";
 import { useAccount } from "@/context/account-context";
 import { Category } from "@/types/categories.types";
 import { toast } from "sonner";
-import { deleteTransaction, editTransactions, fetchTransactionByID } from "@/store/transactions.store";
+import { deleteTransaction, editTransaction } from "@/lib/tq-functions/transactions.tq.functions";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDownIcon, Trash2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { transactionTypes } from "@/lib/data";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { EditTransaction } from "@/types/transactions.types";
+import { EditTransactionPayload } from "@/types/transactions.types";
+import { 
+  dateToTimeString, 
+  TimePicker, 
+  timeStringToDate 
+} from "@/components/custom/timepicker";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { categoryQueryOptions } from "@/lib/tq-options/categories.tq.options";
+import { transactionByIDQueryOptions } from "@/lib/tq-options/transactions.tq.options";
 
 export default function EditTransactionForm() {
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
+  const [transactionDate, setTransactionDate] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("");
   const router = useRouter();
   const { selectedAccountID  } = useAccount();
+  const queryClient = useQueryClient();
   const params = useParams();
   const id = params.id as string;
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [transaction, setTransaction] = useState<EditTransaction>({
-    id: "",
-    note: "",
-    time: "",
-    type: "",
-    amount: "0.00",
-    category: "",
-    date: "",
-    refCategoriesID: "",
-    refUserID: "",
-    refAccountsID: ""
-  });
 
   useEffect(() => {
     fetchSession()
@@ -79,40 +75,55 @@ export default function EditTransactionForm() {
       refCategoriesID: "",
     }
   });
-  const transactionDate = form.getValues('date');
+
+  const { mutate: editTransactionMutation } = useMutation({
+    mutationFn: (transactionData: EditTransactionPayload) => editTransaction(id, transactionData),
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: transactionByIDQueryOptions(id).queryKey
+      });
+      toast.success(data.responseMessage);
+      form.reset();
+      router.push('/pages/transactions');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    }
+  });
+
+  const { mutate: deleteTransactionMutation } = useMutation({
+    mutationFn: (id: string) => deleteTransaction(id),
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: transactionByIDQueryOptions(id).queryKey
+      });
+      toast.success(data.responseMessage);
+      form.reset();
+      router.push('/pages/transactions');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    }
+  });
 
   async function onSubmit(values: z.infer<typeof transactionSchema>) {
-    setIsLoading(true);
     const transactionData = {
       ...values,
-      amount: parseFloat(values.amount) // Convert string to number
+      amount: parseFloat(values.amount)
     };
-    editTransactions(id, transactionData)
-      .then((transaction) => {
-        toast.success(transaction.responseMessage);
-        router.push('/pages/transactions');
-      })
-      .catch((error) => {
-        toast.error(error.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      })
-  };
-
-  const handleDelete = (id: string) => {
-    setIsLoading(true);
-    deleteTransaction(id)
-      .then((transaction) => {
-        toast.success(transaction.responseMessage);
-        router.push('/pages/transactions');
-      })
-      .catch((error) => {
-        toast.error(error.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      })
+    editTransactionMutation(transactionData);
   };
 
   // Set form value from Tab Selector
@@ -127,60 +138,46 @@ export default function EditTransactionForm() {
   }, [activeTab, form]);
 
   // Fetch transaction data
+  const { data: transactionData } = useQuery(
+    transactionByIDQueryOptions(id)
+  );
+
+  const transaction = useMemo(() => {
+    return transactionData?.[0];
+  }, [transactionData])
+
   useEffect(() => {
-    if (!id) return;
-    setIsLoading(true);
-    fetchTransactionByID(id)
-      .then((transaction) => {
-        if (transaction) {
-          setActiveTab(transaction[0].type);
-          setTransaction(transaction[0]);
-        }
-      })
-      .catch((error) => {
-        if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("Failed to load transaction data");
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-    
-  }, [id, setActiveTab]);
+    if (!transaction) {
+      return;
+    } else {
+      setActiveTab(transaction.type);
+    };
+  }, [transaction, setActiveTab]);
 
   // Fetch categories
-  useEffect(() => {
-    if (!selectedAccountID) return;
-    setIsLoading(true);
-    form.setValue('refAccountsID', selectedAccountID);
-    fetchCategories(activeTab, selectedAccountID)
-      .then((categories) => {
-        setCategories(categories[0]?.details);
-      })
-      .catch((error) => {
-        if (error instanceof Error) {
-          toast.error(error.message);
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      })
-  },[form, activeTab, selectedAccountID]);
+  const { data: categoriesData } = useQuery(
+    categoryQueryOptions(
+      activeTab!,
+      selectedAccountID!
+    )
+  );
+  const categories = useMemo(() => {
+    return categoriesData?.[0]?.details;
+  }, [categoriesData]);
 
   // Set form values
   useEffect(() => {
-    if (!transaction && !categories) return;
+    if (!transaction || !categories || !selectedAccountID) return;
     form.setValue('note', transaction.note);
     form.setValue('amount', transaction.amount);
     if (!form.getValues('type')) {
       form.setValue('type', transaction.type);
     };
     form.setValue('time', transaction.time);
-    form.setValue('date', transaction.date);
+    setTransactionDate(transaction.date)
     form.setValue('refCategoriesID', transaction.refCategoriesID);
-  }, [form, transaction, categories]);
+    form.setValue('refAccountsID', selectedAccountID);
+  }, [form, transaction, categories, selectedAccountID]);
 
   return (
     <main className='flex flex-col space-y-4 p-3'>
@@ -211,13 +208,13 @@ export default function EditTransactionForm() {
               <Button
                 variant="destructive"
                 className="border-2"
-                onClick={() => handleDelete(id)}
+                onClick={() => deleteTransactionMutation(id)}
               >
                 Yes, I&apos;m sure
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>    
+        </Dialog>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="-mt-1">
@@ -254,11 +251,14 @@ export default function EditTransactionForm() {
                 <FormControl>
                   <Input
                     required
-                    placeholder="PHP 0.00..."
+                    placeholder="0.00"
                     {...field}
                     className="h-9
                     rounded-lg border-2
                     border-black bg-white"
+                    type="number"
+                    inputMode="decimal"
+                    pattern="[0-9\.]*"
                   />
                 </FormControl>
                 <FormMessage />
@@ -282,11 +282,11 @@ export default function EditTransactionForm() {
                     <SelectContent className="border-2">
                       {categories && (
                         <>
-                          {categories.map((category, index) => (
-                              <SelectItem key={index} value={category.id}>
-                                {category.name}
-                              </SelectItem>
-                          ))}                        
+                          {categories.map((category: Category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
                         </>
                       )}
 
@@ -320,7 +320,7 @@ export default function EditTransactionForm() {
               </FormItem>
             )}
           />
-          <div className="flex flex-row space-x-2">
+          <div className="grid grid-cols-2 gap-x-2">
             <FormField
               control={form.control}
               name="date"
@@ -333,7 +333,7 @@ export default function EditTransactionForm() {
                     <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
                       <PopoverTrigger asChild>
                         <Button
-                            disabled={isLoading}
+                          disabled={isLoading}
                           variant="outline"
                           id="date"
                           className="justify-between font-normal border-2 bg-white text-[16px]"
@@ -369,21 +369,21 @@ export default function EditTransactionForm() {
             <FormField
               control={form.control}
               name="time"
-              disabled={isLoading}
               render={({ field }) => (
                 <FormItem className="-space-y-1 w-full">
                   <FormLabel className="text-md font-medium">
                     Time
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      required
-                      placeholder="Time..."
-                      type="time"
-                      {...field}
-                      className="h-9
-                      rounded-lg border-2
-                      border-black bg-white"
+                    <TimePicker
+                      value={timeStringToDate(field.value)}
+                      onChange={(date) => {
+                        if (date) {
+                          const timeString = dateToTimeString(date);
+                          field.onChange(timeString);
+                        }
+                      }}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />

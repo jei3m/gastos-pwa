@@ -2,12 +2,12 @@ import { NextRequest } from "next/server";
 import { connection, db } from "@/utils/db";
 import { success, fail } from "@/utils/helpers";
 import { responseRow } from "@/types/response.types";
-import { fetchUserID } from '@/lib/auth-session';
+import { fetchUserID } from '@/lib/auth/auth-session';
 import {
     getAccountByID,
     deleteAccount,
     updateAccount
-} from "@/sql/accounts/accounts.sql";
+} from "@/lib/sql/accounts/accounts.sql";
 
 // Get Specific Account
 export async function GET(

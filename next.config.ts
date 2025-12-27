@@ -2,7 +2,12 @@ import type { NextConfig } from 'next';
 import withPWA from '@ducanh2912/next-pwa';
 
 const nextConfig: NextConfig = {
-  /* your regular Next.js options */
+  reactCompiler: true,
+  cacheComponents: true,
+  turbopack: {},
+  images: {
+    domains: ['lh3.googleusercontent.com'],
+  },
 };
 
 const isDev = process.env.NODE_ENV === 'development';

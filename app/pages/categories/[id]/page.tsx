@@ -3,14 +3,6 @@ import { useState, useEffect, createElement } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchSession } from "@/utils/session";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { TypographyH3 } from "@/components/custom/typography";
 import {
 	Form,
@@ -40,129 +32,187 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { editCategory, fetchCategoryByID, deleteCategory } from "@/store/categories.store";
-import { editCategorySchema } from "@/schema/categories.schema";
+import { editCategory, deleteCategory } from "@/lib/tq-functions/categories.tq.functions";
+import { editCategorySchema } from "@/lib/schema/categories.schema";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { icons } from "@/lib/icons";
 import { SquareDashed } from "lucide-react";
 import { Trash2 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { categoryByIDQueryOptions } from "@/lib/tq-options/categories.tq.options";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { transactionTypes } from "@/lib/data";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+	AlertDialog, 
+	AlertDialogCancel, 
+	AlertDialogContent, 
+	AlertDialogDescription, 
+	AlertDialogFooter, 
+	AlertDialogHeader, 
+	AlertDialogTitle, 
+	AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
 
 export default function EditCategory() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [error, setError] = useState("");
 	const router = useRouter();
 	const params = useParams();
+	const queryClient = useQueryClient();
 	const id = params.id as string;
-
-	// Validate user session
-	useEffect(() => {
-		fetchSession()
-			.then(({ session }) => {
-				if (!session) {
-					router.push('/auth/login');
-				}
-			})
-	}, [router]);
 
 	const form = useForm<z.infer<typeof editCategorySchema>>({
 		resolver: zodResolver(editCategorySchema),
 		defaultValues: {
 			name: "",
 			type: "",
-			icon: ""
+			icon: "",
+			description: "",
+		}
+	});
+
+	const { mutate: editCategoryMutation } = useMutation({
+		mutationFn: (values: z.infer<typeof editCategorySchema>) => editCategory(id, values),
+		onMutate: () => {
+			setIsLoading(true);
+		},
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: categoryByIDQueryOptions(id).queryKey,
+			});
+			toast.success(data.responseMessage);
+			form.reset();
+			router.push('/pages/settings');
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+		onSettled: () => {
+			setIsLoading(false);
+		}
+	});
+
+	const { mutate: deleteCategoryMutation } = useMutation({
+		mutationFn: (id: string) => deleteCategory(id),
+		onMutate: () => {
+			setIsLoading(true);    
+		},
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: categoryByIDQueryOptions(id).queryKey,
+			});
+			toast.success(data.responseMessage);
+			router.push('/pages/settings');
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+		onSettled: () => {
+			setIsLoading(false);
 		}
 	});
 
 	async function onSubmit(values: z.infer<typeof editCategorySchema>) {
-		setIsLoading(true);
-		editCategory(id, values)
-			.then((category) => {
-				toast.success(category.responseMessage);
-				router.push('/pages/categories');
-			})
-			.catch((error) => {
-				toast.error(error.message);
-			})
-			.finally(() => {
-				setIsLoading(false);
-			})
+		editCategoryMutation(values)
 	};
 
-	const handleDelete = (id: string) => {
-		setIsLoading(true);
-		deleteCategory(id)
-			.then(() => {
-				router.push('/pages/categories');
-				setIsLoading(false);
-			})
-			.catch((error) => {
-				setError(error.message);
-				setIsLoading(false);
-			})
-	};
+	// Fetch category data
+	const { data, isPending, error: categoryError } = useQuery(
+		categoryByIDQueryOptions(id)
+	);
 
-	// Fetch category data and populate the form
+	// Populate the form
 	useEffect(() => {
-		setIsLoading(true);
-		fetchCategoryByID(id)
-			.then((category) => {
-				if (category && category.length > 0) {
-					form.reset({
-						name: category[0].name,
-						type: category[0].type,
-						icon: category[0].icon
-					});
-				}
-				setIsLoading(false);
-			})
-			.catch((error) => {
-				toast.error(error.message);
-				setError(error.message);
-				setIsLoading(false);
-			})
-	}, [id, form]);
+		if (categoryError) {
+			toast.error(categoryError.message);
+		};
+		if (!data || isPending) return;
+		form.reset({
+			name: data.name,
+			icon: data.icon,
+			type: data.type  || 'expense',
+			description: data.description || '',
+		});
+	}, [categoryError, data, isPending]);
+
+	useEffect(() => {
+		if (form?.formState?.errors?.type?.message) {
+			toast.error(form?.formState?.errors?.type?.message);
+			console.error(form?.formState?.errors?.type?.message);
+		};
+	}, [form?.formState?.errors?.type?.message]);
 
 	return (
 		<main className='flex flex-col space-y-4 p-3'>
-			<div className="flex flex-row space-x-2 justify-center items-center">
+			<div className="flex justify-between items-center">
 				<TypographyH3 className="font-bold">
 					Edit Category
 				</TypographyH3>
-				<Dialog>
-					<DialogTrigger className="text-red-500" disabled={isLoading}>
-						<Trash2 size={20}/>
-					</DialogTrigger>
-					<DialogContent
-						className="border-2 bg-primary [&>button]:hidden"
-						onOpenAutoFocus={(e) => e.preventDefault()}
-					>
-						<DialogHeader className="text-left">
-							<DialogTitle>Are you sure?</DialogTitle>
-							<DialogDescription className="text-gray-800">
-								This action cannot be undone. It will be permanently deleted.
-							</DialogDescription>
-						</DialogHeader>
-						<DialogFooter className="flex flex-row justify-between">
-							<DialogClose asChild>
-								<Button variant="outline" className="border-2">
-									Cancel
-								</Button>
-							</DialogClose>
-							<Button
-								variant="destructive"
-								className="border-2"
-								onClick={() => handleDelete(id)}
-							>
-								Yes, I&apos;m sure
-							</Button>
-						</DialogFooter>
-					</DialogContent>
-				</Dialog>
+        <AlertDialog>
+          <AlertDialogTrigger className="text-red-500" disabled={isLoading || isPending}>
+            <Trash2 size={20} />
+          </AlertDialogTrigger>
+          <AlertDialogContent
+            className="border-2 bg-primary [&>button]:hidden"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            <AlertDialogHeader className="text-left">
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-800">
+                This will permanently delete this category. <br/> <br/>
+								If there are existing transactions associated with this category, please delete them first.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex flex-row justify-between">
+              <AlertDialogCancel asChild>
+                <Button variant="outline" className="border-2">
+                  Cancel
+                </Button>
+              </AlertDialogCancel>
+              <Button
+                variant="destructive"
+                className="border-2"
+                onClick={() => deleteCategoryMutation(id)}
+              >
+                Yes, I&apos;m sure
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 			</div>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-4'>
+					<FormField 
+						control={form.control}
+						name="type"
+						render={({ field }) => (
+							<FormItem>
+								<FormControl>
+									<Tabs value={field.value.toLowerCase()} onValueChange={field.onChange} className="-mt-1">
+										<TabsList className='bg-white border-2 w-full h-10'>
+											{transactionTypes.map((type, index) => (
+												<TabsTrigger
+													value={type.toLowerCase()}
+													key={index}
+													className={`text-md
+														${
+															field.value.toLowerCase() === 'expense'
+																? 'data-[state=active]:bg-red-400'
+																: 'data-[state=active]:bg-green-300'
+														}`
+													}
+												>
+													{type}
+												</TabsTrigger>
+											))}
+										</TabsList>
+									</Tabs>
+								</FormControl>
+							</FormItem>
+						)} 
+					/>
 					<FormField
 						control={form.control}
 						name="icon"
@@ -235,39 +285,32 @@ export default function EditCategory() {
 							</FormItem>
 						)}
 					/>
-					<FormField
-						control={form.control}
-						name="type"
-						render={({ field }) => (
-							<FormItem className="-space-y-1">
-								<FormLabel className="text-md font-medium">
-									Category Type
-								</FormLabel>
-								<FormControl>
-									<Select value={field.value} onValueChange={field.onChange}>
-										<SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
-											<SelectValue placeholder="Select Category Type..." />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="Income">Income</SelectItem>
-											<SelectItem value="Expense">Expense</SelectItem>
-										</SelectContent>
-									</Select>
-								</FormControl>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-md font-medium">
+                  Description
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Description..."
+                    {...field}
+                    className="h-9
+										rounded-lg border-2
+										border-black bg-white"
+                  />
+                </FormControl>
 								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					{error &&
-						<div className="text-red-500 font-medium">
-							{error}
-						</div>
-					}
+              </FormItem>
+            )}
+          />
 					<div className='flex flex-row justify-between'>
 						<Button
 							onClick={() => router.back()}
 							className="bg-red-500 border-2 hover:none"
-							disabled={isLoading}
+							disabled={isLoading || isPending}
 							type="button"
 						>
 							Cancel
@@ -275,7 +318,7 @@ export default function EditCategory() {
 						<Button
 							className="border-2"
 							type="submit"
-							disabled={isLoading}
+							disabled={isLoading || isPending}
 						>
 							{isLoading ? "Submitting..." : "Update"}
 						</Button>

@@ -1,141 +1,108 @@
-"use client"
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+import { useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TypographyH4 } from '@/components/custom/typography';
-import { fetchTransactions } from '@/store/transactions.store';
-import { Transaction, TransactionDetails } from '@/types/transactions.types';
-import { toast } from 'sonner';
-import DateTransactionCard from '@/components/transactions/date-transaction-card';
 import { useAccount } from '@/context/account-context';
-import Link from 'next/link';
+import PulseLoader from '@/components/custom/pulse-loader';
+import TransactionCard from '@/components/transactions/transaction-card';
+import TotalAmountSection from '@/components/transactions/total-amount-section';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { transactionsInfiniteQueryOptions } from '@/lib/tq-options/transactions.tq.options';
+import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
+import { toast } from 'sonner';
 
 export default function Transactions() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [dateStart, setDateStart] = useState<string>('');
-  const [dateEnd, setDateEnd] = useState<string>('');
-  const router = useRouter();
+  const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const isMobile = useIsMobile();
-  const { selectedAccountID  } = useAccount();
+  const { selectedAccountID } = useAccount();
 
-  // Calculate the balance
-  const calculateBalance = () => {
-    if (!transactions || transactions.length === 0) return 'PHP 0.00';
-
-    const total = transactions.reduce((sum, transaction) => {
-      const amount = parseFloat(transaction.total);
-      return sum + (isNaN(amount) ? 0 : amount);
-    }, 0);
-
-    return `PHP ${total.toFixed(2)}`;
-  };
-
-  const handleAddTransaction = (type: 'income' | 'expense') => {
-    router.push(`/pages/transactions/add?type=${type}`);
-  };
-
-  // Handle date range changes from the DateTransactionCard component
-  const handleDateRangeChange = (start: string, end: string) => {
-    setDateStart(start);
-    setDateEnd(end);
-  };
-
-  // Fetch transactions from API when date range changes
+  // Scroll to top on load
   useEffect(() => {
-    if (dateStart && dateEnd && selectedAccountID) {
-      setIsLoading(true);
-      fetchTransactions(selectedAccountID, dateStart, dateEnd)
-        .then((data) => {
-          setTransactions(data)
-        })
-        .catch((error) => {
-          if (error instanceof Error) {
-            toast.error(error.message)
-          };
-        })
-        .finally(() => {
-          setIsLoading(false);
-        })
-    }
-  }, [selectedAccountID, dateStart, dateEnd]);
+    window.scrollTo(0, 0);
+    window.scroll(0, 0);
+		setIsScrolled(false);
+  }, []);
+
+  const { data: account, isPending: isAccountLoading } = useQuery(
+    accountByIDQueryOptions(
+      selectedAccountID!
+    )
+  );
+
+  const { 
+    data: transactionsData, 
+    hasNextPage, 
+    isFetchingNextPage,
+    fetchNextPage,
+    isPending,
+  } = useInfiniteQuery(
+    transactionsInfiniteQueryOptions(
+      selectedAccountID!
+    )
+  );
+
+  const transactions = useMemo(() => {
+    return transactionsData?.pages?.flatMap((item) => item.data)
+  }, [transactionsData]);
+
+  // Handle scroll for pagination
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isFetchingNextPage || !hasNextPage) return;
+      
+      const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const isBottomReached = scrollPosition + 1 >= scrollHeight;
+      
+      if (isBottomReached) {
+        fetchNextPage();
+      };
+    }; 
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isFetchingNextPage, hasNextPage]);
+
+  // Set isScrolled
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 40);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <main className={`flex flex-col space-y-2 min-h-screen
-      ${isMobile ? 'pb-15' : 'pb-18'}
-    `}>
-
-      {/* Date Card Section */}
-      <DateTransactionCard
-        balance={calculateBalance()}
-        onAddTransaction={handleAddTransaction}
-        onDateRangeChange={handleDateRangeChange}
+    <main className={`flex flex-col space-y-2 min-h-screen pb-18`}>
+      {/* Total Amount Section */}
+      <TotalAmountSection 
+        isLoading={isAccountLoading}
+        isScrolled={isScrolled}
+        account={account}
+        isMobile={isMobile}
       />
 
       {/* Transactions Section */}
       <section className='flex flex-col space-y-2 px-3 mb-2'>
         <TypographyH4>
-          Transactions
+          Recent Transactions
         </TypographyH4>
-        {isLoading ? (
-          <div>Loading...</div>
+        {isAccountLoading || isPending ? (
+          <PulseLoader/>
         ):(
           <>
-            { transactions && transactions.length > 0 ? (
-              <>
+            {transactions && transactions.length > 0 ? (
+              <div className='grid md:grid-cols-2 gap-2'>
                 {transactions.map((transaction, index) => (
-                  <Card key={index} className='border-2'>
-                    <CardHeader>
-                      <CardTitle className='flex justify-between'>
-                        <span>
-                          {new Date(transaction.date).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric'
-                          })}
-                        </span>
-                        <span
-                          className={
-                            `${
-                              transaction.total.startsWith('-')
-                                ? 'text-red-500'
-                                : 'text-primary'
-                            }`
-                          }
-                        >
-                          PHP {transaction.total}
-                        </span>
-                      </CardTitle>
-                    </CardHeader>
-                    <div className='w-full border-t border-gray-300' />
-                    <CardContent className='-mb-4'>
-                      {transaction.details.map((detail: TransactionDetails, index: number) => (
-                        <Link key={index} href={`transactions/${detail.id}`}>
-                          <div className='space-y-3 flex flex-row items-center justify-between'>
-                              <div className='flex flex-col text-sm'>
-                                <span>
-                                  {detail.category}
-                                </span>
-                                <span className='text-gray-600'>
-                                  {detail.note}
-                                </span>
-                              </div>
-                              <span className={`text-sm ${detail.type === 'income' ? 'text-primary' : 'text-red-500'}`}>
-                              PHP
-                                {
-                                  detail.type === 'income'
-                                    ? ' +'
-                                    : ' -'
-                                }
-                              {detail.amount.toFixed(2)}
-                              </span>                      
-                          </div>
-                        </Link>
-                      ))}
-                    </CardContent>
-                  </Card>
+                  <TransactionCard 
+                    transaction={transaction}
+                    key={index}
+                  />
                 ))}
-              </>
+                {isFetchingNextPage && (
+                  <PulseLoader className='mt-0'/>
+                )}
+              </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-10">
                 <TypographyH4 className='text-gray-400 font-semibold text-center'>

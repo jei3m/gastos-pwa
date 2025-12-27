@@ -4,13 +4,13 @@ import { db } from '@/utils/db';
 import {
 	createAccounts,
 	getAccounts
-} from '@/sql/accounts/accounts.sql';
+} from '@/lib/sql/accounts/accounts.sql';
 import {
 	success,
 	fail
 } from '@/utils/helpers';
 import { responseRow } from '@/types/response.types';
-import { fetchUserID } from '@/lib/auth-session';
+import { fetchUserID } from '@/lib/auth/auth-session';
 import { connection } from '@/utils/db';
 
 // Create New Account

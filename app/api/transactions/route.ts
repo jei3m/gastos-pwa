@@ -6,12 +6,14 @@ import {
 	fail
 } from '@/utils/helpers';
 import { responseRow } from '@/types/response.types';
-import { fetchUserID } from '@/lib/auth-session';
+import { fetchUserID } from '@/lib/auth/auth-session';
 import { connection } from '@/utils/db';
 import {
 	createTransaction,
-  getTransactions
-} from '@/sql/transactions/transactions.sql';
+  getTransactions,
+  getTransactionsCount
+} from '@/lib/sql/transactions/transactions.sql';
+import { RowDataPacket } from 'mysql2';
 
 // Create New Transaction
 export async function POST(req: NextRequest) {
@@ -69,23 +71,45 @@ export async function POST(req: NextRequest) {
   }
 };
 
+// Fetch Transactions with Pagination
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const accountID = url.searchParams.get('accountID');
     const dateStart = url.searchParams.get('dateStart');
     const dateEnd = url.searchParams.get('dateEnd');
-    const [rows] = await db.query(
-      getTransactions(),
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const limit = 10;
+    const offset = (page - 1) * limit;
+    const userID = await fetchUserID();
+
+    const [transactionCount] = await db.query<RowDataPacket[]>(
+      getTransactionsCount(),
       {
-        userID: await fetchUserID(),
+        userID,
         accountID,
-        dateStart,
-        dateEnd,
       }
     );
 
-    return success({data: rows});
+    const [rows] = await db.query<RowDataPacket[]>(
+      getTransactions(),
+      {
+        userID,
+        accountID,
+        dateStart: dateStart || null,
+        dateEnd: dateEnd || null,
+        limit,
+        offset
+      }
+    );
+
+    const hasMore = (offset + limit) < transactionCount[0].count;
+
+    return success({
+      hasMore: hasMore,
+      currentPage: page,
+      data: rows
+    });
 
   } catch (error) {
     return fail(

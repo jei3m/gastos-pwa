@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { fetchSession } from "@/utils/session";
+import { toast } from "sonner";
 
 export default function Register() {
   const [loading, setLoading] = useState(false);
@@ -40,9 +41,12 @@ export default function Register() {
 
     if (error) {
       setErrors([error.message || "Unknown Error"]);
+      toast.error(error.message);
       setLoading(false);
+    } else {
+      toast.success("User is registered successfully!");
+      router.push('/pages/transactions');
     };
-
     setLoading(false);
   };
 
@@ -105,7 +109,7 @@ export default function Register() {
               disabled={loading}
               className="mt-1 h-12 w-full rounded-lg border-2 font-semibold"
             >
-              {loading ? "Signing up…" : "Sign up"}
+              {loading ? "Signing up…" : "SIGN UP"}
             </Button>
           </form>
 

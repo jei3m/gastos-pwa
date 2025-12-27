@@ -1,15 +1,8 @@
 "use client";
-import { useState, useEffect, createElement } from "react";
+import { useState, createElement, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { TypographyH3 } from "@/components/custom/typography";
 import {
 	Form,
@@ -29,51 +22,57 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { createCategory } from "@/store/categories.store";
-import { createCategorySchema } from "@/schema/categories.schema";
+import { createCategory } from "@/lib/tq-functions/categories.tq.functions";
+import { createCategorySchema } from "@/lib/schema/categories.schema";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { icons } from "@/lib/icons";
 import { SquareDashed } from "lucide-react";
-import { useAccount } from '@/context/account-context';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { transactionTypes } from "@/lib/data";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function CreateCategory() {
-	const [isLoading, setIsLoading] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const router = useRouter();
-	const { selectedAccountID } = useAccount();
+	const queryClient = useQueryClient();
 
 	const form = useForm<z.infer<typeof createCategorySchema>>({
 		resolver: zodResolver(createCategorySchema),
 		defaultValues: {
 			name: "",
-			type: "",
+			type: "expense",
 			icon: "",
-			accountID: ""
+			description: ""
 		}
 	});
 
-	useEffect(() => {
-		if (selectedAccountID) {
-			form.setValue('accountID', selectedAccountID);
-		};
-	}, [form, selectedAccountID]);
+	const {mutate: createCategoryMutation, isPending} = useMutation({
+		mutationFn: (values: z.infer<typeof createCategorySchema>) => createCategory(values),
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: ['categories']
+			});
+			toast.success(data.responseMessage);
+			form.reset();
+			router.push('/pages/settings');
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
 
 	async function onSubmit(values: z.infer<typeof createCategorySchema>) {
-		setIsLoading(true);
-
-		createCategory(values)
-			.then((category) => {
-				toast.success(category.responseMessage);
-				router.push('/pages/categories');
-			})
-			.catch((error) => {
-				toast.error(error.message);
-			})
-			.finally(() => {
-				setIsLoading(false);
-			})
+		createCategoryMutation(values);
 	};
+
+	useEffect(() => {
+		if (form?.formState?.errors?.type?.message) {
+			toast.error(form?.formState?.errors?.type?.message);
+			console.error(form?.formState?.errors?.type?.message);
+		};
+	}, [form?.formState?.errors?.type?.message]);
 
 	return (
 		<main className='flex flex-col space-y-4 p-3'>
@@ -82,6 +81,39 @@ export default function CreateCategory() {
 			</TypographyH3>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-4'>
+					<FormField 
+						control={form.control}
+						name="type"
+						render={({ field }) => (
+							<FormItem>
+								<FormControl>
+									<Tabs
+										value={field.value.toLowerCase()} 
+										onValueChange={field.onChange} 
+										className="-mt-1"
+									>
+										<TabsList className='bg-white border-2 w-full h-10'>
+											{transactionTypes.map((type, index) => (
+												<TabsTrigger
+													value={type.toLowerCase()}
+													key={index}
+													className={`text-md
+														${
+															field.value.toLowerCase() === 'expense'
+																? 'data-[state=active]:bg-red-400'
+																: 'data-[state=active]:bg-green-300'
+														}`
+													}
+												>
+													{type}
+												</TabsTrigger>
+											))}
+										</TabsList>
+									</Tabs>
+								</FormControl>
+							</FormItem>
+						)}
+					/>
 					<FormField
 						control={form.control}
 						name="icon"
@@ -154,34 +186,35 @@ export default function CreateCategory() {
 							</FormItem>
 						)}
 					/>
-					<FormField
-						control={form.control}
-						name="type"
-						render={({ field }) => (
-							<FormItem className="-space-y-1">
-								<FormLabel className="text-md font-medium">
-									Category Type
-								</FormLabel>
-								<FormControl>
-									<Select onValueChange={field.onChange}>
-										<SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
-											<SelectValue placeholder="Select Category Type..." />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="Income">Income</SelectItem>
-											<SelectItem value="Expense">Expense</SelectItem>
-										</SelectContent>
-									</Select>
-								</FormControl>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-md font-medium">
+                  Description
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Description..."
+                    {...field}
+                    className="h-9
+										rounded-lg border-2
+										border-black bg-white"
+                  />
+                </FormControl>
 								<FormMessage />
-							</FormItem>
-						)}
-					/>
+              </FormItem>
+            )}
+          />
 					<div className='flex flex-row justify-between'>
 						<Button
-							onClick={() => router.back()}
+							onClick={() => {
+								form.reset();
+								router.back();
+							}}
 							className="bg-red-500 border-2 hover:none"
-							disabled={isLoading}
+							disabled={isPending}
 							type="button"
 						>
 							Cancel
@@ -189,9 +222,9 @@ export default function CreateCategory() {
 						<Button
 							className="border-2"
 							type="submit"
-							disabled={isLoading}
+							disabled={isPending}
 						>
-							{isLoading ? "Submitting..." : "Submit"}
+							{isPending ? "Submitting..." : "Submit"}
 						</Button>
 					</div>
 				</form>
