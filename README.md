@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gastos - Budget Tracker PWA
 
-## Getting Started
+## Overview
 
-First, run the development server:
+Gastos is a comprehensive budget tracking application designed to help users manage their finances effectively. The app provides a clean, intuitive interface for tracking expenses and income, managing accounts, categorizing transactions, and gaining insights into spending patterns. Built as a Progressive Web App (PWA) with NextJS.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Transaction Management**: Add, edit, and view income and expense transactions with detailed information
+- **Account Management**: Create and manage multiple accounts with individual balances
+- **Category Tracking**: Organize transactions into customizable income and expense categories
+- **Financial Overview**: View total net worth, income vs expenses, and account balances
+- **PWA Functionality**: Installable app experience but still browser-based
+- **Responsive Design**: Optimized for mobile, tablet, and desktop devices
+- **Authentication**: Secure user authentication and session management
+- **Date Range Filtering**: Analyze finances within specific time periods
+- **Dark/Light Mode**: System-aware theme switching
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technologies Used
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 16**: React framework for production-grade applications
+- **TypeScript**: Type-safe JavaScript development
+- **Tailwind CSS 4**: Utility-first CSS framework for styling
+- **PWA Support**: With `@ducanh2912/next-pwa` for PWA support
+- **Better Auth**: Authentication solution for user management
+- **TanStack Query**: Server state management and caching
+- **ShadCN/UI**: Accessible UI components built on Radix UI
+- **Lucide Icons**: Beautiful, consistent icon library
+- **MySQL**: Database with `mysql2` driver
+- **Zod**: Schema validation
+- **React Hook Form**: Form management and validation
 
-## Learn More
+## Usage
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Authentication**: Sign up or log in to access the application
+2. **Add Accounts**: Create accounts (e.g., Checking, Savings, Credit Card) in the Settings section
+3. **Create Categories**: Set up income and expense categories in the Settings section
+4. **Track Transactions**: Add transactions in the Transactions section by specifying amount, category, date, and note
+5. **View Analytics**: Check the Categories section to see spending breakdowns
+6. **Monitor Balances**: View account balances and net worth on the Accounts page
