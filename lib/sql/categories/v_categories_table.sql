@@ -6,6 +6,7 @@ SELECT
   name,
   type,
   icon,
+  description,
   ref_accounts_id,
   ref_user_id
 FROM

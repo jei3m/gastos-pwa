@@ -9,6 +9,7 @@ CREATE PROCEDURE `manage_categories`(
     IN p_name VARCHAR(15),
     IN p_type ENUM('Income','Expense'),
     IN p_icon VARCHAR(20),
+    IN p_description TEXT,
 
     OUT p_response JSON
 )
@@ -48,14 +49,16 @@ BEGIN
                     ref_user_id,
                     name,
                     type,
-                    icon
+                    icon,
+                    description
                 )
                 VALUES(
                     p_id,
                     p_user_id,
                     p_name,
                     p_type,
-                    p_icon
+                    p_icon,
+                    p_description
                 );
 
                 SET v_affected_rows = ROW_COUNT();
@@ -111,7 +114,8 @@ BEGIN
                 SET 
                     name = p_name,
                     type = p_type,
-                    icon = p_icon
+                    icon = p_icon,
+                    description = p_description
                 WHERE
                     ref_user_id = p_user_id
                     AND id = p_id

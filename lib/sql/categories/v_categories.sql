@@ -6,6 +6,7 @@ SELECT
 	c.icon,
     c.name,
     c.type,
+    c.description,
     SUM(t.amount) AS totalAmount,
     c.ref_user_id AS refUserID,
     c.ref_accounts_id AS refAccountsID
