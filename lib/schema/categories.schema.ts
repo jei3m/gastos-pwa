@@ -9,7 +9,10 @@ export const createCategorySchema = z.object({
     }),
     icon: z.string().min(1, {
         message: 'Please select a category icon',
-    })
+    }),
+    description: z.string({
+        message: 'Please add description'
+    }),
 });
 
 export const editCategorySchema = z.object({
@@ -21,5 +24,8 @@ export const editCategorySchema = z.object({
     }),
     icon: z.string().min(1, {
         message: 'Please select a category icon',
+    }),
+    description: z.string().min(1, {
+        message: 'Please add a description',
     })
 });

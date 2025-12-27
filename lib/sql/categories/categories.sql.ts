@@ -7,6 +7,7 @@ export const createCategory = () => {
                 :name,
                 :type,
                 :icon,
+                :description,
                 @response
             );
             SELECT @response AS response;`
@@ -71,6 +72,7 @@ export const getCategories = () => {
                         'icon', c.icon,
                         'name', c.name,
                         'type', c.type,
+                        'description', c.description,
                         'totalAmount', COALESCE(cd.amount, 0),
                         'refUserID', c.ref_user_id,
                         'refAccountsID', :accountID
@@ -103,6 +105,7 @@ export const getCategoryByID = () => {
                 name,
                 type,
                 icon,
+                description,
                 refUserID
             FROM 
                 v_categories
@@ -120,6 +123,7 @@ export const updateCategory = () => {
                 :name,
                 :type,
                 :icon,
+                :description,
                 @response
             );
             SELECT @response AS response;`
@@ -131,6 +135,7 @@ export const deleteCategory = () => {
                 :actionType,
                 :id,
                 :userID,
+                NULL,
                 NULL,
                 NULL,
                 NULL,
