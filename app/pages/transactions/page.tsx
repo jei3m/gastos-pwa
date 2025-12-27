@@ -9,6 +9,7 @@ import TotalAmountSection from '@/components/transactions/total-amount-section';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { transactionsInfiniteQueryOptions } from '@/lib/tq-options/transactions.tq.options';
 import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
+import { toast } from 'sonner';
 
 export default function Transactions() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
@@ -33,6 +34,7 @@ export default function Transactions() {
     hasNextPage, 
     isFetchingNextPage,
     fetchNextPage,
+    isPending,
   } = useInfiniteQuery(
     transactionsInfiniteQueryOptions(
       selectedAccountID!
@@ -85,7 +87,7 @@ export default function Transactions() {
         <TypographyH4>
           Recent Transactions
         </TypographyH4>
-        {isAccountLoading ? (
+        {isAccountLoading || isPending ? (
           <PulseLoader/>
         ):(
           <>
