@@ -1,5 +1,7 @@
 # Gastos - Budget Tracker PWA
 
+<img width="1920" height="1080" alt="ai-ponics" src="https://github.com/user-attachments/assets/82125bfe-59fa-4a8d-a49d-1d880b6c5cc9" />
+
 ## Overview
 
 Gastos is a comprehensive budget tracking application designed to help users manage their finances effectively. The app provides a clean, intuitive interface for tracking expenses and income, managing accounts, categorizing transactions, and gaining insights into spending patterns. Built as a Progressive Web App (PWA) with NextJS.
