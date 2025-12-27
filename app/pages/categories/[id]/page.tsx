@@ -3,13 +3,6 @@ import { useState, useEffect, createElement } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { TypographyH3 } from "@/components/custom/typography";
 import {
 	Form,
@@ -48,10 +41,14 @@ import { SquareDashed } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoryByIDQueryOptions } from "@/lib/tq-options/categories.tq.options";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { transactionTypes } from "@/lib/data";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function EditCategory() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+	const [activeTab, setActiveTab] = useState<string>("expense");
 	const router = useRouter();
 	const params = useParams();
 	const queryClient = useQueryClient();
@@ -62,7 +59,8 @@ export default function EditCategory() {
 		defaultValues: {
 			name: "",
 			type: "",
-			icon: ""
+			icon: "",
+			description: "",
 		}
 	});
 
@@ -77,7 +75,7 @@ export default function EditCategory() {
 			});
 			toast.success(data.responseMessage);
 			form.reset();
-			router.push('/pages/categories');
+			router.push('/pages/settings');
 		},
 		onError: (error) => {
 			toast.error(error.message);
@@ -97,7 +95,7 @@ export default function EditCategory() {
 				queryKey: categoryByIDQueryOptions(id).queryKey,
 			});
 			toast.success(data.responseMessage);
-			router.push('/pages/categories');
+			router.push('/pages/settings');
 		},
 		onError: (error) => {
 			toast.error(error.message);
@@ -124,14 +122,32 @@ export default function EditCategory() {
 		if (!data || isPending) return;
 		form.reset({
 			name: data.name,
-			type: data.type,
-			icon: data.icon
+			icon: data.icon,
+			description: data.description || '',
 		});
+		setActiveTab(data?.type?.toLowerCase());
 	}, [categoryError, data, isPending]);
+
+  // Set form value from Tab Selector
+  useEffect(() => {
+    if (
+      activeTab
+      && (activeTab === 'income'
+      || activeTab === 'expense')
+    ) {
+      form.setValue('type', activeTab);
+    }
+  }, [activeTab, form]);
+
+	useEffect(() => {
+		if (form.formState.errors.type?.message) {
+			toast.error(form.formState.errors.type?.message)
+		}
+	}, [form.formState.errors.type?.message]);
 
 	return (
 		<main className='flex flex-col space-y-4 p-3'>
-			<div className="flex flex-row space-x-2 justify-center items-center">
+			<div className="flex justify-between items-center">
 				<TypographyH3 className="font-bold">
 					Edit Category
 				</TypographyH3>
@@ -166,6 +182,27 @@ export default function EditCategory() {
 					</DialogContent>
 				</Dialog>
 			</div>
+
+			<Tabs value={activeTab} onValueChange={setActiveTab} className="-mt-1">
+				<TabsList className='bg-white border-2 w-full h-10'>
+					{transactionTypes.map((type, index) => (
+						<TabsTrigger
+							value={type.toLowerCase()}
+							key={index}
+							className={`text-md
+								${
+									activeTab === 'expense'
+										? 'data-[state=active]:bg-red-400'
+										: 'data-[state=active]:bg-green-300'
+								}`
+							}
+						>
+							{type}
+						</TabsTrigger>
+					))}
+				</TabsList>
+			</Tabs>
+
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-4'>
 					<FormField
@@ -240,29 +277,27 @@ export default function EditCategory() {
 							</FormItem>
 						)}
 					/>
-					<FormField
-						control={form.control}
-						name="type"
-						render={({ field }) => (
-							<FormItem className="-space-y-1">
-								<FormLabel className="text-md font-medium">
-									Category Type
-								</FormLabel>
-								<FormControl>
-									<Select value={field.value} onValueChange={field.onChange}>
-										<SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
-											<SelectValue placeholder="Select Category Type..." />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="Income">Income</SelectItem>
-											<SelectItem value="Expense">Expense</SelectItem>
-										</SelectContent>
-									</Select>
-								</FormControl>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-md font-medium">
+                  Description
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Description..."
+                    {...field}
+                    className="h-9
+										rounded-lg border-2
+										border-black bg-white"
+                  />
+                </FormControl>
 								<FormMessage />
-							</FormItem>
-						)}
-					/>
+              </FormItem>
+            )}
+          />
 					<div className='flex flex-row justify-between'>
 						<Button
 							onClick={() => router.back()}

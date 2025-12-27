@@ -1,15 +1,8 @@
 "use client";
-import { useState, createElement, useMemo } from "react";
+import { useState, createElement, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { TypographyH3 } from "@/components/custom/typography";
 import {
 	Form,
@@ -36,9 +29,13 @@ import { Card } from "@/components/ui/card";
 import { icons } from "@/lib/icons";
 import { SquareDashed } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { transactionTypes } from "@/lib/data";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function CreateCategory() {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+	const [activeTab, setActiveTab] = useState<string>("expense");
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
@@ -47,7 +44,8 @@ export default function CreateCategory() {
 		defaultValues: {
 			name: "",
 			type: "",
-			icon: ""
+			icon: "",
+			description: ""
 		}
 	});
 
@@ -59,7 +57,7 @@ export default function CreateCategory() {
 			});
 			toast.success(data.responseMessage);
 			form.reset();
-			router.push('/pages/categories');
+			router.push('/pages/settings');
 		},
 		onError: (error) => {
 			toast.error(error.message);
@@ -70,11 +68,47 @@ export default function CreateCategory() {
 		createCategoryMutation(values);
 	};
 
+	// Set form value from Tab Selector
+	useEffect(() => {
+		if (
+			activeTab
+			&& (activeTab === 'income'
+			|| activeTab === 'expense')
+		) {
+			form.setValue('type', activeTab);
+		}
+	}, [activeTab, form]);
+
+	useEffect(() => {
+		if (form.formState.errors.type?.message) {
+			toast.error(form.formState.errors.type?.message)
+		}
+	}, [form.formState.errors.type?.message]);
+
 	return (
 		<main className='flex flex-col space-y-4 p-3'>
 			<TypographyH3 className="font-bold text-center">
 				Create New Category
 			</TypographyH3>
+			<Tabs value={activeTab} onValueChange={setActiveTab} className="-mt-1">
+				<TabsList className='bg-white border-2 w-full h-10'>
+					{transactionTypes.map((type, index) => (
+						<TabsTrigger
+							value={type.toLowerCase()}
+							key={index}
+							className={`text-md
+								${
+									activeTab === 'expense'
+										? 'data-[state=active]:bg-red-400'
+										: 'data-[state=active]:bg-green-300'
+								}`
+							}
+						>
+							{type}
+						</TabsTrigger>
+					))}
+				</TabsList>
+			</Tabs>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-4'>
 					<FormField
@@ -149,32 +183,27 @@ export default function CreateCategory() {
 							</FormItem>
 						)}
 					/>
-					<FormField
-						control={form.control}
-						name="type"
-						render={({ field }) => (
-							<FormItem className="-space-y-1">
-								<FormLabel className="text-md font-medium">
-									Category Type
-								</FormLabel>
-								<FormControl>
-									<Select 
-										onValueChange={field.onChange} 
-										value={field.value}
-									>
-										<SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
-											<SelectValue placeholder="Select Category Type..." />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="Income">Income</SelectItem>
-											<SelectItem value="Expense">Expense</SelectItem>
-										</SelectContent>
-									</Select>
-								</FormControl>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-md font-medium">
+                  Description
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Description..."
+                    {...field}
+                    className="h-9
+										rounded-lg border-2
+										border-black bg-white"
+                  />
+                </FormControl>
 								<FormMessage />
-							</FormItem>
-						)}
-					/>
+              </FormItem>
+            )}
+          />
 					<div className='flex flex-row justify-between'>
 						<Button
 							onClick={() => {
