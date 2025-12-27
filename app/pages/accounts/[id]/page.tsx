@@ -21,16 +21,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   createAccountSchema,
   updateAccountSchema,
 } from "@/lib/schema/acccounts.schema";
@@ -48,6 +38,16 @@ import {
   accountByIDQueryOptions,
   accountsQueryOptions,
 } from "@/lib/tq-options/accounts.tq.options";
+import { 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialog, 
+  AlertDialogCancel, 
+  AlertDialogTrigger, 
+  AlertDialogContent
+} from "@/components/ui/alert-dialog";
+import { AlertDialogDescription } from "@radix-ui/react-alert-dialog";
 
 export default function EditAccount() {
   const router = useRouter();
@@ -118,26 +118,29 @@ export default function EditAccount() {
         <TypographyH3 className="font-bold text-center">
           Edit Account
         </TypographyH3>
-        <Dialog>
-          <DialogTrigger className="text-red-500" disabled={isDisabled}>
+        <AlertDialog>
+          <AlertDialogTrigger className="text-red-500" disabled={isDisabled}>
             <Trash2 size={20} />
-          </DialogTrigger>
-          <DialogContent
+          </AlertDialogTrigger>
+          <AlertDialogContent
             className="border-2 bg-primary [&>button]:hidden"
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
-            <DialogHeader className="text-left">
-              <DialogTitle>Are you sure?</DialogTitle>
-              <DialogDescription className="text-gray-800">
-                This action cannot be undone. It will be permanently deleted.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-between">
-              <DialogClose asChild>
+            <AlertDialogHeader className="text-left">
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-800">
+                This will permanently delete this account, and all transactions linked to this account.
+                <br/>
+                <br/>
+                <span className="font-semibold text-md">This action cannot be undone.</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex flex-row justify-between">
+              <AlertDialogCancel asChild>
                 <Button variant="outline" className="border-2">
                   Cancel
                 </Button>
-              </DialogClose>
+              </AlertDialogCancel>
               <Button
                 variant="destructive"
                 className="border-2"
@@ -145,9 +148,9 @@ export default function EditAccount() {
               >
                 Yes, I&apos;m sure
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
       <Form {...form}>
         <form

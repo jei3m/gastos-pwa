@@ -44,11 +44,20 @@ import { categoryByIDQueryOptions } from "@/lib/tq-options/categories.tq.options
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { transactionTypes } from "@/lib/data";
 import { Textarea } from "@/components/ui/textarea";
+import { 
+	AlertDialog, 
+	AlertDialogCancel, 
+	AlertDialogContent, 
+	AlertDialogDescription, 
+	AlertDialogFooter, 
+	AlertDialogHeader, 
+	AlertDialogTitle, 
+	AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
 
 export default function EditCategory() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [activeTab, setActiveTab] = useState<string>("expense");
 	const router = useRouter();
 	const params = useParams();
 	const queryClient = useQueryClient();
@@ -141,36 +150,37 @@ export default function EditCategory() {
 				<TypographyH3 className="font-bold">
 					Edit Category
 				</TypographyH3>
-				<Dialog>
-					<DialogTrigger className="text-red-500" disabled={isLoading || isPending}>
-						<Trash2 size={20}/>
-					</DialogTrigger>
-					<DialogContent
-						className="border-2 bg-primary [&>button]:hidden"
-						onOpenAutoFocus={(e) => e.preventDefault()}
-					>
-						<DialogHeader className="text-left">
-							<DialogTitle>Are you sure?</DialogTitle>
-							<DialogDescription className="text-gray-800">
-								This action cannot be undone. It will be permanently deleted.
-							</DialogDescription>
-						</DialogHeader>
-						<DialogFooter className="flex flex-row justify-between">
-							<DialogClose asChild>
-								<Button variant="outline" className="border-2">
-									Cancel
-								</Button>
-							</DialogClose>
-							<Button
-								variant="destructive"
-								className="border-2"
-								onClick={() => deleteCategoryMutation(id)}
-							>
-								Yes, I&apos;m sure
-							</Button>
-						</DialogFooter>
-					</DialogContent>
-				</Dialog>
+        <AlertDialog>
+          <AlertDialogTrigger className="text-red-500" disabled={isLoading || isPending}>
+            <Trash2 size={20} />
+          </AlertDialogTrigger>
+          <AlertDialogContent
+            className="border-2 bg-primary [&>button]:hidden"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            <AlertDialogHeader className="text-left">
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-800">
+                This will permanently delete this category. <br/> <br/>
+								If there are existing transactions associated with this category, please delete them first.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex flex-row justify-between">
+              <AlertDialogCancel asChild>
+                <Button variant="outline" className="border-2">
+                  Cancel
+                </Button>
+              </AlertDialogCancel>
+              <Button
+                variant="destructive"
+                className="border-2"
+                onClick={() => deleteCategoryMutation(id)}
+              >
+                Yes, I&apos;m sure
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 			</div>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-4'>
