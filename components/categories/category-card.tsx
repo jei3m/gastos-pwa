@@ -8,12 +8,14 @@ import Link from 'next/link';
 
 interface CategoryCardProps {
   category: Category,
-  hideAmount: boolean
+  hideAmount: boolean,
+  showDescription?: boolean,
 };
 
 export default function CategoryCard({
   category,
-  hideAmount
+  hideAmount,
+  showDescription,
 }: CategoryCardProps) {
 
   // Convert string to React component
@@ -44,7 +46,12 @@ export default function CategoryCard({
             <div>
               <TypographyH5 className='font-semibold'>
                 {category.name}
-              </TypographyH5>									
+              </TypographyH5>
+              {showDescription && (
+                <div className=''>
+                  {category.description || ''}
+                </div>                
+              )}
             </div>
           </div>
           {!hideAmount && (
@@ -69,4 +76,4 @@ export default function CategoryCard({
       </Card>
     </Link>
   )
-}
+};
