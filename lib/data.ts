@@ -7,6 +7,8 @@ export const categoryTypes = ["Expense", "Income"];
 
 export const transactionTypes = ["Expense", "Income"];
 
+export const accountTypes = ["All", "Digital", "Cash"];
+
 export const menuItems: DockItem[] = [
   { 
     label: 'transactions', 
