@@ -14,7 +14,6 @@ import {
 	ArrowUp,
 } from 'lucide-react';
 import { TypographyH4 } from '@/components/custom/typography';
-import { Button } from '@/components/ui/button';
 import { useAccount } from '@/context/account-context';
 import DateSelectCard from '@/components/custom/date-select-card';
 import PulseLoader from '@/components/custom/pulse-loader';
