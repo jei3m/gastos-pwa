@@ -23,7 +23,7 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { transactionSchema } from "@/lib/schema/transactions.schema";
+import { editTransactionSchema } from "@/lib/schema/transactions.schema";
 import { useAccount } from "@/context/account-context";
 import { Category } from "@/types/categories.types";
 import { toast } from "sonner";
@@ -64,8 +64,8 @@ export default function EditTransactionForm() {
       })
   },[router])
 
-  const form = useForm<z.infer<typeof transactionSchema>>({
-    resolver: zodResolver(transactionSchema),
+  const form = useForm<z.infer<typeof editTransactionSchema>>({
+    resolver: zodResolver(editTransactionSchema),
     defaultValues: {
       note: "",
       amount: "0.00",
@@ -118,7 +118,7 @@ export default function EditTransactionForm() {
     }
   });
 
-  async function onSubmit(values: z.infer<typeof transactionSchema>) {
+  async function onSubmit(values: z.infer<typeof editTransactionSchema>) {
     const transactionData = {
       ...values,
       amount: parseFloat(values.amount)
