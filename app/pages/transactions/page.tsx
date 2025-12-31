@@ -10,6 +10,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { transactionsInfiniteQueryOptions } from '@/lib/tq-options/transactions.tq.options';
 import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import { toast } from 'sonner';
+import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
 
 export default function Transactions() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
@@ -23,9 +24,13 @@ export default function Transactions() {
 		setIsScrolled(false);
   }, []);
 
-  const { data: account, isPending: isAccountLoading } = useQuery(
+  const { 
+    data: account,
+    isPending: isAccountLoading, 
+    error: accountError 
+  } = useQuery(
     accountByIDQueryOptions(
-      selectedAccountID!
+      selectedAccountID
     )
   );
 
@@ -35,9 +40,10 @@ export default function Transactions() {
     isFetchingNextPage,
     fetchNextPage,
     isPending,
+    error: transactionsError
   } = useInfiniteQuery(
     transactionsInfiniteQueryOptions(
-      selectedAccountID!
+      selectedAccountID
     )
   );
 
@@ -72,6 +78,22 @@ export default function Transactions() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Listen to errors
+  useEffect(() => {
+    if (accountError) {
+      toast.error(
+        accountError?.message 
+        || 'Failed to fetch account details'
+      );
+    };
+    if (transactionsError) {
+      toast.error(
+        transactionsError?.message 
+        || 'Failed to fetch transactions'
+      );
+    };
+  }, [accountError, transactionsError]);
+
   return (
     <main className={`flex flex-col space-y-2 min-h-screen pb-18`}>
       {/* Total Amount Section */}
@@ -91,28 +113,38 @@ export default function Transactions() {
           <PulseLoader/>
         ):(
           <>
-            {transactions && transactions.length > 0 ? (
-              <div className='grid md:grid-cols-2 gap-2'>
-                {transactions.map((transaction, index) => (
-                  <TransactionCard 
-                    transaction={transaction}
-                    key={index}
-                  />
-                ))}
-                {isFetchingNextPage && (
-                  <PulseLoader className='mt-0'/>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-10">
-                <TypographyH4 className='text-gray-400 font-semibold text-center'>
-                  No Transactions
-                </TypographyH4>
-                <p className="text-gray-500 text-sm text-center">
-                  Start by adding your first transaction
-                </p>
-              </div>
-            )}          
+            {selectedAccountID ? (
+              <>
+                {transactions && transactions.length > 0 ? (
+                  <>
+                    <div className='grid md:grid-cols-2 gap-2'>
+                      {transactions.map((transaction, index) => (
+                        <TransactionCard 
+                          transaction={transaction}
+                          key={index}
+                        />
+                      ))}
+                    </div>
+                    {isFetchingNextPage && (
+                      <PulseLoader className='mt-0'/>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-10">
+                    <TypographyH4 className='text-gray-400 font-semibold text-center'>
+                      No Transactions
+                    </TypographyH4>
+                    <p className="text-gray-500 text-sm text-center">
+                      Start by adding your first transaction
+                    </p>
+                  </div>
+                )}               
+              </>
+            ):(
+              <NoSelectedAccountDiv
+                data='transactions'
+              />
+            )}
           </>
         )}
       </section>
