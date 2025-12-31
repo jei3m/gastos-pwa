@@ -6,7 +6,7 @@ CREATE PROCEDURE `manage_transactions`(
 
     IN p_action_type ENUM('create', 'update', 'delete'),
 	IN p_id CHAR(36),
-	IN p_note VARCHAR(20),
+	IN p_note VARCHAR(30),
 	IN p_amount DECIMAL(12,2),
 	IN p_type ENUM('income', 'expense'),
     IN p_time TIME,
