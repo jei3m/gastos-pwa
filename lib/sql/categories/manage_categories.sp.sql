@@ -15,6 +15,8 @@ CREATE PROCEDURE `manage_categories`(
 )
 BEGIN
     DECLARE v_affected_rows INT;
+    DECLARE v_existing_type ENUM('Income','Expense');
+    DECLARE v_transactions_exist TINYINT DEFAULT 0;
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
@@ -34,6 +36,7 @@ BEGIN
                     WHERE
                         ref_user_id = p_user_id
                         AND name = p_name
+                        AND type = p_type
                     LIMIT 1
                 ) THEN
                     SET p_response = JSON_OBJECT(
@@ -92,6 +95,28 @@ BEGIN
                     LEAVE main;
                 END IF;
 
+                -- Get existing category type
+                SELECT type
+                INTO v_existing_type
+                FROM categories
+                WHERE id = p_id
+                LIMIT 1;
+
+                -- Get associated transactions
+                SELECT 1
+				INTO v_transactions_exist
+                FROM transactions
+                WHERE ref_categories_id = p_id
+                LIMIT 1;
+
+                IF p_type <> v_existing_type AND v_transactions_exist THEN
+                    SET p_response = JSON_OBJECT(
+                        'responseCode', 409,
+                        'responseMessage', 'Cannot change category type with associated transactions'
+                    );
+                    LEAVE main;
+                END IF;
+
                 -- Validate duplicate category name
                 IF EXISTS (
                     SELECT 1
@@ -99,6 +124,7 @@ BEGIN
                     WHERE
                         ref_user_id = p_user_id
                         AND name = p_name
+                        AND type = p_type
                         AND id <> p_id
                     LIMIT 1
                 ) THEN

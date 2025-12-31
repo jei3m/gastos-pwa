@@ -9,7 +9,7 @@ import {
 } from "../tq-functions/transactions.tq.functions";
 
 export function transactionsInfiniteQueryOptions(
-  selectedAccountID: string
+  selectedAccountID: string | null
 ) {
   return infiniteQueryOptions({
     queryKey: ['transactions', selectedAccountID],
@@ -21,7 +21,7 @@ export function transactionsInfiniteQueryOptions(
         ? lastPage.currentPage + 1
         : undefined
     },
-    enabled: !!selectedAccountID
+    retry: false
   })
 };
 

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, createElement } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,32 +12,12 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import {
-	Drawer,
-	DrawerContent,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerTrigger,
-} from "@/components/ui/drawer";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { editCategory, deleteCategory } from "@/lib/tq-functions/categories.tq.functions";
 import { editCategorySchema } from "@/lib/schema/categories.schema";
 import { toast } from "sonner";
-import { Card } from "@/components/ui/card";
-import { icons } from "@/lib/icons";
-import { SquareDashed } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoryByIDQueryOptions } from "@/lib/tq-options/categories.tq.options";
@@ -54,6 +34,7 @@ import {
 	AlertDialogTitle, 
 	AlertDialogTrigger 
 } from "@/components/ui/alert-dialog";
+import IconPicker from "@/components/custom/icon-picker";
 
 export default function EditCategory() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -222,42 +203,11 @@ export default function EditCategory() {
 									Category Icon
 								</FormLabel>
 								<FormControl>
-									<div className="flex items-center gap-2">
-										<Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-											<DrawerTrigger asChild>
-												<div className="h-28 w-28 rounded-xl border-2 border-black bg-white cursor-pointer flex items-center justify-center">
-													{field.value ? (
-														createElement(icons[field.value as keyof typeof icons], { size: 60 })
-													) : (
-														<SquareDashed size={60} className="text-gray-400" />
-													)}
-												</div>
-											</DrawerTrigger>
-											<DrawerContent className="max-h-[80vh] p-4">
-												<DrawerHeader>
-													<DrawerTitle>Select an Icon</DrawerTitle>
-												</DrawerHeader>
-												<div className="w-full h-[60vh] overflow-y-auto p-2">
-													<div className="grid grid-cols-4 gap-2">
-														{Object.keys(icons).map((iconName) => (
-															<div
-																key={iconName}
-																className="flex items-center justify-center"
-																onClick={() => {
-																	field.onChange(iconName);
-																	setIsDrawerOpen(false);
-																}}
-															>
-																<Card className="bg-primary border-2 w-full flex justify-center items-center text-white">
-																	{createElement(icons[iconName as keyof typeof icons], { size: 32 })}
-																</Card>
-															</div>
-														))}
-													</div>
-												</div>
-											</DrawerContent>
-										</Drawer>
-									</div>
+                  <IconPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    type={form.watch('type')}
+                  />
 								</FormControl>
 								<FormMessage className="text-center" />
 							</FormItem>

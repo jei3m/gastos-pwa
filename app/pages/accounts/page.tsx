@@ -5,26 +5,25 @@ import PulseLoader from "@/components/custom/pulse-loader";
 import { 
   Card, 
   CardContent, 
-  CardFooter, 
   CardHeader,
 } from "@/components/ui/card";
 import { formatAmount } from "@/utils/format-amount";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TypographyH4 } from "@/components/custom/typography";
-import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
 import { accountsQueryOptions } from "@/lib/tq-options/accounts.tq.options";
 import { useQuery } from "@tanstack/react-query";
 import { Account } from "@/types/accounts.types";
+import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { accountTypes } from "@/lib/data";
 
 
 export default function Accounts() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [accountType, setAccountType] = useState("All");
   const isMobile = useIsMobile();
-  const router = useRouter();
 
   // Scroll to top on load
   useEffect(() => {
@@ -37,11 +36,36 @@ export default function Accounts() {
     accountsQueryOptions()
   );
 
+  const filteredAccounts = accounts?.filter((account: Account) => 
+    accountType === 'All'
+    ? true 
+    : account.type === accountType
+  );
+
   const calculateNetWorth = () => {
     if (!accounts) return '0.00';
+
+    const accountsToCalculate = isMobile
+      ? filteredAccounts
+      : accounts
     
     // Sum up all account balances
-    const netWorth = accounts.reduce((total: number, account: Account) => {
+    const netWorth = accountsToCalculate.reduce(
+      (total: number, account: Account) => {
+        const balance = parseFloat(account.totalBalance);
+        return total + (isNaN(balance) ? 0 : balance);
+    }, 0);
+    
+    return netWorth.toFixed(2);
+  };
+
+  const calculateNetWorthByType = (type: string) => {
+    if (!accounts) return '0.00';
+
+    const digitalAccounts = accounts.filter((account: Account) => account.type === type);
+    
+    // Sum up all account balances
+    const netWorth = digitalAccounts.reduce((total: number, account: Account) => {
       const balance = parseFloat(account.totalBalance);
       return total + (isNaN(balance) ? 0 : balance);
     }, 0);
@@ -60,25 +84,23 @@ export default function Accounts() {
   }, []);
 
   return (
-		<main className={`flex flex-col space-y-2 min-h-screen
-      ${isMobile ? 'pb-15' : 'pb-18'}
-    `}>
-      <section className={`
-        transition-all duration-150
-        ease-in-out
-        ${
+		<main className={cn(
+      'flex flex-col space-y-2 min-h-screen',
+      isMobile ? "pb-20" : "pb-4"
+    )}>
+      <section className={cn(
+        'transition-all duration-150 ease-in-out',
           isScrolled && isMobile
             ? 'sticky top-0 z-10'
-            : 'pt-2 px-3'
-        }
-      `}>
-        <Card className={`
-            ${
-              isScrolled && isMobile
-                ? `-mt-2 ${isMobile ? 'border-0 rounded-none' : 'border-2'}` 
-                : 'border-2 mt-0'
-            }
-          `}
+            : 'pt-2 px-3 flex md:flex-col lg:flex-row gap-2'
+      )}>
+        {/* Total Net Worth Card */}
+        <Card className={cn(
+            isScrolled && isMobile
+              ? '-mt-2 border-0 rounded-none'
+              : 'border-2 mt-0',
+            isMobile ? 'w-full' : 'flex-3'
+          )}
         >
           <CardContent className='space-y-2'>
             <div className='flex flex-col'>
@@ -97,6 +119,50 @@ export default function Accounts() {
             </div>
           </CardContent>
         </Card>
+        
+        {!isMobile && (
+          <>
+            {/* Total Digital Net Worth Card */}
+            <Card className="border-2 mt-0 flex-3">
+              <CardContent className='space-y-2'>
+                <div className='flex flex-col'>
+                  <h3 className='text-gray-600 font-normal text-lg'>
+                    Digital Net Worth
+                  </h3>
+                  {isAccountsLoading ? (
+                    <h1 className='text-2xl font-extrabold flex'>
+                      <Skeleton className='h-10 w-[50%] bg-gray-300'/>
+                    </h1>               
+                  ):(
+                    <h1 className='text-2xl font-extrabold'>
+                      PHP {formatAmount(calculateNetWorthByType('Digital'))}
+                    </h1> 
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            {/* Total Cash Net Worth Card */}
+            <Card className="border-2 mt-0 flex-3">
+              <CardContent className='space-y-2'>
+                <div className='flex flex-col'>
+                  <h3 className='text-gray-600 font-normal text-lg'>
+                    Cash Net Worth
+                  </h3>
+                  {isAccountsLoading ? (
+                    <h1 className='text-2xl font-extrabold flex'>
+                      <Skeleton className='h-10 w-[50%] bg-gray-300'/>
+                    </h1>               
+                  ):(
+                    <h1 className='text-2xl font-extrabold'>
+                      PHP {formatAmount(calculateNetWorthByType('Cash'))}
+                    </h1> 
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
         {isMobile && isScrolled && (
           <div className='w-full border-t-2 border-black' />
         )}
@@ -104,15 +170,29 @@ export default function Accounts() {
 
       {/* Accounts Section */}
       <section className='flex flex-col space-y-2 px-3 mb-2'>
-        <TypographyH4>
-          Accounts
-        </TypographyH4>
+				<Tabs value={accountType} onValueChange={setAccountType}>
+					<div className='flex flex-row justify-between items-center w-full'>
+						<TypographyH4>
+							Accounts
+						</TypographyH4>					
+						<TabsList className='border-black border-2 p-1'>
+							{accountTypes.map((type, index) => (
+								<TabsTrigger
+									value={type}
+									key={index}
+								>
+									{type}
+								</TabsTrigger>
+							))}
+						</TabsList>
+					</div>
+				</Tabs>
         {isAccountsLoading || !accounts ? (
           <PulseLoader/>
         ):(
           <>
             <div className="grid md:grid-cols-2 gap-2">
-              {accounts.map((account: Account) => (
+              {filteredAccounts.map((account: Account) => (
                 <Link
                   href={`/pages/accounts/${account.id}`}
                   key={account.id}

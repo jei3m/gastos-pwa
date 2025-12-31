@@ -20,6 +20,8 @@ export const getTransactions = () => {
     return `SELECT
                 date,
                 total,
+                totalIncome,
+                totalExpense,
                 details
             FROM
                 v_transactions

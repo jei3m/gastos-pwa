@@ -16,6 +16,10 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
+
+        if (!id || id === 'null') {
+            throw Error("There is no selected account");
+        };
         
         const [rows] = await db.query(
             getAccountByID(),

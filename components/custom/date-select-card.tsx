@@ -37,19 +37,31 @@ function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransact
 
   // Return dateStart, dateEnd, and dateDisplay
   const getDateRange = () => {
-    const toISODate = (d: Date) => d.toISOString().slice(0, 10);
+    // Format dates in local timezone (not UTC)
+    const toLocalISODate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
 
     if (isCustomRange && dateRange?.from && dateRange?.to) {
+      // Start and end of the day in local time
+      const fromDate = new Date(dateRange.from);
+      fromDate.setHours(0, 0, 0, 0);
+      
+      const toDate = new Date(dateRange.to);
+      toDate.setHours(23, 59, 59, 999);
+
       return {
-        dateStart: toISODate(dateRange?.from),
-        dateEnd: toISODate(dateRange?.to),
-        dateDisplay: `${dateRange?.from.toLocaleDateString(
+        dateStart: toLocalISODate(fromDate),
+        dateEnd: toLocalISODate(toDate),
+        dateDisplay: `${fromDate.toLocaleDateString(
           'en-US',
           {
             month: 'long',
             day: 'numeric'
-          })} -
-					${dateRange?.to.toLocaleDateString(
+          })} - ${toDate.toLocaleDateString(
             'en-US',
             {
               month: 'long',
@@ -67,61 +79,61 @@ function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransact
 
       // Set dateStart and dateEnd
       dateStart.setDate(diff);
+      dateStart.setHours(0, 0, 0, 0);
+      
       dateEnd.setDate(dateStart.getDate() + 6);
+      dateEnd.setHours(23, 59, 59, 999);
 
       return {
-        dateStart: toISODate(dateStart),
-        dateEnd: toISODate(dateEnd),
+        dateStart: toLocalISODate(dateStart),
+        dateEnd: toLocalISODate(dateEnd),
         dateDisplay: `${dateStart.toLocaleDateString(
           'en-US',
           {
             month: 'long',
             day: 'numeric'
-          })} -
-					${dateEnd.toLocaleDateString(
+          })} - ${dateEnd.toLocaleDateString(
             'en-US',
             {
               month: 'long',
               day: 'numeric'
             }
           )}`
-      }
+      };
     } else if (activeTab === 'monthly') {
-      const dateStart = new Date(
-        Date.UTC(newDate.getFullYear(), newDate.getMonth(), 1)
-      )
-      const dateEnd = new Date(
-        Date.UTC(newDate.getFullYear(), newDate.getMonth() + 1, 0)
-      );
+      // Use local time, not UTC
+      const dateStart = new Date(newDate.getFullYear(), newDate.getMonth(), 1);
+      dateStart.setHours(0, 0, 0, 0);
+      
+      const dateEnd = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0);
+      dateEnd.setHours(23, 59, 59, 999);
 
       return {
-        dateStart: toISODate(dateStart),
-        dateEnd: toISODate(dateEnd),
+        dateStart: toLocalISODate(dateStart),
+        dateEnd: toLocalISODate(dateEnd),
         dateDisplay: dateStart.toLocaleDateString(
           'en-US',
           {
             month: 'long',
-            year: 'numeric',
-            timeZone: 'UTC'
+            year: 'numeric'
           }
         )
       };
     } else {
-      const dateStart = new Date(
-        Date.UTC(newDate.getFullYear(), 0, 1)
-      )
-      const dateEnd = new Date(
-        Date.UTC(newDate.getFullYear(), 11, 31)
-      );
+      // Yearly
+      const dateStart = new Date(newDate.getFullYear(), 0, 1);
+      dateStart.setHours(0, 0, 0, 0);
+      
+      const dateEnd = new Date(newDate.getFullYear(), 11, 31);
+      dateEnd.setHours(23, 59, 59, 999);
 
       return {
-        dateStart: toISODate(dateStart),
-        dateEnd: toISODate(dateEnd),
+        dateStart: toLocalISODate(dateStart),
+        dateEnd: toLocalISODate(dateEnd),
         dateDisplay: dateStart.toLocaleDateString(
           'en-US',
           {
-            year: 'numeric',
-            timeZone: 'UTC'
+            year: 'numeric'
           }
         )
       };
@@ -156,11 +168,7 @@ function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransact
       return;
     };
 
-    if (activeTab === 'daily') {
-      newDate.setDate(
-        newDate.getDate() + (direction === 'prev' ? -1 : 1)
-      );
-    } else if (activeTab === 'weekly') {
+    if (activeTab === 'weekly') {
       newDate.setDate(
         newDate.getDate() + (direction === 'prev' ? -7 : 7)
       );

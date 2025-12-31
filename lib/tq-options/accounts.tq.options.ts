@@ -13,7 +13,7 @@ export function accountsQueryOptions() {
 };
 
 export function accountByIDQueryOptions(
-  selectedAccountID: string,
+  selectedAccountID: string | null,
 ) {
   return queryOptions({
     queryKey: [
@@ -22,9 +22,9 @@ export function accountByIDQueryOptions(
     ],
     queryFn: () => {
       return fetchAccountByID(
-        selectedAccountID!,
+        selectedAccountID,
       );
     },
-    enabled: !!selectedAccountID
+    retry: false
   })
 };

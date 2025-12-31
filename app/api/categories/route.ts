@@ -63,6 +63,10 @@ export async function GET(request: Request) {
 		const dateStart = url.searchParams.get('dateStart');
 		const dateEnd = url.searchParams.get('dateEnd');
 
+		if (!accountID) {
+			throw Error("There is no selected account");
+		};
+
 		const [selectQuery] = await db.query(
 			getCategories(),
 			{

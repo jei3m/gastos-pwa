@@ -4,7 +4,7 @@
 
 ## Overview
 
-Gastos is a comprehensive budget tracking application designed to help users manage their finances effectively. The app provides a clean, intuitive interface for tracking expenses and income, managing accounts, categorizing transactions, and gaining insights into spending patterns. Built as a Progressive Web App (PWA) with NextJS.
+Gastos is a comprehensive budget tracking application designed to help users manage their finances effectively. The app provides a clean, intuitive interface for tracking expenses and income, managing accounts, categorizing transactions, and gaining insights into spending patterns. Built as a Progressive Web App (PWA) with Next.js.
 
 ## Features
 
@@ -16,19 +16,18 @@ Gastos is a comprehensive budget tracking application designed to help users man
 - **Responsive Design**: Optimized for mobile, tablet, and desktop devices
 - **Authentication**: Secure user authentication and session management
 - **Date Range Filtering**: Analyze finances within specific time periods
-- **Dark/Light Mode**: System-aware theme switching
 
 ## Technologies Used
 
-- **Next.js 16**: React framework for production-grade applications
+- **Next.js**: React-based framework
 - **TypeScript**: Type-safe JavaScript development
-- **Tailwind CSS 4**: Utility-first CSS framework for styling
+- **Tailwind CSS**: Utility-first CSS framework for styling
 - **PWA Support**: With `@ducanh2912/next-pwa` for PWA support
 - **Better Auth**: Authentication solution for user management
 - **TanStack Query**: Server state management and caching
-- **ShadCN/UI**: Accessible UI components built on Radix UI
+- **ShadCN**: Accessible UI components built on Radix UI
 - **Lucide Icons**: Beautiful, consistent icon library
-- **MySQL**: Database with `mysql2` driver
+- **MySQL**: Relational database management system
 - **Zod**: Schema validation
 - **React Hook Form**: Form management and validation
 

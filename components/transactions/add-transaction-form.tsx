@@ -36,7 +36,7 @@ import {
   dateToTimeString, 
   TimePicker, 
   timeStringToDate 
-} from "@/components/custom/timepicker";
+} from "@/components/custom/time-picker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CreateTransaction } from "@/types/transactions.types";
 import { transactionsInfiniteQueryOptions } from "@/lib/tq-options/transactions.tq.options";

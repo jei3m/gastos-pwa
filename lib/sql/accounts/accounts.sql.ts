@@ -22,7 +22,8 @@ export const getAccounts = () => {
             FROM
                 v_accounts
             WHERE
-                ref_user_id = :userID;`
+                ref_user_id = :userID
+            ORDER BY name ASC;`
 };
 
 export const getAccountByID = () => {

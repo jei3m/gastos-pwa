@@ -4,7 +4,7 @@ import { fetchCategories, fetchCategoryByID } from "../tq-functions/categories.t
 
 export function categoryQueryOptions(
   categoryType: string,
-  selectedAccountID: string,
+  selectedAccountID: string | null,
   dateStart?: string,
   dateEnd?: string
 ) {
@@ -19,12 +19,13 @@ export function categoryQueryOptions(
     queryFn: () => {
       return fetchCategories(
         categoryType!,
-        selectedAccountID!,
+        selectedAccountID,
         dateStart,
         dateEnd
       );
     },
-    enabled: !!selectedAccountID || !!categoryType
+    enabled: !!categoryType,
+    retry: false,
   })
 };
 

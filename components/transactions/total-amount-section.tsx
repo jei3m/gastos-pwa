@@ -43,16 +43,16 @@ export default function TotalAmountSection({
           <div className='flex flex-rows items-center justify-between'>
             <div className='text-xl font-bold'>
               {
-                isLoading || !account 
+                isLoading 
                   ? <Skeleton className='h-4 w-[140px] bg-gray-300' /> 
-                  : account?.name
+                  : account?.name || 'N/A'
               }
             </div>
             <div className='text-md text-gray-600 font-normal'>
               {
-                isLoading || !account 
+                isLoading
                   ? <Skeleton className='h-4 w-[140px] bg-gray-300' />
-                  : account?.type
+                  : account?.type || 'N/A'
               }
             </div>
           </div>
@@ -63,13 +63,13 @@ export default function TotalAmountSection({
             <h3 className='text-gray-600 font-normal text-lg'>
               Balance
             </h3>
-            {isLoading || !account ? (
+            {isLoading ? (
               <h1 className='text-2xl font-extrabold flex'>
                 <Skeleton className='h-10 w-[50%] bg-gray-300'/>
               </h1>               
             ):(
               <h1 className='text-2xl font-extrabold'>
-                PHP {formatAmount(account?.totalBalance)}
+                PHP {formatAmount(account?.totalBalance || 0)}
               </h1> 
             )}
           </div>

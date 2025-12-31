@@ -1,10 +1,11 @@
 import { createElement } from 'react';
 import { Category } from '@/types/categories.types';
 import { Card, CardContent, CardDescription, CardTitle } from '../ui/card';
-import { icons } from '@/lib/icons';
+import { getIconById } from '@/lib/icons';
 import { TypographyH5 } from '../custom/typography';
 import { formatAmount } from '@/utils/format-amount';
 import Link from 'next/link';
+import { SquareDashed } from 'lucide-react';
 
 interface CategoryCardProps {
   category: Category,
@@ -17,12 +18,6 @@ export default function CategoryCard({
   hideAmount,
   showDescription,
 }: CategoryCardProps) {
-
-  // Convert string to React component
-  const getIconComponent = (iconName: string) => {
-    const iconKey = iconName;
-    return icons[iconKey as keyof typeof icons];
-  };
 
   // Returns true or false
   const isExpense = (type: string) => {
@@ -41,7 +36,10 @@ export default function CategoryCard({
                 : 'bg-primary'
               }
             `}>
-              {createElement(getIconComponent(category.icon), { size: 30 })}									
+              {createElement(
+                getIconById(category.icon)?.icon 
+                || SquareDashed, { size: 30 }
+              )}
             </div>
             <div>
               <TypographyH5 className='font-semibold'>

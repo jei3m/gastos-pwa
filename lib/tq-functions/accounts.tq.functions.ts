@@ -18,7 +18,7 @@ export const fetchAccounts = async () => {
 	}
 };
 
-export const fetchAccountByID = async (id: string) => {
+export const fetchAccountByID = async (id: string | null) => {
 	try {
 		const res = await fetch(`/api/accounts/${id}`, {
 			method: 'GET',

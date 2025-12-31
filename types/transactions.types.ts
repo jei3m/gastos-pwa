@@ -1,6 +1,8 @@
 export interface Transaction {
   date: string,
   total: string,
+  totalIncome: string,
+  totalExpense: string,
   details: TransactionDetails[],
   userID: string
 };

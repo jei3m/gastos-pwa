@@ -83,6 +83,10 @@ export async function GET(request: Request) {
     const offset = (page - 1) * limit;
     const userID = await fetchUserID();
 
+    if (!accountID) {
+      throw Error("There is no selected account");
+    };
+
     const [transactionCount] = await db.query<RowDataPacket[]>(
       getTransactionsCount(),
       {

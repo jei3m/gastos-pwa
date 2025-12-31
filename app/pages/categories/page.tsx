@@ -14,7 +14,6 @@ import {
 	ArrowUp,
 } from 'lucide-react';
 import { TypographyH4 } from '@/components/custom/typography';
-import { Button } from '@/components/ui/button';
 import { useAccount } from '@/context/account-context';
 import DateSelectCard from '@/components/custom/date-select-card';
 import PulseLoader from '@/components/custom/pulse-loader';
@@ -24,6 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
+import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
 
 export default function Categories() {
 	const [isScrolled, setIsScrolled] = useState(false);
@@ -60,7 +60,7 @@ export default function Categories() {
 	const { data, isPending, error } = useQuery(
 		categoryQueryOptions(
 			categoryType,
-			selectedAccountID!,
+			selectedAccountID,
 			dateStart,
 			dateEnd
 		)
@@ -185,25 +185,33 @@ export default function Categories() {
 					<PulseLoader/>
 				): (
 					<>
-						{categories && categories.length > 0 ? (
-							<div className='grid lg:grid-cols-2 gap-2'>
-								{categories.map((category: Category) => (
-									<CategoryCard 
-										key={category.id}
-										category={category}
-										hideAmount={false}
-									/>
-								))}
-							</div>
-						) : (
-							<div className="flex flex-col items-center justify-center py-10">
-								<TypographyH4 className='text-gray-400 font-semibold text-center'>
-									No Categories
-								</TypographyH4>
-								<p className="text-gray-500 text-sm text-center">
-									Start by adding your first category
-								</p>
-							</div>
+						{selectedAccountID ? (
+							<> 
+								{categories && categories.length > 0 ? (
+									<div className='grid lg:grid-cols-2 gap-2'>
+										{categories.map((category: Category) => (
+											<CategoryCard 
+												key={category.id}
+												category={category}
+												hideAmount={false}
+											/>
+										))}
+									</div>
+								) : (
+									<div className="flex flex-col items-center justify-center py-10">
+										<TypographyH4 className='text-gray-400 font-semibold text-center'>
+											No Categories
+										</TypographyH4>
+										<p className="text-gray-500 text-sm text-center">
+											Start by adding your first category
+										</p>
+									</div>
+								)}							
+							</>
+						):(
+							<NoSelectedAccountDiv 
+								data='categories'
+							/>
 						)}
 					</>     
 				)}
