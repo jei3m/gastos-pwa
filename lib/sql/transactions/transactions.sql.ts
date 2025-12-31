@@ -96,3 +96,20 @@ export const deleteTransaction = () => {
             );
             SELECT @response AS response;`;
 };
+
+export const transferTransaction = () => {
+    return `CALL transfer_transaction
+            (
+                :actionType,
+                :id,
+                :note,
+                :amount,
+                :time,
+                :date,
+                :refAccountsID,
+                :transferToAccountID,
+                :userID,
+                @response
+            );
+            SELECT @response AS response;`;
+};
