@@ -4,7 +4,6 @@ import {
   ShoppingBag,
   Heart,
   BookOpen,
-  DollarSign,
   Gift,
   Plane,
   HomeIcon,
@@ -22,9 +21,9 @@ import {
   Coffee,
   Landmark,
   HeartPulse,
-  Scale,
   ShoppingCart,
 	Ellipsis,
+  ArrowDownUp,
 } from "lucide-react";
 
 // Define types or interface
@@ -115,9 +114,9 @@ export const icons: IconData[] = [
     type: "expense",
   },
   {
-    id: "legal",
-    name: "Legal",
-    icon: Scale,
+    id: "transfer",
+    name: "Transfer",
+    icon: ArrowDownUp,
     type: "expense",
   },
   {
@@ -141,9 +140,9 @@ export const icons: IconData[] = [
 
   // Income
   {
-    id: "salary",
-    name: "Salary",
-    icon: DollarSign,
+    id: "transfer",
+    name: "Transfer",
+    icon: ArrowDownUp,
     type: "income",
   },
   { 
