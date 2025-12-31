@@ -38,7 +38,6 @@ import IconPicker from "@/components/custom/icon-picker";
 
 export default function EditCategory() {
 	const [isLoading, setIsLoading] = useState(false);
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const router = useRouter();
 	const params = useParams();
 	const queryClient = useQueryClient();
