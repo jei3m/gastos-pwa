@@ -21,7 +21,8 @@ export interface CreateTransaction {
   type: string,
   time: string,
   date: string,
-  refCategoriesID: string
+  refCategoriesID?: string,
+  transferToAccountID?: string,
 };
 
 export interface EditTransaction {
