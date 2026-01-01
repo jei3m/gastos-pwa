@@ -42,6 +42,7 @@ import { CreateTransaction } from "@/types/transactions.types";
 import { transactionsInfiniteQueryOptions } from "@/lib/tq-options/transactions.tq.options";
 import { categoryQueryOptions } from "@/lib/tq-options/categories.tq.options";
 import { Account } from "@/types/accounts.types";
+import CustomAlertDialog from "../custom/custom-alert-dialog";
 
 export default function AddTransactionForm() {
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
@@ -125,7 +126,9 @@ export default function AddTransactionForm() {
   }, [selectedAccountID])
 
   const isLoading = useMemo(() => {
-    return isCategoriesPending || isTransactionPending;
+    return transactionType !== 'transfer'
+    ? isCategoriesPending || isTransactionPending
+    : isTransactionPending;
   }, [isCategoriesPending, isTransactionPending]);
 
   return (
@@ -139,25 +142,30 @@ export default function AddTransactionForm() {
             control={form.control}
             name="type"
             render={({ field }) => (
-              <Tabs value={field.value.toLowerCase()} onValueChange={field.onChange} className="-mt-1">
-                <TabsList className='bg-white border-2 w-full h-10'>
-                  {addTransactionTypes.map((type, index) => (
-                    <TabsTrigger
-                      value={type.toLowerCase()}
-                      key={index}
-                      className={`text-md
-                        ${
-                          transactionType === 'expense'
-                            ? 'data-[state=active]:bg-red-400'
-                            : 'data-[state=active]:bg-green-300'
-                        }`
-                      }
-                    >
-                      {type}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
+              <FormItem>
+                <FormControl>
+                  <Tabs value={field.value.toLowerCase()} onValueChange={field.onChange} className="-mt-1">
+                    <TabsList className='bg-white border-2 w-full h-10'>
+                      {addTransactionTypes.map((type, index) => (
+                        <TabsTrigger
+                          value={type.toLowerCase()}
+                          key={index}
+                          className={`text-md
+                            ${
+                              transactionType === 'expense'
+                                ? 'data-[state=active]:bg-red-400'
+                                : 'data-[state=active]:bg-green-300'
+                            }`
+                          }
+                        >
+                          {type}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                  </Tabs>                  
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
           <FormField
@@ -349,13 +357,40 @@ export default function AddTransactionForm() {
             >
               Cancel
             </Button>
-            <Button
-              className="border-2"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? "Submitting..." : "Submit"}
-            </Button>
+            {transactionType === 'transfer' ? (
+              <CustomAlertDialog
+                isDisabled={isLoading}
+                trigger={
+                  <Button
+                    className="border-2"
+                    type="button"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Submitting..." : "Submit"}
+                  </Button>
+                }
+                title="Transfer Transaction"
+                description="You are about to transfer this transaction to another account."
+                body={<>
+                  <span className="font-semibold">Important notes:</span>
+                  <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-800">
+                    <li>Changes are not synchronized automatically between accounts</li>
+                    <li>To edit a transferred transaction, you must update it separately in both accounts</li>
+                  </ul>
+                </>}
+                confirmMessage="Confirm"
+                type="submit"
+                onConfirm={form.handleSubmit(onSubmit)}
+              />
+            ):(
+              <Button
+                className="border-2"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? "Submitting..." : "Submit"}
+              </Button>              
+            )}
           </div>
         </form>
       </Form>
