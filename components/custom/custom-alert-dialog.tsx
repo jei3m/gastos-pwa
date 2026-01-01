@@ -16,6 +16,7 @@ interface AlertDialogProps {
   trigger: ReactNode;
   title: string;
   description: ReactNode;
+  body?: ReactNode;
   confirmMessage: string;
   type?: "button" | "submit";
   onConfirm: () => void;
@@ -26,6 +27,7 @@ export default function CustomAlertDialog({
   trigger,
   title,
   description,
+  body,
   confirmMessage,
   type,
   onConfirm
@@ -43,10 +45,15 @@ export default function CustomAlertDialog({
       >
         <AlertDialogHeader className="text-left">
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription className="text-gray-800">
+          <AlertDialogDescription className="text-gray-800 text-sm">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {body && (
+          <div className="text-sm">
+            {body}
+          </div>
+        )}
         <AlertDialogFooter className="flex flex-row justify-between">
           <AlertDialogCancel asChild>
             <Button variant="outline" className="border-2">
