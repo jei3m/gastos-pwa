@@ -123,7 +123,7 @@ export default function EditCategory() {
 				</TypographyH3>
 				<CustomAlertDialog
 					isDisabled={isLoading || isPending}
-					trigger={<Trash2 size={20} />}
+					trigger={<Trash2 size={20} className="text-red-500"/>}
 					title="Are you sure?"
 					description={<>
 						This will permanently delete this category. <br/> <br/>

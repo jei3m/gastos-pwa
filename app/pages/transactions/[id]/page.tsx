@@ -171,7 +171,7 @@ export default function EditTransactionForm() {
         </TypographyH3>
         <CustomAlertDialog 
           isDisabled={isLoading}
-          trigger={<Trash2 size={24}/>}
+          trigger={<Trash2 size={24} className="text-red-500" />}
           title="Are you sure?"
           description='This action cannot be undone. It will be permanently deleted.'
           confirmMessage="Yes, I&apos;m sure"
