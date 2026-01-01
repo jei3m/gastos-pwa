@@ -1,7 +1,4 @@
-import { 
-  MouseEventHandler, 
-  ReactNode 
-} from "react";
+import { ReactNode } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -20,7 +17,8 @@ interface AlertDialogProps {
   title: string;
   description: ReactNode;
   confirmMessage: string;
-  onConfirm: MouseEventHandler<HTMLButtonElement>;
+  type?: "button" | "submit";
+  onConfirm: () => void;
 };
 
 export default function CustomAlertDialog({
@@ -29,6 +27,7 @@ export default function CustomAlertDialog({
   title,
   description,
   confirmMessage,
+  type,
   onConfirm
 }: AlertDialogProps) {
   return (
@@ -55,7 +54,12 @@ export default function CustomAlertDialog({
               Cancel
             </Button>
           </AlertDialogCancel>
-          <Button variant="destructive" className="border-2" onClick={onConfirm}>
+          <Button 
+            variant="destructive" 
+            className="border-2"
+            type={type || "button"}
+            onClick={onConfirm}
+          >
             {confirmMessage}
           </Button>
         </AlertDialogFooter>
