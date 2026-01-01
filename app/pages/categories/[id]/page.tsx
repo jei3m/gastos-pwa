@@ -25,7 +25,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { transactionTypes } from "@/lib/data";
 import { Textarea } from "@/components/ui/textarea";
 import IconPicker from "@/components/custom/icon-picker";
-import CustomAlertDialog from "@/components/custom/alert-dialog";
+import CustomAlertDialog from "@/components/custom/custom-alert-dialog";
 
 export default function EditCategory() {
 	const [isLoading, setIsLoading] = useState(false);
