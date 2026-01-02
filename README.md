@@ -12,9 +12,9 @@ Gastos is a comprehensive budget tracking application designed to help users man
 - **Account Management**: Create and manage multiple accounts with individual balances
 - **Category Tracking**: Organize transactions into customizable income and expense categories
 - **Financial Overview**: View total net worth, income vs expenses, and account balances
-- **PWA Functionality**: Installable app experience but still browser-based
+- **PWA Functionality**: Native app experience but still browser-based
 - **Responsive Design**: Optimized for mobile, tablet, and desktop devices
-- **Authentication**: Secure user authentication and session management
+- **Google oAuth**: Quick and easy registration using your Google account
 - **Date Range Filtering**: Analyze finances within specific time periods
 
 ## Technologies Used
