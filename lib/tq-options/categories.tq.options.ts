@@ -24,7 +24,7 @@ export function categoryQueryOptions(
         dateEnd
       );
     },
-    enabled: !!categoryType,
+    enabled: categoryType !== 'transfer',
     retry: false,
   })
 };

@@ -5,6 +5,7 @@ SELECT
   id,
   note,
   amount,
+  transfer_fee,
   type,
   time,
   date,

@@ -24,21 +24,11 @@ import { categoryByIDQueryOptions } from "@/lib/tq-options/categories.tq.options
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { transactionTypes } from "@/lib/data";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-	AlertDialog, 
-	AlertDialogCancel, 
-	AlertDialogContent, 
-	AlertDialogDescription, 
-	AlertDialogFooter, 
-	AlertDialogHeader, 
-	AlertDialogTitle, 
-	AlertDialogTrigger 
-} from "@/components/ui/alert-dialog";
 import IconPicker from "@/components/custom/icon-picker";
+import CustomAlertDialog from "@/components/custom/custom-alert-dialog";
 
 export default function EditCategory() {
 	const [isLoading, setIsLoading] = useState(false);
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const router = useRouter();
 	const params = useParams();
 	const queryClient = useQueryClient();
@@ -131,37 +121,17 @@ export default function EditCategory() {
 				<TypographyH3 className="font-bold">
 					Edit Category
 				</TypographyH3>
-        <AlertDialog>
-          <AlertDialogTrigger className="text-red-500" disabled={isLoading || isPending}>
-            <Trash2 size={20} />
-          </AlertDialogTrigger>
-          <AlertDialogContent
-            className="border-2 bg-primary [&>button]:hidden"
-            onOpenAutoFocus={(e) => e.preventDefault()}
-          >
-            <AlertDialogHeader className="text-left">
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-800">
-                This will permanently delete this category. <br/> <br/>
-								If there are existing transactions associated with this category, please delete them first.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex flex-row justify-between">
-              <AlertDialogCancel asChild>
-                <Button variant="outline" className="border-2">
-                  Cancel
-                </Button>
-              </AlertDialogCancel>
-              <Button
-                variant="destructive"
-                className="border-2"
-                onClick={() => deleteCategoryMutation(id)}
-              >
-                Yes, I&apos;m sure
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+				<CustomAlertDialog
+					isDisabled={isLoading || isPending}
+					trigger={<Trash2 size={20} className="text-red-500"/>}
+					title="Are you sure?"
+					description={<>
+						This will permanently delete this category. <br/> <br/>
+						If there are existing transactions associated with this category, please delete them first.
+					</>}
+					confirmMessage="Yes, I&apos;m sure"
+					onConfirm={() => deleteCategoryMutation(id)}
+				/>
 			</div>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-4'>

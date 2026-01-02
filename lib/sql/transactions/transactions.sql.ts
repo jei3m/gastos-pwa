@@ -5,6 +5,7 @@ export const createTransaction = () => {
                 :id,
                 :note,
                 :amount,
+                NULL,
                 :type,
                 :time,
                 :date,
@@ -39,10 +40,13 @@ export const getTransactionByID = () => {
                 id,
                 note,
                 amount,
+                transferFee,
+                isTransfer,
                 type,
                 time,
                 date,
-                refCategoriesID
+                refCategoriesID,
+                refTransferToAccountsID
             FROM
                 v_transaction_details
             WHERE
@@ -68,6 +72,7 @@ export const updateTransaction = () => {
                 :id,
                 :note,
                 :amount,
+                :transferFee,
                 :type,
                 :time,
                 :date,
@@ -91,6 +96,25 @@ export const deleteTransaction = () => {
                 NULL,
                 NULL,
                 NULL,
+                NULL,
+                :userID,
+                @response
+            );
+            SELECT @response AS response;`;
+};
+
+export const transferTransaction = () => {
+    return `CALL transfer_transaction
+            (
+                :actionType,
+                :id,
+                :note,
+                :amount,
+                :transferFee,
+                :time,
+                :date,
+                :refAccountsID,
+                :refTransferToAccountsID,
                 :userID,
                 @response
             );

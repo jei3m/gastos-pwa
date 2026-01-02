@@ -74,25 +74,27 @@ function DateSelectCard({ content, onDateRangeChange, isScrolled }: DateTransact
     if (activeTab === 'weekly') {
       const dateStart = new Date(newDate),
         dayOfWeek = dateStart.getDay(),
-        diff = dateStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1),
-        dateEnd = new Date(dateStart);
+        diff = dateStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
 
-      // Set dateStart and dateEnd
-      dateStart.setDate(diff);
-      dateStart.setHours(0, 0, 0, 0);
-      
-      dateEnd.setDate(dateStart.getDate() + 6);
-      dateEnd.setHours(23, 59, 59, 999);
+      // Create a new date for Monday
+      const monday = new Date(dateStart);
+      monday.setDate(diff);
+      monday.setHours(0, 0, 0, 0);
+
+      // Create Sunday by adding 6 days to Monday
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 59, 999);
 
       return {
-        dateStart: toLocalISODate(dateStart),
-        dateEnd: toLocalISODate(dateEnd),
-        dateDisplay: `${dateStart.toLocaleDateString(
+        dateStart: toLocalISODate(monday),
+        dateEnd: toLocalISODate(sunday),
+        dateDisplay: `${monday.toLocaleDateString(
           'en-US',
           {
             month: 'long',
             day: 'numeric'
-          })} - ${dateEnd.toLocaleDateString(
+          })} - ${sunday.toLocaleDateString(
             'en-US',
             {
               month: 'long',

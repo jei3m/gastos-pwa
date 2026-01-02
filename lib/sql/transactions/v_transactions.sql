@@ -5,7 +5,7 @@ WITH transactions_cte AS (
 	SELECT
 		t.id,
 		t.date,
-        t.amount,
+        (t.amount + t.transfer_fee) AS amount,
         c.name,
         t.note,
         t.type,

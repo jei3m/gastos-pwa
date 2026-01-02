@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Key } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,7 @@ import {
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { transactionSchema } from "@/lib/schema/transactions.schema";
+import { editTransactionSchema } from "@/lib/schema/transactions.schema";
 import { useAccount } from "@/context/account-context";
 import { Category } from "@/types/categories.types";
 import { toast } from "sonner";
@@ -33,7 +33,6 @@ import { ChevronDownIcon, Trash2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { transactionTypes } from "@/lib/data";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { EditTransactionPayload } from "@/types/transactions.types";
 import { 
   dateToTimeString, 
@@ -43,17 +42,21 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoryQueryOptions } from "@/lib/tq-options/categories.tq.options";
 import { transactionByIDQueryOptions } from "@/lib/tq-options/transactions.tq.options";
+import CustomAlertDialog from "@/components/custom/custom-alert-dialog";
+import { Account } from "@/types/accounts.types";
 
 export default function EditTransactionForm() {
   const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
-  const [transactionDate, setTransactionDate] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("");
   const router = useRouter();
-  const { selectedAccountID  } = useAccount();
+  const { selectedAccountID, accounts  } = useAccount();
   const queryClient = useQueryClient();
   const params = useParams();
   const id = params.id as string;
+
+  const filteredAccounts = accounts?.filter((account: Account) => 
+    account.id !== selectedAccountID
+  ) || [];
 
   useEffect(() => {
     fetchSession()
@@ -64,8 +67,8 @@ export default function EditTransactionForm() {
       })
   },[router])
 
-  const form = useForm<z.infer<typeof transactionSchema>>({
-    resolver: zodResolver(transactionSchema),
+  const form = useForm<z.infer<typeof editTransactionSchema>>({
+    resolver: zodResolver(editTransactionSchema),
     defaultValues: {
       note: "",
       amount: "0.00",
@@ -73,8 +76,10 @@ export default function EditTransactionForm() {
       time: new Date().toTimeString().substring(0, 5),
       date: new Date().toISOString().split('T')[0],
       refCategoriesID: "",
+      refTransferToAccountsID: "",
     }
   });
+  const transactionType = form.watch('type');
 
   const { mutate: editTransactionMutation } = useMutation({
     mutationFn: (transactionData: EditTransactionPayload) => editTransaction(id, transactionData),
@@ -118,24 +123,13 @@ export default function EditTransactionForm() {
     }
   });
 
-  async function onSubmit(values: z.infer<typeof transactionSchema>) {
+  async function onSubmit(values: z.infer<typeof editTransactionSchema>) {
     const transactionData = {
       ...values,
       amount: parseFloat(values.amount)
     };
     editTransactionMutation(transactionData);
   };
-
-  // Set form value from Tab Selector
-  useEffect(() => {
-    if (
-      activeTab
-      && (activeTab === 'income'
-      || activeTab === 'expense')
-    ) {
-      form.setValue('type', activeTab);
-    }
-  }, [activeTab, form]);
 
   // Fetch transaction data
   const { data: transactionData } = useQuery(
@@ -146,18 +140,10 @@ export default function EditTransactionForm() {
     return transactionData?.[0];
   }, [transactionData])
 
-  useEffect(() => {
-    if (!transaction) {
-      return;
-    } else {
-      setActiveTab(transaction.type);
-    };
-  }, [transaction, setActiveTab]);
-
   // Fetch categories
   const { data: categoriesData } = useQuery(
     categoryQueryOptions(
-      activeTab!,
+      transactionType!,
       selectedAccountID!
     )
   );
@@ -167,16 +153,19 @@ export default function EditTransactionForm() {
 
   // Set form values
   useEffect(() => {
-    if (!transaction || !categories || !selectedAccountID) return;
-    form.setValue('note', transaction.note);
-    form.setValue('amount', transaction.amount);
-    if (!form.getValues('type')) {
-      form.setValue('type', transaction.type);
-    };
-    form.setValue('time', transaction.time);
-    setTransactionDate(transaction.date)
-    form.setValue('refCategoriesID', transaction.refCategoriesID);
-    form.setValue('refAccountsID', selectedAccountID);
+    if (!transaction || !selectedAccountID) return;
+    if (!transaction.isTransfer && !categories) return;
+    form.reset({
+      'type': transaction.isTransfer ? 'transfer' : transaction.type,
+      'note': transaction.note,
+      'amount': transaction.amount,
+      'transferFee': transaction.transferFee,
+      'time': transaction.time,
+      'date': transaction.date,
+      'refCategoriesID': transaction.refCategoriesID,
+      'refAccountsID': selectedAccountID,
+      'refTransferToAccountsID': transaction.refTransferToAccountsID || ""
+    });
   }, [form, transaction, categories, selectedAccountID]);
 
   return (
@@ -185,60 +174,49 @@ export default function EditTransactionForm() {
         <TypographyH3>
           Edit Transaction
         </TypographyH3>
-        <Dialog>
-          <DialogTrigger className="text-red-500" disabled={isLoading}>
-            <Trash2 size={24}/>
-          </DialogTrigger>
-          <DialogContent
-            className="border-2 bg-primary [&>button]:hidden"
-            onOpenAutoFocus={(e) => e.preventDefault()}
-          >
-            <DialogHeader className="text-left">
-              <DialogTitle>Are you sure?</DialogTitle>
-              <DialogDescription className="text-gray-800">
-                This action cannot be undone. It will be permanently deleted.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-between">
-              <DialogClose asChild>
-                <Button variant="outline" className="border-2">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button
-                variant="destructive"
-                className="border-2"
-                onClick={() => deleteTransactionMutation(id)}
-              >
-                Yes, I&apos;m sure
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <CustomAlertDialog 
+          isDisabled={isLoading}
+          trigger={<Trash2 size={24} className="text-red-500" />}
+          title="Are you sure?"
+          description='This action cannot be undone. It will be permanently deleted.'
+          confirmMessage="Yes, I&apos;m sure"
+          onConfirm={() => deleteTransactionMutation(id)}
+        />
       </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="-mt-1">
-        <TabsList className='bg-white border-2 w-full h-10'>
-          {transactionTypes.map((category, index) => (
-            <TabsTrigger
-              value={category.toLowerCase()}
-              key={index}
-              disabled={true}
-              className={`text-md
-                ${
-                  activeTab === 'expense'
-                    ? 'data-[state=active]:bg-red-400'
-                    : 'data-[state=active]:bg-green-300'
-                }`
-              }
-            >
-              {category}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col space-y-4">
+          <FormField
+            control={form.control}
+            name="type"
+            disabled={isLoading}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Tabs value={field.value.toLowerCase()} onValueChange={field.onChange} className="-mt-1">
+                    <TabsList className='bg-white border-2 w-full h-10'>
+                      {transactionTypes.map((category, index) => (
+                        <TabsTrigger
+                          value={category.toLowerCase()}
+                          key={index}
+                          disabled={true}
+                          className={`text-md
+                            ${
+                              field.value.toLowerCase() === 'expense' || field.value.toLowerCase() === 'transfer'
+                                ? 'data-[state=active]:bg-red-400'
+                                : 'data-[state=active]:bg-green-300'
+                            }`
+                          }
+                        >
+                          {category}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                  </Tabs>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="amount"
@@ -265,38 +243,96 @@ export default function EditTransactionForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="refCategoriesID"
-            disabled={isLoading}
-            render={({ field }) => (
-              <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
-                  Category
-                </FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
-                    <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
-                      <SelectValue placeholder="Select Category..." />
-                    </SelectTrigger>
-                    <SelectContent className="border-2">
-                      {categories && (
-                        <>
-                          {categories.map((category: Category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </>
-                      )}
+          {form.watch('type') !== 'transfer' ? (
+            <FormField
+              control={form.control}
+              name="refCategoriesID"
+              disabled={isLoading}
+              render={({ field }) => (
+                <FormItem className="-space-y-1">
+                  <FormLabel className="text-md font-medium">
+                    Category
+                  </FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+                      <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
+                        <SelectValue placeholder="Select Category..." />
+                      </SelectTrigger>
+                      <SelectContent className="border-2">
+                        {categories && (
+                          <>
+                            {categories.map((category: Category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </>
+                        )}
 
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ):(
+            <div className="flex gap-2 items-center w-full">
+              <FormField
+                control={form.control}
+                name="refTransferToAccountsID"
+                render={({ field }) => (
+                  <FormItem className="flex-2">
+                    <FormLabel className="-mb-1 text-md font-medium">
+                      Transfer to
+                    </FormLabel>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg">
+                          <SelectValue placeholder="Select Account..." />
+                        </SelectTrigger>
+                        <SelectContent className="border-2">
+                          {accounts && (
+                            <>
+                              {filteredAccounts.map((account: Account, index: Key) => (
+                                <SelectItem key={index} value={account.id}>
+                                  {account.name}
+                                </SelectItem>
+                              ))}
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="transferFee"
+                render={({ field }) => (
+                  <FormItem className="flex-2">
+                    <FormLabel className="-mb-1 text-md font-medium">
+                      Transfer Fee
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        required
+                        placeholder="0.00"
+                        {...field}
+                        className="h-9 rounded-lg border-2 border-black bg-white"
+                        type="number"
+                        inputMode="decimal"
+                        pattern="[0-9\.]*"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />            
+            </div>
+          )}
           <FormField
             control={form.control}
             name="note"
@@ -338,14 +374,14 @@ export default function EditTransactionForm() {
                           id="date"
                           className="justify-between font-normal border-2 bg-white text-[16px]"
                         >
-                          {transactionDate ? new Date(transactionDate).toLocaleDateString() : "Select date"}
+                          {field.value ? new Date(field.value).toLocaleDateString() : "Select date"}
                           <ChevronDownIcon />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                         <Calendar
                           mode="single"
-                          selected={transactionDate ? new Date(transactionDate) : undefined}
+                          selected={field.value ? new Date(field.value) : undefined}
                           captionLayout="dropdown"
                           disabled={(date) => date > new Date()}
                           onSelect={(date) => {

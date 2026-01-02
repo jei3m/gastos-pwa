@@ -5,7 +5,7 @@ export const tabItems = [{ value: "weekly" }, { value: "monthly" }, { value: "ye
 
 export const categoryTypes = ["Expense", "Income"];
 
-export const transactionTypes = ["Expense", "Income"];
+export const transactionTypes = ["Expense", "Income", "Transfer"];
 
 export const accountTypes = ["All", "Digital", "Cash"];
 
