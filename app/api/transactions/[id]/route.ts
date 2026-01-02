@@ -9,6 +9,7 @@ import { fetchUserID } from '@/lib/auth/auth-session';
 import {
 	deleteTransaction,
 	getTransactionByID,
+	transferTransaction,
 	updateTransaction
 } from "@/lib/sql/transactions/transactions.sql";
 
@@ -50,27 +51,37 @@ export async function PUT(
 		const {
 			note,
 			amount,
+			transferFee,
 			type,
 			time,
 			date,
 			refAccountsID,
-			refCategoriesID
+			refCategoriesID,
+      refTransferToAccountsID,
 		} = await req.json();
 		const { id } = await params;
+    const isTransfer = type === 'transfer';
+
+		const processTransferFee = () => {
+			if (type === 'income') return 0;
+			return transferFee || 0;
+		};
 
 		const [resultUpdate] = await db.query<responseRow[]>(
-			updateTransaction(),
+			isTransfer ? transferTransaction() : updateTransaction(),
 			{
 				actionType: 'update',
 				id,
 				userID: await fetchUserID(),
 				note,
 				amount,
+				transferFee: processTransferFee(),
 				type,
 				time,
-				date,
+				date,	
 				refAccountsID,
 				refCategoriesID,
+      	refTransferToAccountsID,
 			}
 		);
 
