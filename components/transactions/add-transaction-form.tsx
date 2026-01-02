@@ -30,7 +30,7 @@ import { createTransaction } from "@/lib/tq-functions/transactions.tq.functions"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { addTransactionTypes } from "@/lib/data";
+import { transactionTypes } from "@/lib/data";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { 
   dateToTimeString, 
@@ -148,7 +148,7 @@ export default function AddTransactionForm() {
                 <FormControl>
                   <Tabs value={field.value.toLowerCase()} onValueChange={field.onChange} className="-mt-1">
                     <TabsList className='bg-white border-2 w-full h-10'>
-                      {addTransactionTypes.map((type, index) => (
+                      {transactionTypes.map((type, index) => (
                         <TabsTrigger
                           value={type.toLowerCase()}
                           key={index}
