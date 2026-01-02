@@ -35,7 +35,7 @@ export const getCategories = () => {
                     SELECT
                         ref_user_id,
 			            ref_accounts_id,
-                        SUM(amount) AS total_expense
+                        SUM(amount + transfer_fee) AS total_expense
                     FROM
                         v_transactions_table
                     WHERE
@@ -51,7 +51,7 @@ export const getCategories = () => {
                     SELECT
                         ref_categories_id,
                         ref_user_id,
-                        SUM(amount) AS amount
+                        SUM(amount + transfer_fee) AS amount
                     FROM
                         v_transactions_table
                     WHERE
