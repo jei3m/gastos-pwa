@@ -61,12 +61,13 @@ export default function AddTransactionForm() {
     defaultValues: {
       note: "",
       amount: "",
+      transferFee: "",
       type: "",
       time: new Date().toTimeString().substring(0, 5),
       date: new Date().toLocaleDateString('en-CA'), // Use 'en-CA' locale which formats as YYYY-MM-DD
       refCategoriesID: "",
       refAccountsID: "",
-      transferToAccountID: "",
+      refTransferToAccountsID: "",
     }
   });
   const transactionDate = form.getValues('date');
@@ -103,7 +104,8 @@ export default function AddTransactionForm() {
   async function onSubmit(values: z.infer<typeof createTransactionSchema>) {
     const transactionData = {
       ...values,
-      amount: parseFloat(values.amount) // Convert string to number
+      amount: parseFloat(values.amount), // Convert string to number
+      transferFee: parseFloat(values.transferFee || "0")
     };
     createTransactionMutation(transactionData);
   };
@@ -152,7 +154,7 @@ export default function AddTransactionForm() {
                           key={index}
                           className={`text-md
                             ${
-                              transactionType === 'expense'
+                              field.value.toLowerCase() === 'expense' || field.value.toLowerCase() === 'transfer'
                                 ? 'data-[state=active]:bg-red-400'
                                 : 'data-[state=active]:bg-green-300'
                             }`
@@ -223,36 +225,61 @@ export default function AddTransactionForm() {
               )}
             />  
           ):(
-            <FormField
-              control={form.control}
-              name="transferToAccountID"
-              render={({ field }) => (
-                <FormItem className="-space-y-1">
-                  <FormLabel className="text-md font-medium">
-                    Transfer to
-                  </FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
-                        <SelectValue placeholder="Select Account..." />
-                      </SelectTrigger>
-                      <SelectContent className="border-2">
-                        {accounts && (
-                          <>
-                            {filteredAccounts.map((account: Account, index: Key) => (
-                              <SelectItem key={index} value={account.id}>
-                                {account.name}
-                              </SelectItem>
-                            ))}
-                          </>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex gap-2 items-center w-full">
+              <FormField
+                control={form.control}
+                name="refTransferToAccountsID"
+                render={({ field }) => (
+                  <FormItem className="flex-2">
+                    <FormLabel className="-mb-1 text-md font-medium">
+                      Transfer to
+                    </FormLabel>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg">
+                          <SelectValue placeholder="Select Account..." />
+                        </SelectTrigger>
+                        <SelectContent className="border-2">
+                          {accounts && (
+                            <>
+                              {filteredAccounts.map((account: Account, index: Key) => (
+                                <SelectItem key={index} value={account.id}>
+                                  {account.name}
+                                </SelectItem>
+                              ))}
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="transferFee"
+                render={({ field }) => (
+                  <FormItem className="flex-2">
+                    <FormLabel className="-mb-1 text-md font-medium">
+                      Transfer Fee
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        required
+                        placeholder="0.00"
+                        {...field}
+                        className="h-9 rounded-lg border-2 border-black bg-white"
+                        type="number"
+                        inputMode="decimal"
+                        pattern="[0-9\.]*"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />            
+            </div>
           )}
           <FormField
             control={form.control}
