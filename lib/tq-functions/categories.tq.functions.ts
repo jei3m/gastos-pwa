@@ -1,4 +1,5 @@
 import {
+	CategoryData,
 	CreateCategory,
 	EditCategory
 } from "@/types/categories.types";
@@ -29,9 +30,17 @@ export const fetchCategories = async (
     
     if (!data.success) {
       throw new Error(data.message);
-    }
-    
-    return data.data;
+    };
+
+		const sortedData = JSON.parse(JSON.stringify(data.data));
+		// Sort category details by name
+		sortedData.forEach((category: CategoryData) => {
+			category.details.sort((a, b) => {
+				return a.name.localeCompare(b.name);
+			})
+		});
+
+    return sortedData;
   } catch (error) {
     if (error instanceof Error) {
       throw error; // Just re-throw the existing error
