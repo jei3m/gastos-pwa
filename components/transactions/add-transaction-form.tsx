@@ -1,16 +1,19 @@
-"use client";
-import { useState, useEffect, Key, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+'use client';
+import { useState, useEffect, Key, useMemo } from 'react';
+import {
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { TypographyH3 } from "@/components/custom/typography";
+} from '@/components/ui/select';
+import { TypographyH3 } from '@/components/custom/typography';
 import {
   Form,
   FormControl,
@@ -18,62 +21,77 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { createTransactionSchema } from "@/lib/schema/transactions.schema";
-import { useAccount } from "@/context/account-context";
-import { Category } from "@/types/categories.types";
-import { toast } from "sonner";
-import { createTransaction } from "@/lib/tq-functions/transactions.tq.functions";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronDownIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { transactionTypes } from "@/lib/data";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
-import { 
-  dateToTimeString, 
-  TimePicker, 
-  timeStringToDate 
-} from "@/components/custom/time-picker";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CreateTransaction } from "@/types/transactions.types";
-import { transactionsInfiniteQueryOptions } from "@/lib/tq-options/transactions.tq.options";
-import { categoryQueryOptions } from "@/lib/tq-options/categories.tq.options";
-import { Account } from "@/types/accounts.types";
-import CustomAlertDialog from "../custom/custom-alert-dialog";
+} from '@/components/ui/form';
+import z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { createTransactionSchema } from '@/lib/schema/transactions.schema';
+import { useAccount } from '@/context/account-context';
+import { Category } from '@/types/categories.types';
+import { toast } from 'sonner';
+import { createTransaction } from '@/lib/tq-functions/transactions.tq.functions';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { ChevronDownIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { transactionTypes } from '@/lib/data';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
+import {
+  dateToTimeString,
+  TimePicker,
+  timeStringToDate,
+} from '@/components/custom/time-picker';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { CreateTransaction } from '@/types/transactions.types';
+import { transactionsInfiniteQueryOptions } from '@/lib/tq-options/transactions.tq.options';
+import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
+import { Account } from '@/types/accounts.types';
+import CustomAlertDialog from '../custom/custom-alert-dialog';
 
 export default function AddTransactionForm() {
-  const [datePickerOpen, setDatePickerOpen] = useState<boolean>(false);
+  const [datePickerOpen, setDatePickerOpen] =
+    useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const transactionTypeParam = searchParams.get('type');
   const { selectedAccountID, accounts } = useAccount();
   const queryClient = useQueryClient();
 
-  const filteredAccounts = accounts?.filter((account: Account) => 
-    account.id !== selectedAccountID
-  ) || [];
+  const filteredAccounts =
+    accounts?.filter(
+      (account: Account) => account.id !== selectedAccountID
+    ) || [];
 
-  const form = useForm<z.infer<typeof createTransactionSchema>>({
+  const form = useForm<
+    z.infer<typeof createTransactionSchema>
+  >({
     resolver: zodResolver(createTransactionSchema),
     defaultValues: {
-      note: "",
-      amount: "",
-      transferFee: "",
-      type: "",
+      note: '',
+      amount: '',
+      transferFee: '',
+      type: '',
       time: new Date().toTimeString().substring(0, 5),
       date: new Date().toLocaleDateString('en-CA'), // Use 'en-CA' locale which formats as YYYY-MM-DD
-      refCategoriesID: "",
-      refAccountsID: "",
-      refTransferToAccountsID: "",
-    }
+      refCategoriesID: '',
+      refAccountsID: '',
+      refTransferToAccountsID: '',
+    },
   });
   const transactionDate = form.getValues('date');
   const transactionType = form.watch('type');
 
-  const { data: categoriesData, isPending: isCategoriesPending } = useQuery(
+  const {
+    data: categoriesData,
+    isPending: isCategoriesPending,
+  } = useQuery(
     categoryQueryOptions(
       transactionType,
       selectedAccountID!,
@@ -86,14 +104,17 @@ export default function AddTransactionForm() {
     return categoriesData;
   }, [categoriesData]);
 
-  const { 
-    mutate: createTransactionMutation, 
-    isPending: isCreateTransactionPending 
+  const {
+    mutate: createTransactionMutation,
+    isPending: isCreateTransactionPending,
   } = useMutation({
-    mutationFn: (transactionData: CreateTransaction) => createTransaction(transactionData),
+    mutationFn: (transactionData: CreateTransaction) =>
+      createTransaction(transactionData),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: transactionsInfiniteQueryOptions(selectedAccountID!).queryKey
+        queryKey: transactionsInfiniteQueryOptions(
+          selectedAccountID!
+        ).queryKey,
       });
       form.reset();
       toast.success(data.responseMessage);
@@ -101,74 +122,89 @@ export default function AddTransactionForm() {
     },
     onError: (error) => {
       toast.error(error.message);
-    }
+    },
   });
 
-  async function onSubmit(values: z.infer<typeof createTransactionSchema>) {
+  async function onSubmit(
+    values: z.infer<typeof createTransactionSchema>
+  ) {
     const transactionData = {
       ...values,
       amount: parseFloat(values.amount), // Convert string to number
-      transferFee: parseFloat(values.transferFee || "0")
+      transferFee: parseFloat(values.transferFee || '0'),
     };
     createTransactionMutation(transactionData);
-  };
+  }
 
   // Set initial tab value and form value from url param
   useEffect(() => {
     if (
-      transactionTypeParam
-      && (transactionTypeParam === 'income'
-      ||  transactionTypeParam === 'expense')
+      transactionTypeParam &&
+      (transactionTypeParam === 'income' ||
+        transactionTypeParam === 'expense')
     ) {
-      form.setValue('type', transactionTypeParam)
-    };
+      form.setValue('type', transactionTypeParam);
+    }
   }, [form, transactionTypeParam]);
 
   // Set refAccountsID
   useEffect(() => {
     if (!selectedAccountID) return;
-    form.setValue('refAccountsID', selectedAccountID)
-  }, [selectedAccountID])
+    form.setValue('refAccountsID', selectedAccountID);
+  }, [selectedAccountID]);
 
   const isLoading = useMemo(() => {
     return transactionType !== 'transfer'
-    ? isCategoriesPending || isCreateTransactionPending
-    : isCreateTransactionPending;
-  }, [transactionType, isCategoriesPending, isCreateTransactionPending]);
+      ? isCategoriesPending || isCreateTransactionPending
+      : isCreateTransactionPending;
+  }, [
+    transactionType,
+    isCategoriesPending,
+    isCreateTransactionPending,
+  ]);
 
   return (
-    <main className='flex flex-col space-y-4 p-3'>
-      <TypographyH3>
-        New Transaction
-      </TypographyH3>
+    <main className="flex flex-col space-y-4 p-3">
+      <TypographyH3>New Transaction</TypographyH3>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col space-y-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col space-y-4"
+        >
           <FormField
             control={form.control}
             name="type"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Tabs value={field.value.toLowerCase()} onValueChange={field.onChange} className="-mt-1">
-                    <TabsList className='bg-white border-2 w-full h-10'>
-                      {transactionTypes.map((type, index) => (
-                        <TabsTrigger
-                          value={type.toLowerCase()}
-                          key={index}
-                          disabled={isLoading}
-                          className={`text-md
+                  <Tabs
+                    value={field.value.toLowerCase()}
+                    onValueChange={field.onChange}
+                    className="-mt-1"
+                  >
+                    <TabsList className="bg-white border-2 w-full h-10">
+                      {transactionTypes.map(
+                        (type, index) => (
+                          <TabsTrigger
+                            value={type.toLowerCase()}
+                            key={index}
+                            disabled={isLoading}
+                            className={`text-md
                             ${
-                              field.value.toLowerCase() === 'expense' || field.value.toLowerCase() === 'transfer'
+                              field.value.toLowerCase() ===
+                                'expense' ||
+                              field.value.toLowerCase() ===
+                                'transfer'
                                 ? 'data-[state=active]:bg-red-400'
                                 : 'data-[state=active]:bg-green-300'
-                            }`
-                          }
-                        >
-                          {type}
-                        </TabsTrigger>
-                      ))}
+                            }`}
+                          >
+                            {type}
+                          </TabsTrigger>
+                        )
+                      )}
                     </TabsList>
-                  </Tabs>                  
+                  </Tabs>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -208,18 +244,30 @@ export default function AddTransactionForm() {
                     Category
                   </FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={isLoading}
+                    >
                       <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
                         <SelectValue placeholder="Select Category..." />
                       </SelectTrigger>
                       <SelectContent className="border-2">
                         {categories && (
                           <>
-                            {categories.map((category: Category, index: Key) => (
-                              <SelectItem key={index} value={category.id}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
+                            {categories.map(
+                              (
+                                category: Category,
+                                index: Key
+                              ) => (
+                                <SelectItem
+                                  key={index}
+                                  value={category.id}
+                                >
+                                  {category.name}
+                                </SelectItem>
+                              )
+                            )}
                           </>
                         )}
                       </SelectContent>
@@ -228,8 +276,8 @@ export default function AddTransactionForm() {
                   <FormMessage />
                 </FormItem>
               )}
-            />  
-          ):(
+            />
+          ) : (
             <div className="flex gap-2 items-center w-full">
               <FormField
                 control={form.control}
@@ -240,18 +288,30 @@ export default function AddTransactionForm() {
                       Transfer to
                     </FormLabel>
                     <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={isLoading}
+                      >
                         <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg">
                           <SelectValue placeholder="Select Account..." />
                         </SelectTrigger>
                         <SelectContent className="border-2">
                           {accounts && (
                             <>
-                              {filteredAccounts.map((account: Account, index: Key) => (
-                                <SelectItem key={index} value={account.id}>
-                                  {account.name}
-                                </SelectItem>
-                              ))}
+                              {filteredAccounts.map(
+                                (
+                                  account: Account,
+                                  index: Key
+                                ) => (
+                                  <SelectItem
+                                    key={index}
+                                    value={account.id}
+                                  >
+                                    {account.name}
+                                  </SelectItem>
+                                )
+                              )}
                             </>
                           )}
                         </SelectContent>
@@ -284,7 +344,7 @@ export default function AddTransactionForm() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />            
+              />
             </div>
           )}
           <FormField
@@ -320,7 +380,10 @@ export default function AddTransactionForm() {
                     Date
                   </FormLabel>
                   <FormControl>
-                    <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                    <Popover
+                      open={datePickerOpen}
+                      onOpenChange={setDatePickerOpen}
+                    >
                       <PopoverTrigger asChild>
                         <Button
                           disabled={isLoading}
@@ -328,25 +391,43 @@ export default function AddTransactionForm() {
                           id="date"
                           className="justify-between font-normal border-2 bg-white text-[16px]"
                         >
-                          {transactionDate ? new Date(transactionDate).toLocaleDateString() : "Select date"}
+                          {transactionDate
+                            ? new Date(
+                                transactionDate
+                              ).toLocaleDateString()
+                            : 'Select date'}
                           <ChevronDownIcon />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                      <PopoverContent
+                        className="w-auto overflow-hidden p-0"
+                        align="start"
+                      >
                         <Calendar
                           mode="single"
-                          selected={transactionDate ? new Date(transactionDate) : undefined}
+                          selected={
+                            transactionDate
+                              ? new Date(transactionDate)
+                              : undefined
+                          }
                           captionLayout="dropdown"
-                          disabled={(date) => date > new Date()}
+                          disabled={(date) =>
+                            date > new Date()
+                          }
                           onSelect={(date) => {
                             if (date) {
-                              const year = date.getFullYear();
-                              const month = String(date.getMonth() + 1).padStart(2, '0');
-                              const day = String(date.getDate()).padStart(2, '0');
+                              const year =
+                                date.getFullYear();
+                              const month = String(
+                                date.getMonth() + 1
+                              ).padStart(2, '0');
+                              const day = String(
+                                date.getDate()
+                              ).padStart(2, '0');
                               const formattedDate = `${year}-${month}-${day}`;
                               field.onChange(formattedDate);
                             }
-                            setDatePickerOpen(false)
+                            setDatePickerOpen(false);
                           }}
                         />
                       </PopoverContent>
@@ -369,7 +450,8 @@ export default function AddTransactionForm() {
                       value={timeStringToDate(field.value)}
                       onChange={(date) => {
                         if (date) {
-                          const timeString = dateToTimeString(date);
+                          const timeString =
+                            dateToTimeString(date);
                           field.onChange(timeString);
                         }
                       }}
@@ -381,7 +463,7 @@ export default function AddTransactionForm() {
               )}
             />
           </div>
-          <div className='flex flex-row justify-between'>
+          <div className="flex flex-row justify-between">
             <Button
               onClick={() => {
                 form.reset();
@@ -402,34 +484,47 @@ export default function AddTransactionForm() {
                     type="button"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Submitting..." : "Submit"}
+                    {isLoading ? 'Submitting...' : 'Submit'}
                   </Button>
                 }
                 title="Transfer Transaction"
                 description="You are about to transfer this transaction to another account."
-                body={<>
-                  <span className="font-semibold">Important notes:</span>
-                  <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-800">
-                    <li>Changes are not synchronized automatically between accounts</li>
-                    <li>To edit a transferred transaction, you must update it separately in both accounts</li>
-                  </ul>
-                </>}
-                confirmMessage={isLoading ? 'Confirming...' : 'Confirm'}
+                body={
+                  <>
+                    <span className="font-semibold">
+                      Important notes:
+                    </span>
+                    <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-800">
+                      <li>
+                        Changes are not synchronized
+                        automatically between accounts
+                      </li>
+                      <li>
+                        To edit a transferred transaction,
+                        you must update it separately in
+                        both accounts
+                      </li>
+                    </ul>
+                  </>
+                }
+                confirmMessage={
+                  isLoading ? 'Confirming...' : 'Confirm'
+                }
                 type="submit"
                 onConfirm={form.handleSubmit(onSubmit)}
               />
-            ):(
+            ) : (
               <Button
                 className="border-2"
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? "Submitting..." : "Submit"}
-              </Button>              
+                {isLoading ? 'Submitting...' : 'Submit'}
+              </Button>
             )}
           </div>
         </form>
       </Form>
     </main>
   );
-};
+}
