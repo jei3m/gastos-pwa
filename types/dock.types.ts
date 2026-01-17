@@ -1,4 +1,6 @@
-type IconComponentType = React.ElementType<{ className?: string }>;
+type IconComponentType = React.ElementType<{
+  className?: string;
+}>;
 
 export interface DockItem {
   label: string;
