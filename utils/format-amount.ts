@@ -1,8 +1,9 @@
 export const formatAmount = (amount: string | number) => {
   // Conver to number if string
-  const numberAmount = typeof amount === 'string' 
-    ? Number.parseFloat(amount) 
-    : amount;
+  const numberAmount =
+    typeof amount === 'string'
+      ? Number.parseFloat(amount)
+      : amount;
 
   // Format based on magnitude
   if (numberAmount >= 1e9) {
@@ -18,7 +19,7 @@ export const formatAmount = (amount: string | number) => {
     // Less than hundred thousands
     return `${numberAmount.toLocaleString('en-US', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     })}`;
   }
 };

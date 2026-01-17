@@ -17,7 +17,9 @@ export function getSelectedAccountID(): string | null {
  * Sets the selected account ID in local storage
  * @param accountID The account ID to store
  */
-export function setAccountIDInStorage(accountID: string): void {
+export function setAccountIDInStorage(
+  accountID: string
+): void {
   if (typeof window !== 'undefined') {
     localStorage.setItem('accountID', accountID);
   }
