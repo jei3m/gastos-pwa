@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from '@/components/ui/sonner';
 
 export default function AuthLayout({
   children,
@@ -6,10 +6,7 @@ export default function AuthLayout({
   return (
     <div className="h-full max-w-[600px] m-auto">
       {children}
-      <Toaster
-        position="top-center"
-        expand={false}
-      />
+      <Toaster position="top-center" expand={false} />
     </div>
   );
-};
+}

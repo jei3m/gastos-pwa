@@ -1,36 +1,36 @@
-"use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth/auth-client";
-import { Button } from "@/components/ui/button";
-import { fetchSession } from "@/utils/session";
-import Image from "next/image";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+'use client';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth/auth-client';
+import { Button } from '@/components/ui/button';
+import { fetchSession } from '@/utils/session';
+import Image from 'next/image';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 export default function Login() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    fetchSession().then(({session}) => {
+    fetchSession().then(({ session }) => {
       if (session) {
-        router.push('/pages/transactions')
-      } 
+        router.push('/pages/transactions');
+      }
     });
-  },[router]);
+  }, [router]);
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
     const { error } = await authClient.signIn.social({
-      provider: "google",
+      provider: 'google',
     });
 
     if (error) {
       setGoogleLoading(false);
-      toast.error(error.message)
-    };
-  };
+      toast.error(error.message);
+    }
+  }
 
   return (
     <main className="min-h-screen w-full flex items-center justify-center p-4">
@@ -41,11 +41,11 @@ export default function Login() {
           <div className="text-center space-y-4">
             <div className="inline-flex items-center justify-center p-2 bg-gradient-to-br from-green-300 to-green-700 rounded-2xl">
               <Image
-                alt='Gastos Icon'
+                alt="Gastos Icon"
                 src={'/icons/icons-512x512.png'}
                 width={64}
                 height={64}
-                className='rounded-xl'
+                className="rounded-xl"
               />
             </div>
             <div className="space-y-2">
@@ -61,7 +61,9 @@ export default function Login() {
               <div className="w-full border-t border-slate-300"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-500">Continue with</span>
+              <span className="bg-white px-2 text-slate-500">
+                Continue with
+              </span>
             </div>
           </div>
 
@@ -77,11 +79,16 @@ export default function Login() {
               {googleLoading ? (
                 <div className="flex items-center justify-center gap-3">
                   <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
-                  <span className="font-medium text-slate-700">Connecting...</span>
+                  <span className="font-medium text-slate-700">
+                    Connecting...
+                  </span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-2">
-                  <svg className="w-8 h-8" viewBox="0 0 24 24">
+                  <svg
+                    className="w-8 h-8"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       fill="#4285F4"
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -113,4 +120,4 @@ export default function Login() {
       </div>
     </main>
   );
-};
+}

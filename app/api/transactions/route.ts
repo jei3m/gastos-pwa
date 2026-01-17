@@ -1,18 +1,15 @@
 import { NextRequest } from 'next/server';
-import crypto from 'crypto'
+import crypto from 'crypto';
 import { db } from '@/utils/db';
-import {
-	success,
-	fail
-} from '@/utils/helpers';
+import { success, fail } from '@/utils/helpers';
 import { responseRow } from '@/types/response.types';
 import { fetchUserID } from '@/lib/auth/auth-session';
 import { connection } from '@/utils/db';
 import {
-	createTransaction,
+  createTransaction,
   getTransactions,
   getTransactionsCount,
-  transferTransaction
+  transferTransaction,
 } from '@/lib/sql/transactions/transactions.sql';
 import { RowDataPacket } from 'mysql2';
 
@@ -33,7 +30,9 @@ export async function POST(req: NextRequest) {
     const isTransfer = type === 'transfer';
 
     const [resultCreate] = await db.query<responseRow[]>(
-      isTransfer ? transferTransaction() : createTransaction(),
+      isTransfer
+        ? transferTransaction()
+        : createTransaction(),
       {
         actionType: 'create',
         id: crypto.randomUUID(),
@@ -58,13 +57,12 @@ export async function POST(req: NextRequest) {
       return fail(
         parsedData.responseCode,
         parsedData.responseMessage
-      )
-    };
+      );
+    }
 
     return success({
-      data: parsedData
+      data: parsedData,
     });
-
   } catch (error) {
     return fail(
       500,
@@ -75,7 +73,7 @@ export async function POST(req: NextRequest) {
   } finally {
     connection.release();
   }
-};
+}
 
 // Fetch Transactions with Pagination
 export async function GET(request: Request) {
@@ -84,22 +82,24 @@ export async function GET(request: Request) {
     const accountID = url.searchParams.get('accountID');
     const dateStart = url.searchParams.get('dateStart');
     const dateEnd = url.searchParams.get('dateEnd');
-    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const page = parseInt(
+      url.searchParams.get('page') || '1',
+      10
+    );
     const limit = 10;
     const offset = (page - 1) * limit;
     const userID = await fetchUserID();
 
     if (!accountID) {
-      throw Error("There is no selected account");
-    };
+      throw Error('There is no selected account');
+    }
 
-    const [transactionCount] = await db.query<RowDataPacket[]>(
-      getTransactionsCount(),
-      {
-        userID,
-        accountID,
-      }
-    );
+    const [transactionCount] = await db.query<
+      RowDataPacket[]
+    >(getTransactionsCount(), {
+      userID,
+      accountID,
+    });
 
     const [rows] = await db.query<RowDataPacket[]>(
       getTransactions(),
@@ -109,26 +109,26 @@ export async function GET(request: Request) {
         dateStart: dateStart || null,
         dateEnd: dateEnd || null,
         limit,
-        offset
+        offset,
       }
     );
 
-    const hasMore = (offset + limit) < transactionCount[0].count;
+    const hasMore =
+      offset + limit < transactionCount[0].count;
 
     return success({
       hasMore: hasMore,
       currentPage: page,
-      data: rows
+      data: rows,
     });
-
   } catch (error) {
     return fail(
       500,
       error instanceof Error
         ? error.message
-        : "Failed to Fetch Transactions"
-    )
+        : 'Failed to Fetch Transactions'
+    );
   } finally {
-    connection.release()
+    connection.release();
   }
-};
+}
