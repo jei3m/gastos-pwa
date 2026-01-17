@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo, Key } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchSession } from "@/utils/session";
 import {
   Select,
   SelectContent,
@@ -57,15 +56,6 @@ export default function EditTransactionForm() {
   const filteredAccounts = accounts?.filter((account: Account) => 
     account.id !== selectedAccountID
   ) || [];
-
-  useEffect(() => {
-    fetchSession()
-      .then(({session}) => {
-        if (!session) {
-          router.push('/auth/login')
-        }
-      })
-  },[router])
 
   const form = useForm<z.infer<typeof editTransactionSchema>>({
     resolver: zodResolver(editTransactionSchema),
@@ -144,17 +134,23 @@ export default function EditTransactionForm() {
   const { data: categoriesData } = useQuery(
     categoryQueryOptions(
       transactionType!,
-      selectedAccountID!
+      selectedAccountID!,
+      null,
+      null,
+      'list'
     )
   );
   const categories = useMemo(() => {
-    return categoriesData?.[0]?.details;
+    return categoriesData;
   }, [categoriesData]);
 
   // Set form values
   useEffect(() => {
     if (!transaction || !selectedAccountID) return;
-    if (!transaction.isTransfer && !categories) return;
+    if (
+      (transaction.isTransfer && !accounts)
+      && (!transaction.isTransfer && !categories)
+    ) return;
     form.reset({
       'type': transaction.isTransfer ? 'transfer' : transaction.type,
       'note': transaction.note,
@@ -166,7 +162,7 @@ export default function EditTransactionForm() {
       'refAccountsID': selectedAccountID,
       'refTransferToAccountsID': transaction.refTransferToAccountsID || ""
     });
-  }, [form, transaction, categories, selectedAccountID]);
+  }, [form, transaction, categories, accounts, selectedAccountID]);
 
   return (
     <main className='flex flex-col space-y-4 p-3'>

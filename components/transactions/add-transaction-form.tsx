@@ -76,11 +76,14 @@ export default function AddTransactionForm() {
   const { data: categoriesData, isPending: isCategoriesPending } = useQuery(
     categoryQueryOptions(
       transactionType,
-      selectedAccountID!
+      selectedAccountID!,
+      null,
+      null,
+      'list'
     )
   );
   const categories = useMemo(() => {
-    return categoriesData?.[0]?.details;
+    return categoriesData;
   }, [categoriesData]);
 
   const { 
