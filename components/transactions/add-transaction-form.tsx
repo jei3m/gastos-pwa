@@ -1,9 +1,6 @@
 'use client';
 import { useState, useEffect, Key, useMemo } from 'react';
-import {
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -54,15 +51,25 @@ import { transactionsInfiniteQueryOptions } from '@/lib/tq-options/transactions.
 import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
 import { Account } from '@/types/accounts.types';
 import CustomAlertDialog from '../custom/custom-alert-dialog';
+import { cn } from '@/lib/utils';
 
-export default function AddTransactionForm() {
+interface AddTransactionFormProps {
+  isModal?: boolean;
+  transactionTypeParam: string | null;
+  onClose?: () => void;
+}
+
+export default function AddTransactionForm({
+  isModal = false,
+  transactionTypeParam,
+  onClose,
+}: AddTransactionFormProps) {
   const [datePickerOpen, setDatePickerOpen] =
     useState<boolean>(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const transactionTypeParam = searchParams.get('type');
   const { selectedAccountID, accounts } = useAccount();
   const queryClient = useQueryClient();
+  const pathname = window.location.pathname;
 
   const filteredAccounts =
     accounts?.filter(
@@ -118,7 +125,9 @@ export default function AddTransactionForm() {
       });
       form.reset();
       toast.success(data.responseMessage);
-      router.push('/pages/transactions');
+      isModal && onClose
+        ? onClose()
+        : router.push('/pages/transactions');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -164,8 +173,15 @@ export default function AddTransactionForm() {
   ]);
 
   return (
-    <main className="flex flex-col space-y-4 p-3">
-      <TypographyH3>New Transaction</TypographyH3>
+    <main
+      className={cn(
+        'flex flex-col space-y-4',
+        !isModal && 'p-3'
+      )}
+    >
+      {!isModal && (
+        <TypographyH3>New Transaction</TypographyH3>
+      )}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -467,7 +483,11 @@ export default function AddTransactionForm() {
             <Button
               onClick={() => {
                 form.reset();
-                router.back();
+                if (isModal && onClose) {
+                  onClose();
+                } else {
+                  router.back();
+                }
               }}
               className="bg-red-500 border-2 hover:none"
               disabled={isLoading}
