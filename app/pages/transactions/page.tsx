@@ -14,7 +14,6 @@ import { transactionsInfiniteQueryOptions } from '@/lib/tq-options/transactions.
 import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import { toast } from 'sonner';
 import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
-import TransactionTable from '@/components/transactions/transaction-table';
 
 export default function Transactions() {
   const [isScrolled, setIsScrolled] =
@@ -126,22 +125,16 @@ export default function Transactions() {
               <>
                 {transactions && transactions.length > 0 ? (
                   <>
-                    {isMobile ? (
-                      <div className="grid md:grid-cols-2 gap-2">
-                        {transactions.map(
-                          (transaction, index) => (
-                            <TransactionCard
-                              transaction={transaction}
-                              key={index}
-                            />
-                          )
-                        )}
-                      </div>
-                    ) : (
-                      <TransactionTable
-                        transactions={transactions}
-                      />
-                    )}
+                    <div className="grid md:grid-cols-2 gap-2">
+                      {transactions.map(
+                        (transaction, index) => (
+                          <TransactionCard
+                            transaction={transaction}
+                            key={index}
+                          />
+                        )
+                      )}
+                    </div>
                     {isFetchingNextPage && (
                       <PulseLoader className="mt-0" />
                     )}
