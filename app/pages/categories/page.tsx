@@ -225,7 +225,7 @@ export default function Categories() {
                       No Categories
                     </TypographyH4>
                     <p className="text-gray-500 text-sm text-center">
-                      Start by adding your first category
+                      No {categoryType} activity for this period
                     </p>
                   </div>
                 )}
