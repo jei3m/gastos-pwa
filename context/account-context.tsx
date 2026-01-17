@@ -1,17 +1,20 @@
 'use client';
-import { 
-  createContext, 
-  useContext, 
-  useEffect, 
-  useState, 
-  ReactNode 
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
 } from 'react';
-import { 
-  getSelectedAccountID, 
-  setAccountIDInStorage 
+import {
+  getSelectedAccountID,
+  setAccountIDInStorage,
 } from '@/utils/account';
 import { Account } from '@/types/accounts.types';
-import { QueryObserverResult, useQuery } from '@tanstack/react-query';
+import {
+  QueryObserverResult,
+  useQuery,
+} from '@tanstack/react-query';
 import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 
 type AccountContextType = {
@@ -19,17 +22,26 @@ type AccountContextType = {
   setSelectedAccount: (uuid: string) => void;
   refetchAccountsData: () => Promise<QueryObserverResult>;
   isAccountsLoading: boolean;
-  accounts: Account[]
+  accounts: Account[];
 };
 
-const AccountContext = createContext<AccountContextType | undefined>(undefined);
+const AccountContext = createContext<
+  AccountContextType | undefined
+>(undefined);
 
-export function AccountProvider({ children }: { children: ReactNode }) {
-  const [selectedAccountID, setSelectedAccountID] = useState<string | null>(null);
+export function AccountProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [selectedAccountID, setSelectedAccountID] =
+    useState<string | null>(null);
 
-  const { data: accounts, isPending: isAccountsLoading, refetch} = useQuery(
-    accountsQueryOptions()
-  );
+  const {
+    data: accounts,
+    isPending: isAccountsLoading,
+    refetch,
+  } = useQuery(accountsQueryOptions());
 
   const refetchAccountsData = () => {
     return refetch();
@@ -47,24 +59,26 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AccountContext.Provider 
-      value={{ 
-        selectedAccountID, 
+    <AccountContext.Provider
+      value={{
+        selectedAccountID,
         setSelectedAccount,
         refetchAccountsData,
         isAccountsLoading,
-        accounts
+        accounts,
       }}
     >
       {children}
     </AccountContext.Provider>
   );
-};
+}
 
 export function useAccount() {
   const context = useContext(AccountContext);
   if (context === undefined) {
-    throw new Error('useAccount must be used within an AccountProvider');
+    throw new Error(
+      'useAccount must be used within an AccountProvider'
+    );
   }
   return context;
-};
+}
