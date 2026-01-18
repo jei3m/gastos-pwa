@@ -55,9 +55,9 @@ export default function CreateAccount() {
         queryClient.invalidateQueries({
           queryKey: accountsQueryOptions().queryKey,
         });
-        toast.success(data.responseMessage);
         form.reset();
-        router.push('/pages/accounts');
+        toast.success(data.responseMessage);
+        router.push('/pages/settings');
       },
       onError: (error) => {
         toast.error(error.message);
@@ -83,6 +83,7 @@ export default function CreateAccount() {
           <FormField
             control={form.control}
             name="name"
+            disabled={isPending}
             render={({ field }) => (
               <FormItem className="-space-y-1">
                 <FormLabel className="text-md font-medium">
@@ -111,7 +112,11 @@ export default function CreateAccount() {
                   Account Type
                 </FormLabel>
                 <FormControl>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isPending}
+                  >
                     <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
                       <SelectValue placeholder="Select Account Type..." />
                     </SelectTrigger>
@@ -132,6 +137,7 @@ export default function CreateAccount() {
           <FormField
             control={form.control}
             name="description"
+            disabled={isPending}
             render={({ field }) => (
               <FormItem className="-space-y-1">
                 <FormLabel className="text-md font-medium">
