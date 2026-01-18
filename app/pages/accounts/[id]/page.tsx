@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,16 +42,7 @@ import {
   accountByIDQueryOptions,
   accountsQueryOptions,
 } from '@/lib/tq-options/accounts.tq.options';
-import {
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogTrigger,
-  AlertDialogContent,
-} from '@/components/ui/alert-dialog';
-import { AlertDialogDescription } from '@radix-ui/react-alert-dialog';
+import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 
 export default function EditAccount() {
   const router = useRouter();
@@ -59,9 +50,8 @@ export default function EditAccount() {
   const id = params.id as string;
   const queryClient = useQueryClient();
 
-  const { data: account, isPending } = useQuery(
-    accountByIDQueryOptions(id)
-  );
+  const { data: account, isPending: isAccountPending } =
+    useQuery(accountByIDQueryOptions(id));
 
   const form = useForm<z.infer<typeof createAccountSchema>>(
     {
@@ -118,16 +108,19 @@ export default function EditAccount() {
   }
 
   useEffect(() => {
-    if (!account || isPending) return;
+    if (!account || isAccountPending) return;
     form.reset({
       name: account.name || '',
       type: account.type.toLowerCase() || '',
       description: account.description || '',
     });
-  }, [account, isPending, form]);
+  }, [account, isAccountPending, form]);
 
-  const isDisabled =
-    isEditPending || isDeletePending || isPending;
+  const isDisabled = useMemo(() => {
+    return (
+      isEditPending || isDeletePending || isAccountPending
+    );
+  }, [isEditPending, isDeletePending, isAccountPending]);
 
   return (
     <main className="flex flex-col m-auto space-y-4 p-3">
@@ -135,50 +128,25 @@ export default function EditAccount() {
         <TypographyH3 className="font-bold text-center">
           Edit Account
         </TypographyH3>
-        <AlertDialog>
-          <AlertDialogTrigger
-            className="text-red-500"
-            disabled={isDisabled}
-          >
-            <Trash2 size={20} />
-          </AlertDialogTrigger>
-          <AlertDialogContent
-            className="border-2 bg-primary [&>button]:hidden"
-            onOpenAutoFocus={(e) => e.preventDefault()}
-          >
-            <AlertDialogHeader className="text-left">
-              <AlertDialogTitle>
-                Are you sure?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-800">
-                This will permanently delete this account,
-                and all transactions linked to this account.
-                <br />
-                <br />
-                <span className="font-semibold text-md">
-                  This action cannot be undone.
-                </span>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex flex-row justify-between">
-              <AlertDialogCancel asChild>
-                <Button
-                  variant="outline"
-                  className="border-2"
-                >
-                  Cancel
-                </Button>
-              </AlertDialogCancel>
-              <Button
-                variant="destructive"
-                className="border-2"
-                onClick={() => deleteAccountMutation(id)}
-              >
-                Yes, I&apos;m sure
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <CustomAlertDialog
+          isDisabled={isDisabled}
+          trigger={
+            <Trash2 size={24} className="text-red-500" />
+          }
+          title="Are you sure?"
+          description={
+            <>
+              This will permanently delete this account, and
+              all transactions linked to this account.
+              <br /> <br />
+              <span className="font-semibold text-md">
+                This action cannot be undone.
+              </span>
+            </>
+          }
+          confirmMessage="Yes, I'm sure"
+          onConfirm={() => deleteAccountMutation(id)}
+        />
       </div>
       <Form {...form}>
         <form
@@ -188,6 +156,7 @@ export default function EditAccount() {
           <FormField
             control={form.control}
             name="name"
+            disabled={isDisabled}
             render={({ field }) => (
               <FormItem className="-space-y-1">
                 <FormLabel className="text-md font-medium">
@@ -240,6 +209,7 @@ export default function EditAccount() {
           <FormField
             control={form.control}
             name="description"
+            disabled={isDisabled}
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-md font-medium">
