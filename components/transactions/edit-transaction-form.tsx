@@ -379,6 +379,7 @@ export default function EditTransactionForm({
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
+                        disabled={isLoading}
                       >
                         <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg">
                           <SelectValue placeholder="Select Account..." />
@@ -411,6 +412,7 @@ export default function EditTransactionForm({
               <FormField
                 control={form.control}
                 name="transferFee"
+                disabled={isLoading}
                 render={({ field }) => (
                   <FormItem className="flex-2">
                     <FormLabel className="-mb-1 text-md font-medium">
