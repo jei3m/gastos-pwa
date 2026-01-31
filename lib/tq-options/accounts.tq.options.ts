@@ -21,6 +21,7 @@ export function accountByIDQueryOptions(
     queryFn: () => {
       return fetchAccountByID(selectedAccountID);
     },
+    enabled: !!selectedAccountID,
     retry: false,
   });
 }

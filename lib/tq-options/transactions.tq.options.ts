@@ -21,6 +21,7 @@ export function transactionsInfiniteQueryOptions(
         ? lastPage.currentPage + 1
         : undefined;
     },
+    enabled: !!selectedAccountID,
     retry: false,
   });
 }
