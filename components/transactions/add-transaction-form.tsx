@@ -85,8 +85,8 @@ export default function AddTransactionForm({
       amount: '',
       transferFee: '',
       type: '',
-      time: new Date().toTimeString().substring(0, 5),
-      date: new Date().toLocaleDateString('en-CA'), // Use 'en-CA' locale which formats as YYYY-MM-DD
+      time: '',
+      date: '', // Use 'en-CA' locale which formats as YYYY-MM-DD
       refCategoriesID: '',
       refAccountsID: '',
       refTransferToAccountsID: '',
@@ -160,6 +160,14 @@ export default function AddTransactionForm({
   useEffect(() => {
     if (!selectedAccountID) return;
     form.setValue('refAccountsID', selectedAccountID);
+    form.setValue(
+      'time',
+      new Date().toTimeString().substring(0, 5)
+    );
+    form.setValue(
+      'date',
+      new Date().toLocaleDateString('en-CA')
+    );
   }, [selectedAccountID]);
 
   const isLoading = useMemo(() => {
