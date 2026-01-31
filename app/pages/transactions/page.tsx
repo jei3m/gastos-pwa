@@ -117,41 +117,37 @@ export default function Transactions() {
       {/* Transactions Section */}
       <section className="flex flex-col space-y-2 px-3 mb-2">
         <TypographyH4>Recent Transactions</TypographyH4>
-        {isAccountLoading || isPending ? (
+        {!selectedAccountID ? (
+          <NoSelectedAccountDiv data="transactions" />
+        ) : isAccountLoading || isPending ? (
           <PulseLoader />
         ) : (
           <>
-            {selectedAccountID ? (
+            {transactions && transactions.length > 0 ? (
               <>
-                {transactions && transactions.length > 0 ? (
-                  <>
-                    <div className="grid md:grid-cols-2 gap-2">
-                      {transactions.map(
-                        (transaction, index) => (
-                          <TransactionCard
-                            transaction={transaction}
-                            key={index}
-                          />
-                        )
-                      )}
-                    </div>
-                    {isFetchingNextPage && (
-                      <PulseLoader className="mt-0" />
-                    )}
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-10">
-                    <TypographyH4 className="text-gray-400 font-semibold text-center">
-                      No Transactions
-                    </TypographyH4>
-                    <p className="text-gray-500 text-sm text-center">
-                      Start by adding your first transaction
-                    </p>
-                  </div>
+                <div className="grid md:grid-cols-2 gap-2">
+                  {transactions.map(
+                    (transaction, index) => (
+                      <TransactionCard
+                        transaction={transaction}
+                        key={index}
+                      />
+                    )
+                  )}
+                </div>
+                {isFetchingNextPage && (
+                  <PulseLoader className="mt-0" />
                 )}
               </>
             ) : (
-              <NoSelectedAccountDiv data="transactions" />
+              <div className="flex flex-col items-center justify-center py-10">
+                <TypographyH4 className="text-gray-400 font-semibold text-center">
+                  No Transactions
+                </TypographyH4>
+                <p className="text-gray-500 text-sm text-center">
+                  Start by adding your first transaction
+                </p>
+              </div>
             )}
           </>
         )}
