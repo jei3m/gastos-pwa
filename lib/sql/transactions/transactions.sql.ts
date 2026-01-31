@@ -29,8 +29,6 @@ export const getTransactions = () => {
             WHERE
                 userID = :userID
                 AND accountID = :accountID
-                AND (:dateStart IS NULL OR :dateStart <= date)
-                AND (:dateEnd IS NULL OR :dateEnd >= date)
             LIMIT :limit
             OFFSET :offset;`;
 };
