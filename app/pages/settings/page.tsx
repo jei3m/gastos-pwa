@@ -1,8 +1,5 @@
 'use client';
-import {
-  TypographyH4,
-  TypographyH5,
-} from '@/components/custom/typography';
+import { TypographyH4 } from '@/components/custom/typography';
 import { Separator } from '@/components/ui/separator';
 import { createAuthClient } from 'better-auth/react';
 import { Button } from '@/components/ui/button';
@@ -220,9 +217,9 @@ export default function Settings() {
 
       {/* Accounts Section */}
       <section className={cn('space-y-4')}>
-        <TypographyH5 className="font-semibold text-lg">
+        <TypographyH4 className="font-semibold text-lg">
           Accounts
-        </TypographyH5>
+        </TypographyH4>
         <Separator className="-mt-2 bg-muted-foreground" />
         {isAccountsLoading ? (
           <PulseLoader />
