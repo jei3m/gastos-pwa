@@ -22,11 +22,21 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { accountTypes } from '@/lib/data';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { Eye, EyeOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Accounts() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [accountType, setAccountType] = useState('All');
   const isMobile = useIsMobile();
+
+  const [hideNetWorthTotal, setHideNetWorthTotal] =
+    useLocalStorage('hideNetWorthTotal', false);
+  const [hideNetWorthDigital, setHideNetWorthDigital] =
+    useLocalStorage('hideNetWorthDigital', false);
+  const [hideNetWorthCash, setHideNetWorthCash] =
+    useLocalStorage('hideNetWorthCash', false);
 
   // Scroll to top on load
   useEffect(() => {
@@ -103,6 +113,7 @@ export default function Accounts() {
         isMobile ? 'pb-20' : 'pb-4'
       )}
     >
+      {/* Net Worth Section */}
       <section
         className={cn(
           'transition-all duration-150 ease-in-out',
@@ -121,20 +132,37 @@ export default function Accounts() {
           )}
         >
           <CardContent className="space-y-2">
-            <div className="flex flex-col">
+            <div className="flex flex-row items-center">
               <h3 className="text-gray-600 font-normal text-lg">
                 Total Net Worth
               </h3>
-              {isAccountsLoading ? (
-                <h1 className="text-2xl font-extrabold flex">
-                  <Skeleton className="h-10 w-[50%] bg-gray-300" />
-                </h1>
-              ) : (
-                <h1 className="text-2xl font-extrabold">
-                  PHP {formatAmount(calculateNetWorth())}
-                </h1>
-              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() =>
+                  setHideNetWorthTotal(!hideNetWorthTotal)
+                }
+                className="h-8 w-8 text-gray-600"
+              >
+                {hideNetWorthTotal ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
             </div>
+            {isAccountsLoading ? (
+              <h1 className="text-2xl font-extrabold flex">
+                <Skeleton className="h-10 w-[50%] bg-gray-300" />
+              </h1>
+            ) : (
+              <h1 className="text-2xl font-extrabold">
+                PHP{' '}
+                {hideNetWorthTotal
+                  ? '********'
+                  : formatAmount(calculateNetWorth())}
+              </h1>
+            )}
           </CardContent>
         </Card>
 
@@ -143,45 +171,79 @@ export default function Accounts() {
             {/* Total Digital Net Worth Card */}
             <Card className="border-2 mt-0 flex-3">
               <CardContent className="space-y-2">
-                <div className="flex flex-col">
+                <div className="flex flex-row items-center">
                   <h3 className="text-gray-600 font-normal text-lg">
                     Digital Net Worth
                   </h3>
-                  {isAccountsLoading ? (
-                    <h1 className="text-2xl font-extrabold flex">
-                      <Skeleton className="h-10 w-[50%] bg-gray-300" />
-                    </h1>
-                  ) : (
-                    <h1 className="text-2xl font-extrabold">
-                      PHP{' '}
-                      {formatAmount(
-                        calculateNetWorthByType('Digital')
-                      )}
-                    </h1>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      setHideNetWorthDigital(
+                        !hideNetWorthDigital
+                      )
+                    }
+                    className="h-8 w-8 text-gray-600"
+                  >
+                    {hideNetWorthDigital ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
+                {isAccountsLoading ? (
+                  <h1 className="text-2xl font-extrabold flex">
+                    <Skeleton className="h-10 w-[50%] bg-gray-300" />
+                  </h1>
+                ) : (
+                  <h1 className="text-2xl font-extrabold">
+                    PHP{' '}
+                    {hideNetWorthDigital
+                      ? '********'
+                      : formatAmount(
+                          calculateNetWorthByType('Digital')
+                        )}
+                  </h1>
+                )}
               </CardContent>
             </Card>
             {/* Total Cash Net Worth Card */}
             <Card className="border-2 mt-0 flex-3">
               <CardContent className="space-y-2">
-                <div className="flex flex-col">
+                <div className="flex flex-row items-center">
                   <h3 className="text-gray-600 font-normal text-lg">
                     Cash Net Worth
                   </h3>
-                  {isAccountsLoading ? (
-                    <h1 className="text-2xl font-extrabold flex">
-                      <Skeleton className="h-10 w-[50%] bg-gray-300" />
-                    </h1>
-                  ) : (
-                    <h1 className="text-2xl font-extrabold">
-                      PHP{' '}
-                      {formatAmount(
-                        calculateNetWorthByType('Cash')
-                      )}
-                    </h1>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      setHideNetWorthCash(!hideNetWorthCash)
+                    }
+                    className="h-8 w-8 text-gray-600"
+                  >
+                    {hideNetWorthCash ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
+                {isAccountsLoading ? (
+                  <h1 className="text-2xl font-extrabold flex">
+                    <Skeleton className="h-10 w-[50%] bg-gray-300" />
+                  </h1>
+                ) : (
+                  <h1 className="text-2xl font-extrabold">
+                    PHP{' '}
+                    {hideNetWorthCash
+                      ? '********'
+                      : formatAmount(
+                          calculateNetWorthByType('Cash')
+                        )}
+                  </h1>
+                )}
               </CardContent>
             </Card>
           </>

@@ -94,7 +94,7 @@ function TransactionCard({
           (detail: TransactionDetails, index: number) => (
             <Link
               key={index}
-              href={`transactions/${detail.id}`}
+              href={`/pages/transactions/${detail.id}`}
             >
               <div className="space-y-3 flex flex-row items-center justify-between">
                 <div className="flex flex-col text-sm">

@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect, Key, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useMemo, Key } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -22,20 +22,28 @@ import {
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { createTransactionSchema } from '@/lib/schema/transactions.schema';
+import { editTransactionSchema } from '@/lib/schema/transactions.schema';
 import { useAccount } from '@/context/account-context';
 import { Category } from '@/types/categories.types';
 import { toast } from 'sonner';
-import { createTransaction } from '@/lib/tq-functions/transactions.tq.functions';
+import {
+  deleteTransaction,
+  editTransaction,
+} from '@/lib/tq-functions/transactions.tq.functions';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, Trash2 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { transactionTypes } from '@/lib/data';
-import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
+import { EditTransactionPayload } from '@/types/transactions.types';
 import {
   dateToTimeString,
   TimePicker,
@@ -46,30 +54,30 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { CreateTransaction } from '@/types/transactions.types';
-import { transactionsInfiniteQueryOptions } from '@/lib/tq-options/transactions.tq.options';
 import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
+import { transactionByIDQueryOptions } from '@/lib/tq-options/transactions.tq.options';
+import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 import { Account } from '@/types/accounts.types';
-import CustomAlertDialog from '../custom/custom-alert-dialog';
 import { cn } from '@/lib/utils';
 
-interface AddTransactionFormProps {
+interface EditTransactionFormProps {
+  id?: string;
   isModal?: boolean;
-  transactionTypeParam: string | null;
   onClose?: () => void;
 }
 
-export default function AddTransactionForm({
+export default function EditTransactionForm({
+  id: propId,
   isModal = false,
-  transactionTypeParam,
   onClose,
-}: AddTransactionFormProps) {
+}: EditTransactionFormProps) {
   const [datePickerOpen, setDatePickerOpen] =
     useState<boolean>(false);
   const router = useRouter();
   const { selectedAccountID, accounts } = useAccount();
   const queryClient = useQueryClient();
-  const pathname = window.location.pathname;
+  const params = useParams();
+  const id = propId || (params.id as string);
 
   const filteredAccounts =
     accounts?.filter(
@@ -77,30 +85,93 @@ export default function AddTransactionForm({
     ) || [];
 
   const form = useForm<
-    z.infer<typeof createTransactionSchema>
+    z.infer<typeof editTransactionSchema>
   >({
-    resolver: zodResolver(createTransactionSchema),
+    resolver: zodResolver(editTransactionSchema),
     defaultValues: {
       note: '',
-      amount: '',
-      transferFee: '',
+      amount: '0.00',
       type: '',
-      time: '',
-      date: '', // Use 'en-CA' locale which formats as YYYY-MM-DD
+      time: new Date().toTimeString().substring(0, 5),
+      date: new Date().toISOString().split('T')[0],
       refCategoriesID: '',
-      refAccountsID: '',
       refTransferToAccountsID: '',
     },
   });
-  const transactionDate = form.getValues('date');
   const transactionType = form.watch('type');
 
+  const {
+    mutate: editTransactionMutation,
+    isPending: IsEditTransactionPending,
+  } = useMutation({
+    mutationFn: (transactionData: EditTransactionPayload) =>
+      editTransaction(id, transactionData),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: transactionByIDQueryOptions(id).queryKey,
+      });
+      toast.success(data.responseMessage);
+      form.reset();
+      if (isModal && onClose) {
+        onClose();
+      } else {
+        router.push('/pages/transactions');
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const {
+    mutate: deleteTransactionMutation,
+    isPending: isDeleteTransactionPending,
+  } = useMutation({
+    mutationFn: (id: string) => deleteTransaction(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: transactionByIDQueryOptions(id).queryKey,
+      });
+      toast.success(data.responseMessage);
+      form.reset();
+      if (isModal && onClose) {
+        onClose();
+      } else {
+        router.push('/pages/transactions');
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  async function onSubmit(
+    values: z.infer<typeof editTransactionSchema>
+  ) {
+    const transactionData = {
+      ...values,
+      amount: parseFloat(values.amount),
+    };
+    editTransactionMutation(transactionData);
+  }
+
+  // Fetch transaction data
+  const {
+    data: transactionData,
+    isPending: isTransactionPending,
+  } = useQuery(transactionByIDQueryOptions(id));
+
+  const transaction = useMemo(() => {
+    return transactionData?.[0];
+  }, [transactionData]);
+
+  // Fetch categories
   const {
     data: categoriesData,
     isPending: isCategoriesPending,
   } = useQuery(
     categoryQueryOptions(
-      transactionType,
+      transactionType!,
       selectedAccountID!,
       null,
       null,
@@ -111,73 +182,53 @@ export default function AddTransactionForm({
     return categoriesData;
   }, [categoriesData]);
 
-  const {
-    mutate: createTransactionMutation,
-    isPending: isCreateTransactionPending,
-  } = useMutation({
-    mutationFn: (transactionData: CreateTransaction) =>
-      createTransaction(transactionData),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: transactionsInfiniteQueryOptions(
-          selectedAccountID!
-        ).queryKey,
-      });
-      form.reset();
-      toast.success(data.responseMessage);
-      isModal && onClose
-        ? onClose()
-        : router.push('/pages/transactions');
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  async function onSubmit(
-    values: z.infer<typeof createTransactionSchema>
-  ) {
-    const transactionData = {
-      ...values,
-      amount: parseFloat(values.amount), // Convert string to number
-      transferFee: parseFloat(values.transferFee || '0'),
-    };
-    createTransactionMutation(transactionData);
-  }
-
-  // Set initial tab value and form value from url param
+  // Set form values
   useEffect(() => {
+    if (!transaction || !selectedAccountID) return;
     if (
-      transactionTypeParam &&
-      (transactionTypeParam === 'income' ||
-        transactionTypeParam === 'expense')
-    ) {
-      form.setValue('type', transactionTypeParam);
-    }
-  }, [form, transactionTypeParam]);
-
-  // Set refAccountsID
-  useEffect(() => {
-    if (!selectedAccountID) return;
-    form.setValue('refAccountsID', selectedAccountID);
-    form.setValue(
-      'time',
-      new Date().toTimeString().substring(0, 5)
-    );
-    form.setValue(
-      'date',
-      new Date().toLocaleDateString('en-CA')
-    );
-  }, [selectedAccountID]);
+      transaction.isTransfer &&
+      !accounts &&
+      !transaction.isTransfer &&
+      !categories
+    )
+      return;
+    form.reset({
+      type: transaction.isTransfer
+        ? 'transfer'
+        : transaction.type,
+      note: transaction.note,
+      amount: transaction.amount,
+      transferFee: transaction.transferFee,
+      time: transaction.time,
+      date: transaction.date,
+      refCategoriesID: transaction.refCategoriesID,
+      refAccountsID: selectedAccountID,
+      refTransferToAccountsID:
+        transaction.refTransferToAccountsID || '',
+    });
+  }, [
+    form,
+    transaction,
+    categories,
+    accounts,
+    selectedAccountID,
+  ]);
 
   const isLoading = useMemo(() => {
     return transactionType !== 'transfer'
-      ? isCategoriesPending || isCreateTransactionPending
-      : isCreateTransactionPending;
+      ? isCategoriesPending ||
+          isTransactionPending ||
+          IsEditTransactionPending ||
+          isDeleteTransactionPending
+      : isTransactionPending ||
+          IsEditTransactionPending ||
+          isDeleteTransactionPending;
   }, [
     transactionType,
     isCategoriesPending,
-    isCreateTransactionPending,
+    isTransactionPending,
+    IsEditTransactionPending,
+    isDeleteTransactionPending,
   ]);
 
   return (
@@ -188,7 +239,19 @@ export default function AddTransactionForm({
       )}
     >
       {!isModal && (
-        <TypographyH3>New Transaction</TypographyH3>
+        <div className="flex justify-between items-center">
+          <TypographyH3>Edit Transaction</TypographyH3>
+          <CustomAlertDialog
+            isDisabled={isLoading}
+            trigger={
+              <Trash2 size={24} className="text-red-500" />
+            }
+            title="Are you sure?"
+            description="This action cannot be undone. It will be permanently deleted."
+            confirmMessage="Yes, I'm sure"
+            onConfirm={() => deleteTransactionMutation(id)}
+          />
+        </div>
       )}
       <Form {...form}>
         <form
@@ -198,6 +261,7 @@ export default function AddTransactionForm({
           <FormField
             control={form.control}
             name="type"
+            disabled={isLoading}
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -208,11 +272,11 @@ export default function AddTransactionForm({
                   >
                     <TabsList className="bg-white border-2 w-full h-10">
                       {transactionTypes.map(
-                        (type, index) => (
+                        (category, index) => (
                           <TabsTrigger
-                            value={type.toLowerCase()}
+                            value={category.toLowerCase()}
                             key={index}
-                            disabled={isLoading}
+                            disabled={true}
                             className={`text-md
                             ${
                               field.value.toLowerCase() ===
@@ -223,7 +287,7 @@ export default function AddTransactionForm({
                                 : 'data-[state=active]:bg-green-300'
                             }`}
                           >
-                            {type}
+                            {category}
                           </TabsTrigger>
                         )
                       )}
@@ -248,7 +312,9 @@ export default function AddTransactionForm({
                     required
                     placeholder="0.00"
                     {...field}
-                    className="h-9 rounded-lg border-2 border-black bg-white"
+                    className="h-9
+                    rounded-lg border-2
+                    border-black bg-white"
                     type="number"
                     inputMode="decimal"
                     pattern="[0-9\.]*"
@@ -258,10 +324,11 @@ export default function AddTransactionForm({
               </FormItem>
             )}
           />
-          {transactionType !== 'transfer' ? (
+          {form.watch('type') !== 'transfer' ? (
             <FormField
               control={form.control}
               name="refCategoriesID"
+              disabled={isLoading}
               render={({ field }) => (
                 <FormItem className="-space-y-1">
                   <FormLabel className="text-md font-medium">
@@ -280,12 +347,9 @@ export default function AddTransactionForm({
                         {categories && (
                           <>
                             {categories.map(
-                              (
-                                category: Category,
-                                index: Key
-                              ) => (
+                              (category: Category) => (
                                 <SelectItem
-                                  key={index}
+                                  key={category.id}
                                   value={category.id}
                                 >
                                   {category.name}
@@ -394,7 +458,7 @@ export default function AddTransactionForm({
               </FormItem>
             )}
           />
-          <div className="flex flex-row space-x-2">
+          <div className="grid grid-cols-2 gap-x-2">
             <FormField
               control={form.control}
               name="date"
@@ -415,9 +479,9 @@ export default function AddTransactionForm({
                           id="date"
                           className="justify-between font-normal border-2 bg-white text-[16px]"
                         >
-                          {transactionDate
+                          {field.value
                             ? new Date(
-                                transactionDate
+                                field.value
                               ).toLocaleDateString()
                             : 'Select date'}
                           <ChevronDownIcon />
@@ -430,8 +494,8 @@ export default function AddTransactionForm({
                         <Calendar
                           mode="single"
                           selected={
-                            transactionDate
-                              ? new Date(transactionDate)
+                            field.value
+                              ? new Date(field.value)
                               : undefined
                           }
                           captionLayout="dropdown"
@@ -490,12 +554,9 @@ export default function AddTransactionForm({
           <div className="flex flex-row justify-between">
             <Button
               onClick={() => {
-                form.reset();
-                if (isModal && onClose) {
-                  onClose();
-                } else {
-                  router.back();
-                }
+                isModal && onClose
+                  ? onClose()
+                  : router.back();
               }}
               className="bg-red-500 border-2 hover:none"
               disabled={isLoading}
@@ -503,53 +564,13 @@ export default function AddTransactionForm({
             >
               Cancel
             </Button>
-            {transactionType === 'transfer' ? (
-              <CustomAlertDialog
-                isDisabled={isLoading}
-                trigger={
-                  <Button
-                    className="border-2"
-                    type="button"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Submitting...' : 'Submit'}
-                  </Button>
-                }
-                title="Transfer Transaction"
-                description="You are about to transfer this transaction to another account."
-                body={
-                  <>
-                    <span className="font-semibold">
-                      Important notes:
-                    </span>
-                    <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-800">
-                      <li>
-                        Changes are not synchronized
-                        automatically between accounts
-                      </li>
-                      <li>
-                        To edit a transferred transaction,
-                        you must update it separately in
-                        both accounts
-                      </li>
-                    </ul>
-                  </>
-                }
-                confirmMessage={
-                  isLoading ? 'Confirming...' : 'Confirm'
-                }
-                type="submit"
-                onConfirm={form.handleSubmit(onSubmit)}
-              />
-            ) : (
-              <Button
-                className="border-2"
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Submitting...' : 'Submit'}
-              </Button>
-            )}
+            <Button
+              className="border-2"
+              type="submit"
+              disabled={isLoading}
+            >
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

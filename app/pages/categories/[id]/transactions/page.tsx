@@ -1,38 +1,34 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useEffect, useMemo } from 'react';
 import { TypographyH4 } from '@/components/custom/typography';
 import { useAccount } from '@/context/account-context';
 import PulseLoader from '@/components/custom/pulse-loader';
 import TransactionCard from '@/components/transactions/transaction-card';
-import TotalAmountSection from '@/components/transactions/total-amount-section';
-import {
-  useInfiniteQuery,
-  useQuery,
-} from '@tanstack/react-query';
-import { transactionsInfiniteQueryOptions } from '@/lib/tq-options/transactions.tq.options';
-import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
-import { toast } from 'sonner';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { transactionsByCategoryInfiniteQueryOptions } from '@/lib/tq-options/transactions.tq.options';
 import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
+import {
+  useParams,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
+import { ChevronLeft } from 'lucide-react';
 
 export default function Transactions() {
-  const [isScrolled, setIsScrolled] =
-    useState<boolean>(false);
-  const isMobile = useIsMobile();
   const { selectedAccountID } = useAccount();
+  const params = useParams();
+  const categoryID = params.id as string;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const dateStart =
+    searchParams.get('dateStart') || undefined;
+  const dateEnd = searchParams.get('dateEnd') || undefined;
 
   // Scroll to top on load
   useEffect(() => {
     window.scrollTo(0, 0);
     window.scroll(0, 0);
-    setIsScrolled(false);
   }, []);
-
-  const {
-    data: account,
-    isPending: isAccountLoading,
-    error: accountError,
-  } = useQuery(accountByIDQueryOptions(selectedAccountID));
 
   const {
     data: transactionsData,
@@ -40,9 +36,13 @@ export default function Transactions() {
     isFetchingNextPage,
     fetchNextPage,
     isPending,
-    error: transactionsError,
   } = useInfiniteQuery(
-    transactionsInfiniteQueryOptions(selectedAccountID)
+    transactionsByCategoryInfiniteQueryOptions(
+      selectedAccountID,
+      categoryID,
+      dateStart,
+      dateEnd
+    )
   );
 
   const transactions = useMemo(() => {
@@ -73,53 +73,24 @@ export default function Transactions() {
       window.removeEventListener('scroll', handleScroll);
   }, [isFetchingNextPage, hasNextPage]);
 
-  // Set isScrolled
-  useEffect(() => {
-    const onScroll = () => {
-      setIsScrolled(window.scrollY > 40);
-    };
-
-    window.addEventListener('scroll', onScroll, {
-      passive: true,
-    });
-    return () =>
-      window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Listen to errors
-  useEffect(() => {
-    if (accountError) {
-      toast.error(
-        accountError?.message ||
-          'Failed to fetch account details'
-      );
-    }
-    if (transactionsError) {
-      toast.error(
-        transactionsError?.message ||
-          'Failed to fetch transactions'
-      );
-    }
-  }, [accountError, transactionsError]);
-
   return (
     <main
       className={`flex flex-col space-y-2 min-h-screen pb-18`}
     >
-      {/* Total Amount Section */}
-      <TotalAmountSection
-        isLoading={isAccountLoading}
-        isScrolled={isScrolled}
-        account={account}
-        isMobile={isMobile}
-      />
-
       {/* Transactions Section */}
       <section className="flex flex-col space-y-2 px-3 mb-2">
-        <TypographyH4>Recent Transactions</TypographyH4>
+        <div className="flex flex-row items-center pt-2 -ml-1">
+          <div
+            onClick={() => router.back()}
+            className="flex items-center cursor-pointer"
+          >
+            <ChevronLeft className="mr-2" size={22} />
+            <TypographyH4>Transactions</TypographyH4>
+          </div>
+        </div>
         {!selectedAccountID ? (
           <NoSelectedAccountDiv data="transactions" />
-        ) : isAccountLoading || isPending ? (
+        ) : isPending ? (
           <PulseLoader />
         ) : (
           <>
@@ -145,7 +116,8 @@ export default function Transactions() {
                   No Transactions
                 </TypographyH4>
                 <p className="text-gray-500 text-sm text-center">
-                  Start by adding your first transaction
+                  No existing transactions for this period
+                  and category
                 </p>
               </div>
             )}

@@ -5,6 +5,7 @@ import {
 import {
   fetchTransactionByID,
   fetchTransactions,
+  fetchTransactionsByCategory,
   fetchTransactionsCount,
 } from '../tq-functions/transactions.tq.functions';
 
@@ -21,6 +22,40 @@ export function transactionsInfiniteQueryOptions(
         ? lastPage.currentPage + 1
         : undefined;
     },
+    enabled: !!selectedAccountID,
+    retry: false,
+  });
+}
+
+export function transactionsByCategoryInfiniteQueryOptions(
+  selectedAccountID: string | null,
+  categoryID: string | null,
+  dateStart?: string,
+  dateEnd?: string
+) {
+  return infiniteQueryOptions({
+    queryKey: [
+      'transactions',
+      selectedAccountID,
+      categoryID,
+      dateStart,
+      dateEnd,
+    ],
+    queryFn: ({ pageParam }) =>
+      fetchTransactionsByCategory(
+        selectedAccountID,
+        categoryID,
+        pageParam,
+        dateStart,
+        dateEnd
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasMore
+        ? lastPage.currentPage + 1
+        : undefined;
+    },
+    enabled: !!selectedAccountID || !!categoryID,
     retry: false,
   });
 }

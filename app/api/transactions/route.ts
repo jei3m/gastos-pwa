@@ -80,8 +80,6 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const accountID = url.searchParams.get('accountID');
-    const dateStart = url.searchParams.get('dateStart');
-    const dateEnd = url.searchParams.get('dateEnd');
     const page = parseInt(
       url.searchParams.get('page') || '1',
       10
@@ -106,8 +104,6 @@ export async function GET(request: Request) {
       {
         userID,
         accountID,
-        dateStart: dateStart || null,
-        dateEnd: dateEnd || null,
         limit,
         offset,
       }

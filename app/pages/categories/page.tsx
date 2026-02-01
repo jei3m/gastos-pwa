@@ -21,6 +21,10 @@ import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
 import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
+import {
+  useSearchParams,
+  useRouter,
+} from 'next/navigation';
 
 export default function Categories() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,12 +41,22 @@ export default function Categories() {
     useState<string>('0.00');
   const { selectedAccountID } = useAccount();
   const isMobile = useIsMobile();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Scroll to top on load
   useEffect(() => {
     window.scrollTo(0, 0);
     window.scroll(0, 0);
     setIsScrolled(false);
+  }, []);
+
+  // Initialize date from URL
+  useEffect(() => {
+    const urlDateStart = searchParams.get('dateStart');
+    const urlDateEnd = searchParams.get('dateEnd');
+    if (urlDateStart) setDateStart(urlDateStart);
+    if (urlDateEnd) setDateEnd(urlDateEnd);
   }, []);
 
   // Function to handle previous or next
@@ -52,6 +66,12 @@ export default function Categories() {
   ) => {
     setDateStart(start);
     setDateEnd(end);
+    const params = new URLSearchParams();
+    if (start) params.set('dateStart', start);
+    if (end) params.set('dateEnd', end);
+    router.push(`/pages/categories?${params.toString()}`, {
+      scroll: false,
+    });
   };
 
   const calculateBalance = () => {
@@ -215,6 +235,7 @@ export default function Categories() {
                           key={category.id}
                           category={category}
                           hideAmount={false}
+                          isEdit={false}
                         />
                       )
                     )}

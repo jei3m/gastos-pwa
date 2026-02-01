@@ -1,11 +1,13 @@
+'use client';
 import AddTransactionForm from '@/components/transactions/add-transaction-form';
-import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 function AddTransactionPage() {
+  const searchParams = useSearchParams();
   return (
-    <Suspense fallback={<></>}>
-      <AddTransactionForm />
-    </Suspense>
+    <AddTransactionForm
+      transactionTypeParam={searchParams.get('type')}
+    />
   );
 }
 
