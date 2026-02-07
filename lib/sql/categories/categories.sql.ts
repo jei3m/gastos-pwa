@@ -121,17 +121,33 @@ export const getCategoriesList = () => {
 
 export const getCategoryByID = () => {
   return `SELECT
-                id,
-                name,
-                type,
-                icon,
-                description,
-                refUserID
+                c.id,
+                c.name,
+                c.type,
+                c.icon,
+                c.description,
+                c.refUserID,
+                CASE 
+                    WHEN 
+                        :dateStart IS NOT NULL AND 
+                        :dateEnd IS NOT NULL AND
+                        :accountID IS NOT NULL
+                    THEN(
+                        SELECT SUM(amount)
+                        FROM v_transactions_table t
+                        WHERE t.ref_categories_id = :id
+                            AND t.ref_accounts_id = :accountID
+                            AND t.date >= :dateStart
+                            AND t.date <= :dateEnd
+                    )
+                    ELSE 0
+                END AS totalAmount
             FROM 
-                v_categories
+                v_categories c
             WHERE
-                refUserID = :userID
-                AND id = :id;`;
+                c.refUserID = :userID
+                AND c.id = :id
+            LIMIT 1;`;
 };
 
 export const updateCategory = () => {
