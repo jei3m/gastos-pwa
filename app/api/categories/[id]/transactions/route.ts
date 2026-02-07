@@ -7,6 +7,7 @@ import {
   getTransactionsByCategoryCount,
 } from '@/lib/sql/transactions/transactions.sql';
 import { RowDataPacket } from 'mysql2';
+import { getCategoryByID } from '@/lib/sql/categories/categories.sql';
 
 // Fetch Transactions By Category with Pagination
 export async function GET(
@@ -31,6 +32,16 @@ export async function GET(
     if (!accountID) {
       throw Error('There is no selected account');
     }
+
+    const [categoryDetails] = await db.query<
+      RowDataPacket[]
+    >(getCategoryByID(), {
+      userID,
+      id,
+      accountID,
+      dateStart,
+      dateEnd,
+    });
 
     const [transactionCount] = await db.query<
       RowDataPacket[]
@@ -61,6 +72,7 @@ export async function GET(
     return success({
       hasMore: hasMore,
       currentPage: page,
+      categoryDetails: categoryDetails,
       data: rows,
     });
   } catch (error) {
