@@ -1,5 +1,16 @@
 import { createAuthClient } from 'better-auth/react';
+import { toast } from 'sonner';
 export const authClient = createAuthClient({
-  /** The base URL of the server (optional if you're using the same domain) */
-  baseURL: process.env.API_BASE_URL,
+  fetchOptions: {
+    onError: async (context) => {
+      const { response } = context;
+      if (response.status === 429) {
+        const retryAfter =
+          response.headers.get('X-Retry-After');
+        toast.warning(
+          `Rate limit exceeded. Retry after ${retryAfter} seconds`
+        );
+      }
+    },
+  },
 });
