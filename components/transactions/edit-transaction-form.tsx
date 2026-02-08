@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { editTransactionSchema } from '@/lib/schema/transactions.schema';
 import { useAccount } from '@/context/account-context';
 import { Category } from '@/types/categories.types';
@@ -98,7 +98,10 @@ export default function EditTransactionForm({
       refTransferToAccountsID: '',
     },
   });
-  const transactionType = form.watch('type');
+  const transactionType = useWatch({
+    control: form.control,
+    name: 'type',
+  });
 
   const {
     mutate: editTransactionMutation,
@@ -324,7 +327,7 @@ export default function EditTransactionForm({
               </FormItem>
             )}
           />
-          {form.watch('type') !== 'transfer' ? (
+          {transactionType !== 'transfer' ? (
             <FormField
               control={form.control}
               name="refCategoriesID"

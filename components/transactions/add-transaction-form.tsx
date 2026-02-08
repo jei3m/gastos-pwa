@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { createTransactionSchema } from '@/lib/schema/transactions.schema';
 import { useAccount } from '@/context/account-context';
 import { Category } from '@/types/categories.types';
@@ -93,7 +93,10 @@ export default function AddTransactionForm({
     },
   });
   const transactionDate = form.getValues('date');
-  const transactionType = form.watch('type');
+  const transactionType = useWatch({
+    control: form.control,
+    name: 'type',
+  });
 
   const {
     data: categoriesData,
