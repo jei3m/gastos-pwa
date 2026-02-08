@@ -69,7 +69,6 @@ export default function AddTransactionForm({
   const router = useRouter();
   const { selectedAccountID, accounts } = useAccount();
   const queryClient = useQueryClient();
-  const pathname = window.location.pathname;
 
   const filteredAccounts =
     accounts?.filter(
@@ -86,13 +85,16 @@ export default function AddTransactionForm({
       transferFee: '',
       type: '',
       time: '',
-      date: '', // Use 'en-CA' locale which formats as YYYY-MM-DD
+      date: '',
       refCategoriesID: '',
       refAccountsID: '',
       refTransferToAccountsID: '',
     },
   });
-  const transactionDate = form.getValues('date');
+  const transactionDate = useWatch({
+    control: form.control,
+    name: 'date',
+  });
   const transactionType = useWatch({
     control: form.control,
     name: 'type',
