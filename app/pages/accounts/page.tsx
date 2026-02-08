@@ -25,11 +25,12 @@ import { accountTypes } from '@/lib/data';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useScrollState } from '@/hooks/use-scroll-state';
 
 export default function Accounts() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [accountType, setAccountType] = useState('All');
   const isMobile = useIsMobile();
+  const isScrolled = useScrollState();
 
   const [hideNetWorthTotal, setHideNetWorthTotal] =
     useLocalStorage('hideNetWorthTotal', false);
@@ -37,13 +38,6 @@ export default function Accounts() {
     useLocalStorage('hideNetWorthDigital', false);
   const [hideNetWorthCash, setHideNetWorthCash] =
     useLocalStorage('hideNetWorthCash', false);
-
-  // Scroll to top on load
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    window.scroll(0, 0);
-    setIsScrolled(false);
-  }, []);
 
   const { data: accounts, isPending: isAccountsLoading } =
     useQuery(accountsQueryOptions());
@@ -92,19 +86,6 @@ export default function Accounts() {
 
     return netWorth.toFixed(2);
   };
-
-  // Set isScrolled
-  useEffect(() => {
-    const onScroll = () => {
-      setIsScrolled(window.scrollY > 40);
-    };
-
-    window.addEventListener('scroll', onScroll, {
-      passive: true,
-    });
-    return () =>
-      window.removeEventListener('scroll', onScroll);
-  }, []);
 
   return (
     <main
