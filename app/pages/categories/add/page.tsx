@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { createCategory } from '@/lib/tq-functions/categories.tq.functions';
 import { createCategorySchema } from '@/lib/schema/categories.schema';
 import { toast } from 'sonner';
@@ -32,7 +32,6 @@ import { Textarea } from '@/components/ui/textarea';
 import IconPicker from '@/components/custom/icon-picker';
 
 export default function CreateCategory() {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -46,6 +45,11 @@ export default function CreateCategory() {
       icon: '',
       description: '',
     },
+  });
+
+  const transactionType = useWatch({
+    control: form.control,
+    name: 'type',
   });
 
   const { mutate: createCategoryMutation, isPending } =
@@ -136,7 +140,7 @@ export default function CreateCategory() {
                   <IconPicker
                     value={field.value}
                     onChange={field.onChange}
-                    type={form.watch('type')}
+                    type={transactionType}
                   />
                 </FormControl>
                 <FormMessage className="text-center" />
