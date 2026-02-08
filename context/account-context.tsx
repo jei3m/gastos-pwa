@@ -47,9 +47,10 @@ export function AccountProvider({
     return refetch();
   };
 
+  // Initialize the selected account from localStorage
   useEffect(() => {
-    // Initialize the selected account from localStorage
     const accountID = getSelectedAccountID();
+    // eslint-disable-next-line
     setSelectedAccountID(accountID);
   }, []);
 
