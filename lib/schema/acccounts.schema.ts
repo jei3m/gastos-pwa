@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createAccountSchema = z.object({
-  name: z.string().max(10, {
+  name: z.string().trim().max(10, {
     message: 'Name has a maximum of 10 characters only',
   }),
   type: z.string().min(1, {
@@ -11,7 +11,7 @@ export const createAccountSchema = z.object({
 });
 
 export const updateAccountSchema = z.object({
-  name: z.string().max(10, {
+  name: z.string().trim().max(10, {
     message: 'Name has a maximum of 10 characters only',
   }),
   type: z.string().min(1, {
