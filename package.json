@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun next dev -p 3000",
-    "build": "prettier --write . && bun next build",
-    "start": "next start",
+    "dev": "bun --bun next dev -p 3000",
+    "build": "prettier --write . && bun --bun next build",
+    "start": "bun --bun next start",
     "lint": "eslint"
   },
   "dependencies": {
