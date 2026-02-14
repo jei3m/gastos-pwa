@@ -12,6 +12,7 @@ import { formatAmount } from '@/utils/format-amount';
 import Link from 'next/link';
 import { SquareDashed } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 interface CategoryCardProps {
   category: Category;
@@ -51,14 +52,12 @@ export default function CategoryCard({
         <CardContent className="flex flex-row justify-between items-center -p-1">
           <div className="flex flex-row space-x-2 items-center">
             <div
-              className={`
-              p-1.5 rounded-lg border-2 
-              ${
+              className={cn(
+                'p-1.5 rounded-lg border-2 ',
                 isExpense(category.type)
                   ? 'bg-red-500'
                   : 'bg-primary'
-              }
-            `}
+              )}
             >
               {createElement(
                 getIconById(category.icon)?.icon ||
@@ -71,7 +70,7 @@ export default function CategoryCard({
                 {category.name}
               </TypographyH5>
               {showDescription && (
-                <div className="">
+                <div className="truncate w-[280px]">
                   {category.description || ''}
                 </div>
               )}
@@ -79,17 +78,16 @@ export default function CategoryCard({
           </div>
           {!hideAmount && (
             <div className="text-right">
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Total Amount:
               </CardDescription>
               <CardTitle
-                className={`
-                  ${
-                    isExpense(category.type)
-                      ? 'text-red-500'
-                      : 'text-primary'
-                  }
-                `}
+                className={cn(
+                  'text-md md:text-lg',
+                  isExpense(category.type)
+                    ? 'text-red-500'
+                    : 'text-primary'
+                )}
               >
                 PHP {isExpense(category.type) ? '-' : '+'}
                 {formatAmount(category.totalAmount) ?? 0.0}
