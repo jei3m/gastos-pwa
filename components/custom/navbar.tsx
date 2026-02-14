@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TypographyH3 } from '@/components/custom/typography';
 import AccountSelector from './account-selector';
+import { cn } from '@/lib/utils';
 
 function Navbar() {
   const isMobile = useIsMobile();
@@ -11,19 +12,13 @@ function Navbar() {
   return (
     <div className={`${isMobile ? 'px-0' : 'pb-14'}`}>
       <nav
-        className={`
-					h-[50px]
-					p-2
-					flex
-					justify-between
-					items-center
-					bg-white border-black
-					${
-            isMobile
-              ? 'border-b-2 rounded-none'
-              : 'border-b-2 fixed top-0 w-full'
+        className={cn(
+          'h-[50px] p-2 flex justify-between items-center bg-white border-black border-b-2',
+          {
+            'rounded-none': isMobile,
+            'fixed top-0 w-full z-10': !isMobile,
           }
-				`}
+        )}
       >
         <Link
           href={'/pages/transactions'}
