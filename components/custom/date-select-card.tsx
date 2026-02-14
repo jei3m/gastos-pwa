@@ -266,7 +266,7 @@ function DateSelectCard({
         ${
           isScrolled && isMobile
             ? 'sticky top-0 z-10'
-            : 'pt-2 px-3'
+            : 'pt-2 md:pt-4 px-3'
         }
       `}
     >
@@ -345,6 +345,7 @@ function DateSelectCard({
                   <TabsTrigger
                     value={item.value}
                     key={index}
+                    className='md:text-md'
                   >
                     {/* Capitalized first letter of item.value */}
                     {item.value.charAt(0).toUpperCase() +
@@ -356,7 +357,7 @@ function DateSelectCard({
           </div>
 
           {/* Date Display and Date Change */}
-          <div className="w-full">
+          <div className="w-full md:mt-1">
             <div
               className="flex
                 justify-between
@@ -367,7 +368,9 @@ function DateSelectCard({
                 className={`cursor-pointer ${disabled.prev && 'opacity-50'}`}
                 onClick={() => handleDateChange('prev')}
               />
-              {dateDisplay}
+              <span className="text-base md:text-lg">
+                {dateDisplay}
+              </span>
               <ChevronRight
                 className={`cursor-pointer ${disabled.next && 'opacity-50'}`}
                 onClick={() => handleDateChange('next')}
