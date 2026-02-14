@@ -82,10 +82,7 @@ export default function IconPicker({
           >
             <Card
               className={cn(
-                'text-white border-2 w-full flex justify-center items-center cursor-pointer',
-                type.toLowerCase() === 'expense'
-                  ? 'bg-red-500'
-                  : 'bg-primary'
+                'text-black border-2 w-full flex justify-center items-center cursor-pointer bg-white'
               )}
             >
               {createElement(iconData.icon, {
@@ -99,7 +96,7 @@ export default function IconPicker({
   );
 
   const renderTrigger = () => (
-    <div className="h-28 w-28 rounded-xl border-2 border-black bg-white cursor-pointer flex items-center justify-center">
+    <div className="h-28 w-28 md:h-34 md:w-34 rounded-xl border-2 border-black bg-white cursor-pointer flex items-center justify-center">
       {renderIcon(value)}
     </div>
   );
@@ -112,9 +109,16 @@ export default function IconPicker({
           <DrawerTrigger asChild>
             {renderTrigger()}
           </DrawerTrigger>
-          <DrawerContent className="max-h-[80vh] p-4">
-            <DrawerHeader>
-              <DrawerTitle>Select an Icon</DrawerTitle>
+          <DrawerContent
+            className={cn(
+              'max-h-[80vh] p-2',
+              type.toLowerCase() === 'expense'
+                ? 'bg-red-500'
+                : 'bg-primary'
+            )}
+          >
+            <DrawerHeader className='-mb-2'>
+              <DrawerTitle className='text-xl'>Select an Icon</DrawerTitle>
             </DrawerHeader>
             {renderContent()}
           </DrawerContent>
@@ -131,11 +135,16 @@ export default function IconPicker({
           {renderTrigger()}
         </DialogTrigger>
         <DialogContent
-          className="min-w-[700px] max-h-[80vh] p-4"
+          className={cn(
+            'min-w-[700px] max-h-[80vh] p-4',
+            type.toLowerCase() === 'expense'
+              ? 'bg-red-500'
+              : 'bg-primary'
+          )}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle className="text-xl">
+            <DialogTitle className="text-2xl">
               Select an Icon
             </DialogTitle>
           </DialogHeader>
