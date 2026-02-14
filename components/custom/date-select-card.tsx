@@ -345,7 +345,7 @@ function DateSelectCard({
                   <TabsTrigger
                     value={item.value}
                     key={index}
-                    className='md:text-md'
+                    className="md:text-md"
                   >
                     {/* Capitalized first letter of item.value */}
                     {item.value.charAt(0).toUpperCase() +
