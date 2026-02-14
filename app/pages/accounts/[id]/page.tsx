@@ -109,11 +109,13 @@ export default function EditAccount() {
 
   useEffect(() => {
     if (!account || isAccountPending) return;
-    form.reset({
-      name: account.name || '',
-      type: account.type.toLowerCase() || '',
-      description: account.description || '',
-    });
+    setTimeout(() => {
+      form.reset({
+        name: account.name || '',
+        type: account.type.toLowerCase() || '',
+        description: account.description || '',
+      });
+    }, 50);
   }, [account, isAccountPending, form]);
 
   const isDisabled = useMemo(() => {
