@@ -328,6 +328,14 @@ Mobile-first responsive design with `sm:`, `md:`, `lg:` prefixes.
 
 Use prefixes: `feat:`, `fix:`, `chore:`, `del:`, `ref:`
 
+**Mapping to PR Sections:**
+
+- `feat:` commits → Features section
+- `fix:` commits → Fixes section
+- `ref:` commits → Refactor section
+- `chore:` commits → Chores section
+- `del:` commits → Refactor or Fixes section (depending on context)
+
 ## Important
 
 - Never add comments unless asked
@@ -343,12 +351,20 @@ Use prefixes: `feat:`, `fix:`, `chore:`, `del:`, `ref:`
 
 ### Features
 
-- [list of new features implemented, starting with a commit prefix of 'feat:']
+- [list of new features implemented as plain descriptions]
 
 ### Fixes
 
-- [list of fixes, starting with a commit prefix of 'fix:']
+- [list of fixes as plain descriptions]
 
 ### Refactor
 
-- [list of made refactors, starting with a commit prefix of 'ref:']
+- [list of refactors as plain descriptions]
+
+### Chores
+
+- [list of chores as plain descriptions]
+
+**Important:** Do NOT include commit prefixes (feat:, fix:, ref:, chore:, del:, etc.) in PR descriptions. DO NOT also directly copy the commit message. Promptly describe the changes made.
+
+**Empty Sections:** Do NOT include sections that have no commits. For example, if there are no `feat:` commits, omit the "### Features" section entirely.
