@@ -184,11 +184,12 @@ function DateSelectCard({
   // Variables for date handling: filtering, display, etc
   const { dateStart, dateEnd, dateDisplay } =
     getDateRange();
-  const convertedDateEnd = new Date(dateEnd); // string to date
-  const today = new Date();
 
   // Disabled state for prev and next buttons
   const disabled = useMemo(() => {
+    const today = new Date();
+    const convertedDateEnd = new Date(dateEnd);
+
     if (isCustomRange) {
       return { prev: true, next: true };
     }
@@ -196,7 +197,7 @@ function DateSelectCard({
       return { prev: false, next: true };
     }
     return { prev: false, next: false };
-  }, [isCustomRange, convertedDateEnd, today]);
+  }, [isCustomRange, dateEnd]);
 
   // Function to handle previous or next
   const handleDateChange = (direction: 'prev' | 'next') => {
@@ -345,7 +346,7 @@ function DateSelectCard({
                   <TabsTrigger
                     value={item.value}
                     key={index}
-                    className='md:text-md'
+                    className="md:text-md"
                   >
                     {/* Capitalized first letter of item.value */}
                     {item.value.charAt(0).toUpperCase() +

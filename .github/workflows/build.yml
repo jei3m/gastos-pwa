@@ -1,11 +1,11 @@
 name: Build Workflow
 env:
   NODE_ENV: ${{ secrets.NODE_ENV }}
-  HOST_PROD: ${{ secrets.HOST_PROD }}
-  PORT_PROD: ${{ secrets.PORT_PROD }}
-  USER_PROD: ${{ secrets.USER_PROD }}
-  PASSWORD_PROD: ${{ secrets.PASSWORD_PROD }}
-  DATABASE_PROD: ${{ secrets.DATABASE_PROD }}
+  MYSQL_HOST_PROD: ${{ secrets.MYSQL_HOST_PROD }}
+  MYSQL_PORT_PROD: ${{ secrets.MYSQL_PORT_PROD }}
+  MYSQL_USER_PROD: ${{ secrets.MYSQL_USER_PROD }}
+  MYSQL_PASSWORD_PROD: ${{ secrets.MYSQL_PASSWORD_PROD }}
+  MYSQL_DATABASE_PROD: ${{ secrets.MYSQL_DATABASE_PROD }}
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
         run: bun install
 
       - name: Run TypeScript Check
-        run: npx tsc --noEmit
+        run: bun tsc --noEmit
 
       - name: Run ESLint
         run: bun eslint

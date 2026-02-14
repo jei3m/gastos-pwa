@@ -140,9 +140,7 @@ export default function EditCategory() {
   return (
     <main className="flex flex-col space-y-4 p-3">
       <div className="flex justify-between items-center">
-        <TypographyH3>
-          Edit Category
-        </TypographyH3>
+        <TypographyH3>Edit Category</TypographyH3>
         <CustomAlertDialog
           isDisabled={isLoading || isPending}
           trigger={
@@ -178,23 +176,21 @@ export default function EditCategory() {
                     className="-mt-1"
                   >
                     <TabsList className="bg-white border-2 w-full h-10">
-                      {categoryTypes.map(
-                        (type, index) => (
-                          <TabsTrigger
-                            value={type.toLowerCase()}
-                            key={index}
-                            className={`text-md
+                      {categoryTypes.map((type, index) => (
+                        <TabsTrigger
+                          value={type.toLowerCase()}
+                          key={index}
+                          className={`text-md
 														${
                               field.value.toLowerCase() ===
                               'expense'
                                 ? 'data-[state=active]:bg-red-400'
                                 : 'data-[state=active]:bg-green-300'
                             }`}
-                          >
-                            {type}
-                          </TabsTrigger>
-                        )
-                      )}
+                        >
+                          {type}
+                        </TabsTrigger>
+                      ))}
                     </TabsList>
                   </Tabs>
                 </FormControl>

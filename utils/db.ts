@@ -6,18 +6,19 @@ const getDbConfig = () => {
 
   if (isProduction) {
     return {
-      host: process.env.HOST_PROD,
-      port: Number(process.env.PORT_PROD),
-      user: process.env.USER_PROD,
-      password: process.env.PASSWORD_PROD,
-      database: process.env.DATABASE_PROD,
+      host: process.env.MYSQL_HOST_PROD,
+      port: Number(process.env.MYSQL_PORT_PROD),
+      user: process.env.MYSQL_USER_PROD,
+      password: process.env.MYSQL_PASSWORD_PROD,
+      database: process.env.MYSQL_DATABASE_PROD,
     };
   } else {
     return {
-      host: process.env.HOST,
-      user: process.env.USER,
-      password: process.env.PASSWORD,
-      database: process.env.DATABASE,
+      host: process.env.MYSQL_HOST,
+      port: Number(process.env.MYSQL_PORT),
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
     };
   }
 };
