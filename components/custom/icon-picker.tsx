@@ -117,8 +117,10 @@ export default function IconPicker({
                 : 'bg-primary'
             )}
           >
-            <DrawerHeader className='-mb-2'>
-              <DrawerTitle className='text-xl'>Select an Icon</DrawerTitle>
+            <DrawerHeader className="-mb-2">
+              <DrawerTitle className="text-xl">
+                Select an Icon
+              </DrawerTitle>
             </DrawerHeader>
             {renderContent()}
           </DrawerContent>
