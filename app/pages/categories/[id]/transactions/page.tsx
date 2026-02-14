@@ -104,7 +104,7 @@ export default function Transactions() {
     window.addEventListener('scroll', handleScroll);
     return () =>
       window.removeEventListener('scroll', handleScroll);
-  }, [isFetchingNextPage, hasNextPage]);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   const isExpense = (type: string) => {
     return type === 'Expense';

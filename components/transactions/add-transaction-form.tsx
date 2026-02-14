@@ -173,7 +173,7 @@ export default function AddTransactionForm({
       'date',
       new Date().toLocaleDateString('en-CA')
     );
-  }, [selectedAccountID]);
+  }, [selectedAccountID, form]);
 
   const isLoading = useMemo(() => {
     return transactionType !== 'transfer'
