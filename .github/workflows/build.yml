@@ -31,7 +31,7 @@ jobs:
         run: bun install
 
       - name: Run TypeScript Check
-        run: npx tsc --noEmit
+        run: bun tsc --noEmit
 
       - name: Run ESLint
         run: bun eslint
