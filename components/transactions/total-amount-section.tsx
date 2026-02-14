@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { formatAmount } from '@/utils/format-amount';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Separator } from '../ui/separator';
@@ -7,15 +6,6 @@ import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Account } from '@/types/accounts.types';
 import Link from 'next/link';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import AddTransactionForm from '@/components/transactions/add-transaction-form';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -32,10 +22,6 @@ export default function TotalAmountSection({
   account,
   isMobile,
 }: TotalAmountSectionProps) {
-  const [transactionTypeParam, setTransactionTypeParam] =
-    useState<'income' | 'expense'>('income');
-  const [isAddDialogOpen, setIsAddDialogOpen] =
-    useState<boolean>(false);
   const [hideBalance, setHideBalance] = useLocalStorage(
     'hideBalance',
     false
@@ -48,7 +34,7 @@ export default function TotalAmountSection({
         ${
           isScrolled && isMobile
             ? 'sticky top-0 z-10'
-            : 'pt-2 px-3'
+            : 'pt-2 md:pt-4 px-3'
         }
       `}
     >
@@ -63,16 +49,16 @@ export default function TotalAmountSection({
       >
         <CardHeader>
           <div className="flex flex-rows items-center justify-between">
-            <div className="text-xl font-bold">
+            <div className="text-xl md:text-2xl font-bold">
               {isLoading ? (
-                <Skeleton className="h-4 w-[140px] bg-gray-300" />
+                <Skeleton className="h-4 md:h-6 w-[140px] bg-gray-300" />
               ) : (
                 account?.name || 'N/A'
               )}
             </div>
-            <div className="text-md text-gray-600 font-normal">
+            <div className="text-md md:text-lg text-gray-600 font-normal">
               {isLoading ? (
-                <Skeleton className="h-4 w-[140px] bg-gray-300" />
+                <Skeleton className="h-4 md:h-6 w-[140px] bg-gray-300" />
               ) : (
                 account?.type || 'N/A'
               )}
@@ -83,7 +69,7 @@ export default function TotalAmountSection({
         <CardContent className="space-y-2">
           <div className="flex flex-col">
             <div className="flex flex-row items-center">
-              <h3 className="text-gray-600 font-normal text-lg">
+              <h3 className="text-gray-600 font-normal text-lg md:text-xl">
                 Balance
               </h3>
               <Button
@@ -100,11 +86,11 @@ export default function TotalAmountSection({
               </Button>
             </div>
             {isLoading ? (
-              <h1 className="text-2xl font-extrabold flex">
-                <Skeleton className="h-10 w-[50%] bg-gray-300" />
+              <h1 className="text-2xl md:text-3xl font-extrabold flex">
+                <Skeleton className="h-10 md:h-12 w-[50%] bg-gray-300" />
               </h1>
             ) : (
-              <h1 className="text-2xl font-extrabold">
+              <h1 className="text-2xl md:text-3xl font-extrabold">
                 PHP{' '}
                 {hideBalance
                   ? '********'
@@ -116,86 +102,30 @@ export default function TotalAmountSection({
           </div>
           {(!isMobile || !isScrolled) && (
             <div className="w-full flex flex-row justify-center space-x-2">
-              {isMobile ? (
-                <>
-                  <Link
-                    href={`/pages/transactions/add?type=income`}
-                    className="w-full"
-                  >
-                    <Button className="w-full flex flex-row -space-x-1">
-                      <ArrowDownLeft strokeWidth={3} />
-                      <span>Income</span>
-                    </Button>
-                  </Link>
+              <>
+                <Link
+                  href={`/pages/transactions/add?type=income`}
+                  className="w-full"
+                >
+                  <Button className="w-full flex flex-row -space-x-1">
+                    <ArrowDownLeft strokeWidth={3} />
+                    <span>Income</span>
+                  </Button>
+                </Link>
 
-                  <Link
-                    href={`/pages/transactions/add?type=expense`}
-                    className="w-full"
+                <Link
+                  href={`/pages/transactions/add?type=expense`}
+                  className="w-full"
+                >
+                  <Button
+                    variant="destructive"
+                    className="w-full flex flex-row -space-x-1"
                   >
-                    <Button
-                      variant="destructive"
-                      className="w-full flex flex-row -space-x-1"
-                    >
-                      <ArrowUpRight strokeWidth={3} />
-                      <span>Expense</span>
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <div className="w-full flex space-x-2">
-                  <Dialog
-                    open={isAddDialogOpen}
-                    onOpenChange={setIsAddDialogOpen}
-                  >
-                    <DialogTrigger asChild>
-                      <Button
-                        className="flex-1 flex flex-row -space-x-1"
-                        onClick={() =>
-                          setTransactionTypeParam('income')
-                        }
-                      >
-                        <ArrowDownLeft strokeWidth={3} />
-                        <span>Income</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        className="flex-1 flex flex-row -space-x-1"
-                        onClick={() =>
-                          setTransactionTypeParam('expense')
-                        }
-                      >
-                        <ArrowUpRight strokeWidth={3} />
-                        <span>Expense</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent
-                      onOpenAutoFocus={(e) =>
-                        e.preventDefault()
-                      }
-                      showCloseButton={false}
-                      className="border-2 min-w-[600px]"
-                    >
-                      <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold">
-                          New Transaction
-                        </DialogTitle>
-                        <DialogDescription></DialogDescription>
-                      </DialogHeader>
-                      <AddTransactionForm
-                        isModal={true}
-                        transactionTypeParam={
-                          transactionTypeParam
-                        }
-                        onClose={() =>
-                          setIsAddDialogOpen(false)
-                        }
-                      />
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              )}
+                    <ArrowUpRight strokeWidth={3} />
+                    <span>Expense</span>
+                  </Button>
+                </Link>
+              </>
             </div>
           )}
         </CardContent>

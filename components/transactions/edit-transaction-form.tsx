@@ -480,7 +480,7 @@ export default function EditTransactionForm({
                           disabled={isLoading}
                           variant="outline"
                           id="date"
-                          className="justify-between font-normal border-2 bg-white text-[16px]"
+                          className="justify-between font-normal border-2 bg-white text-[16px] h-9 md:h-10"
                         >
                           {field.value
                             ? new Date(

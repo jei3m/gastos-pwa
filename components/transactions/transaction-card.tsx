@@ -17,6 +17,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { InfoIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -29,7 +30,7 @@ function TransactionCard({
     <Card className="border-2">
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
-          <span>
+          <span className="text-md md:text-xl">
             {new Date(transaction.date).toLocaleDateString(
               'en-US',
               {
@@ -38,7 +39,7 @@ function TransactionCard({
               }
             )}
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 md:gap-4">
             <Popover>
               <PopoverTrigger>
                 <InfoIcon
@@ -71,11 +72,12 @@ function TransactionCard({
               </PopoverContent>
             </Popover>
             <span
-              className={`${
+              className={cn(
                 transaction.total.startsWith('-')
                   ? 'text-red-500'
-                  : 'text-primary'
-              }`}
+                  : 'text-primary',
+                'text-md md:text-lg'
+              )}
             >
               PHP
               {transaction.total.startsWith('-')
@@ -96,15 +98,15 @@ function TransactionCard({
               key={index}
               href={`/pages/transactions/${detail.id}`}
             >
-              <div className="space-y-3 flex flex-row items-center justify-between">
-                <div className="flex flex-col text-sm">
+              <div className="space-y-3 md:space-y-4 flex flex-row items-center justify-between text-sm md:text-md">
+                <div className="flex flex-col">
                   <span>{detail.category}</span>
                   <span className="text-gray-600">
                     {detail.note}
                   </span>
                 </div>
                 <span
-                  className={`text-sm ${detail.type === 'income' ? 'text-primary' : 'text-red-500'}`}
+                  className={`${detail.type === 'income' ? 'text-primary' : 'text-red-500'}`}
                 >
                   PHP
                   {detail.type === 'income' ? ' +' : ' -'}

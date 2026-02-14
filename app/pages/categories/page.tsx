@@ -94,7 +94,7 @@ export default function Categories() {
 
   return (
     <main
-      className={`flex flex-col space-y-2 min-h-screen
+      className={`flex flex-col space-y-2 md:space-y-4 min-h-screen
       ${isMobile ? 'pb-15' : 'pb-18'}
     `}
     >
@@ -106,10 +106,10 @@ export default function Categories() {
           <>
             <div className="flex flex-col md:flex-row gap-2 md:justify-between md:items-center">
               <div className="flex flex-col">
-                <h3 className="text-gray-600 font-normal text-lg">
+                <h3 className="text-gray-600 font-normal text-lg md:text-xl">
                   Balance
                 </h3>
-                <h1 className="text-2xl font-extrabold">
+                <h1 className="text-2xl md:text-3xl font-extrabold">
                   {isPending ? (
                     <Skeleton className="h-[30px] w-[140px] bg-gray-300" />
                   ) : (
@@ -129,7 +129,7 @@ export default function Categories() {
                     <ArrowDown size={32} />
                   </div>
                   <div className="text-right -space-y-1">
-                    <div className="text-md lg:text-lg">
+                    <div className="text-md md:text-lg">
                       Income
                     </div>
                     <div className="text-xl font-bold">
@@ -152,7 +152,7 @@ export default function Categories() {
                     <ArrowUp size={32} />
                   </div>
                   <div className="text-right -space-y-1">
-                    <div className="text-md lg:text-lg">
+                    <div className="text-md md:text-lg">
                       Expense
                     </div>
                     <div className="text-xl font-bold">
@@ -171,7 +171,7 @@ export default function Categories() {
       />
 
       {/* Categories Section */}
-      <section className="flex flex-col space-y-2 px-3 mb-2">
+      <section className="flex flex-col space-y-2 md:space-y-4 px-3 mb-2">
         <Tabs
           defaultValue="expense"
           value={categoryType}
@@ -206,7 +206,7 @@ export default function Categories() {
             {selectedAccountID ? (
               <>
                 {categories && categories.length > 0 ? (
-                  <div className="grid lg:grid-cols-2 gap-2">
+                  <div className="grid md:grid-cols-2 gap-2 md:gap-4">
                     {categories.map(
                       (category: Category) => (
                         <CategoryCard

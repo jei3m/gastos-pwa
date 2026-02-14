@@ -73,7 +73,7 @@ export default function Transactions() {
         icon: '',
         description: '',
         refUserID: '',
-        amount: 0,
+        totalAmount: 0,
       }
     );
   }, [transactionsData]);
@@ -104,23 +104,21 @@ export default function Transactions() {
     window.addEventListener('scroll', handleScroll);
     return () =>
       window.removeEventListener('scroll', handleScroll);
-  }, [isFetchingNextPage, hasNextPage]);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   const isExpense = (type: string) => {
     return type === 'Expense';
   };
 
   return (
-    <main
-      className={`flex flex-col space-y-2 min-h-screen pb-18`}
-    >
+    <main className="flex flex-col space-y-2 md:space-y-4 min-h-screen pb-18">
       {/* Category Details Section */}
       <section
         className={cn(
           'transition-all duration-150 ease-in-out',
           isScrolled && isMobile
             ? 'sticky top-0 z-10'
-            : 'pt-2 px-3'
+            : 'pt-2 md:pt-4 px-3'
         )}
       >
         <Card
@@ -160,18 +158,19 @@ export default function Transactions() {
               </div>
             </div>
             <div className="text-right">
-              <CardDescription>
+              <CardDescription className="text-sm md:text-md">
                 Total Amount:
               </CardDescription>
               <CardTitle
                 className={cn(
+                  'text-md md:text-xl',
                   isExpense(category.type)
                     ? 'text-red-500'
                     : 'text-primary'
                 )}
               >
                 PHP {isExpense(category.type) ? '-' : '+'}
-                {formatAmount(category.totalAmount || 0.0)}
+                {formatAmount(category.totalAmount)}
               </CardTitle>
             </div>
           </CardHeader>
@@ -181,7 +180,7 @@ export default function Transactions() {
               <Skeleton className="h-6 w-[50%] bg-gray-300" />
             </CardContent>
           ) : (
-            <CardContent className="-mb-2">
+            <CardContent className="-mb-2 text-md md:text-lg">
               {category.description}
             </CardContent>
           )}
@@ -192,7 +191,7 @@ export default function Transactions() {
       </section>
 
       {/* Transactions Section */}
-      <section className="flex flex-col space-y-2 px-3 mb-2">
+      <section className="flex flex-col space-y-2 md:space-y-4 px-3 mb-2">
         <div className="flex flex-row items-center pt-2 -ml-1">
           <div
             onClick={() => router.back()}
@@ -210,7 +209,7 @@ export default function Transactions() {
           <>
             {transactions && transactions.length > 0 ? (
               <>
-                <div className="grid md:grid-cols-2 gap-2">
+                <div className="grid gap-2 md:gap-4">
                   {transactions.map(
                     (transaction, index) => (
                       <TransactionCard

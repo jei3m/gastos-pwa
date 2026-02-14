@@ -46,6 +46,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-weight-base: 500;
   --font-weight-heading: 800;
+  --text-md: 1rem;
 }
 
 :root {

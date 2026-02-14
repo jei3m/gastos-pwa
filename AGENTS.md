@@ -8,7 +8,7 @@ This document provides guidelines for AI agents working on this budget tracker P
 bun next dev -p 3000    # Start development server on port 3000
 bun next build          # Build for production
 next start              # Start production server
-eslint                  # Run ESLint (Next.js + TypeScript config)
+bun eslint              # Run ESLint (Next.js + TypeScript config)
 ```
 
 No test framework is currently configured.
@@ -331,7 +331,24 @@ Use prefixes: `feat:`, `fix:`, `chore:`, `del:`, `ref:`
 ## Important
 
 - Never add comments unless asked
-- Use server components by default
 - Minimize client components for performance
 - Follow existing patterns in the codebase
 - Run `eslint` before committing
+
+## PR Description Format
+
+## Summary of Changes
+
+[A brief and concise description of all changes]
+
+### Features
+
+- [list of new features implemented, starting with a commit prefix of 'feat:']
+
+### Fixes
+
+- [list of fixes, starting with a commit prefix of 'fix:']
+
+### Refactor
+
+- [list of made refactors, starting with a commit prefix of 'ref:']

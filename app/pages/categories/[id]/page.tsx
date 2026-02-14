@@ -33,7 +33,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { transactionTypes } from '@/lib/data';
+import { categoryTypes } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
 import IconPicker from '@/components/custom/icon-picker';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
@@ -140,7 +140,7 @@ export default function EditCategory() {
   return (
     <main className="flex flex-col space-y-4 p-3">
       <div className="flex justify-between items-center">
-        <TypographyH3 className="font-bold">
+        <TypographyH3>
           Edit Category
         </TypographyH3>
         <CustomAlertDialog
@@ -178,7 +178,7 @@ export default function EditCategory() {
                     className="-mt-1"
                   >
                     <TabsList className="bg-white border-2 w-full h-10">
-                      {transactionTypes.map(
+                      {categoryTypes.map(
                         (type, index) => (
                           <TabsTrigger
                             value={type.toLowerCase()}

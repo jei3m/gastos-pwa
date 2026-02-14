@@ -125,9 +125,7 @@ export default function EditAccount() {
   return (
     <main className="flex flex-col m-auto space-y-4 p-3">
       <div className="flex flex-row space-x-2 items-center">
-        <TypographyH3 className="font-bold text-center">
-          Edit Account
-        </TypographyH3>
+        <TypographyH3>Edit Account</TypographyH3>
         <CustomAlertDialog
           isDisabled={isDisabled}
           trigger={
@@ -159,9 +157,7 @@ export default function EditAccount() {
             disabled={isDisabled}
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
-                  Account Name
-                </FormLabel>
+                <FormLabel>Account Name</FormLabel>
                 <FormControl>
                   <Input
                     required
@@ -180,9 +176,7 @@ export default function EditAccount() {
             name="type"
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
-                  Account Type
-                </FormLabel>
+                <FormLabel>Account Type</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
@@ -212,9 +206,7 @@ export default function EditAccount() {
             disabled={isDisabled}
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-md font-medium">
-                  Description
-                </FormLabel>
+                <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Description..."

@@ -27,7 +27,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { transactionTypes } from '@/lib/data';
+import { categoryTypes } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
 import IconPicker from '@/components/custom/icon-picker';
 
@@ -85,9 +85,7 @@ export default function CreateCategory() {
 
   return (
     <main className="flex flex-col space-y-4 p-3">
-      <TypographyH3 className="font-bold text-center">
-        Create New Category
-      </TypographyH3>
+      <TypographyH3>Create New Category</TypographyH3>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -105,23 +103,21 @@ export default function CreateCategory() {
                     className="-mt-1"
                   >
                     <TabsList className="bg-white border-2 w-full h-10">
-                      {transactionTypes.map(
-                        (type, index) => (
-                          <TabsTrigger
-                            value={type.toLowerCase()}
-                            key={index}
-                            className={`text-md
+                      {categoryTypes.map((type, index) => (
+                        <TabsTrigger
+                          value={type.toLowerCase()}
+                          key={index}
+                          className={`text-md
 														${
                               field.value.toLowerCase() ===
                               'expense'
                                 ? 'data-[state=active]:bg-red-400'
                                 : 'data-[state=active]:bg-green-300'
                             }`}
-                          >
-                            {type}
-                          </TabsTrigger>
-                        )
-                      )}
+                        >
+                          {type}
+                        </TabsTrigger>
+                      ))}
                     </TabsList>
                   </Tabs>
                 </FormControl>
@@ -133,9 +129,7 @@ export default function CreateCategory() {
             name="icon"
             render={({ field }) => (
               <FormItem className="m-auto mb-4 flex flex-col justify-center items-center">
-                <FormLabel className="text-md font-medium">
-                  Category Icon
-                </FormLabel>
+                <FormLabel>Category Icon</FormLabel>
                 <FormControl>
                   <IconPicker
                     value={field.value}
@@ -152,9 +146,7 @@ export default function CreateCategory() {
             name="name"
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
-                  Category Name
-                </FormLabel>
+                <FormLabel>Category Name</FormLabel>
                 <FormControl>
                   <Input
                     required
@@ -174,9 +166,7 @@ export default function CreateCategory() {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-md font-medium">
-                  Description
-                </FormLabel>
+                <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Description..."

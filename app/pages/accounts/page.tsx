@@ -90,7 +90,7 @@ export default function Accounts() {
   return (
     <main
       className={cn(
-        'flex flex-col space-y-2 min-h-screen',
+        'flex flex-col space-y-2 md:space-y-4 min-h-screen',
         isMobile ? 'pb-20' : 'pb-4'
       )}
     >
@@ -100,7 +100,7 @@ export default function Accounts() {
           'transition-all duration-150 ease-in-out',
           isScrolled && isMobile
             ? 'sticky top-0 z-10'
-            : 'pt-2 px-3 flex md:flex-col lg:flex-row gap-2'
+            : 'pt-2 md:pt-4 px-3 flex md:flex-col md:flex-row gap-2 md:gap-4'
         )}
       >
         {/* Total Net Worth Card */}
@@ -236,7 +236,7 @@ export default function Accounts() {
       </section>
 
       {/* Accounts Section */}
-      <section className="flex flex-col space-y-2 px-3 mb-2">
+      <section className="flex flex-col space-y-2 md:space-y-4 px-3 mb-2">
         <Tabs
           value={accountType}
           onValueChange={setAccountType}
@@ -245,7 +245,11 @@ export default function Accounts() {
             <TypographyH4>Accounts</TypographyH4>
             <TabsList className="border-black border-2 p-1">
               {accountTypes.map((type, index) => (
-                <TabsTrigger value={type} key={index}>
+                <TabsTrigger
+                  className="text-sm md:text-md"
+                  value={type}
+                  key={index}
+                >
                   {type}
                 </TabsTrigger>
               ))}
@@ -256,7 +260,7 @@ export default function Accounts() {
           <PulseLoader />
         ) : (
           <>
-            <div className="grid md:grid-cols-2 gap-2">
+            <div className="grid md:grid-cols-2 gap-2 md:gap-4">
               {filteredAccounts.map((account: Account) => (
                 <Link
                   href={`/pages/accounts/${account.id}`}
@@ -265,16 +269,16 @@ export default function Accounts() {
                   <Card className="border-2 h-full">
                     <CardHeader>
                       <div className="flex flex-rows items-center justify-between">
-                        <div className="text-lg font-bold">
+                        <div className="text-lg md:text-xl font-bold">
                           {isAccountsLoading ? (
-                            <Skeleton className="h-4 w-[140px] bg-gray-300" />
+                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
                           ) : (
                             account?.name
                           )}
                         </div>
                         <div className="text-md text-gray-600 font-normal">
                           {isAccountsLoading ? (
-                            <Skeleton className="h-4 w-[140px] bg-gray-300" />
+                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
                           ) : (
                             account?.type
                           )}

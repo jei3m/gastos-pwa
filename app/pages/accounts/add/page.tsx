@@ -72,7 +72,7 @@ export default function CreateAccount() {
 
   return (
     <main className="flex flex-col space-y-4 p-3">
-      <TypographyH3 className="font-bold text-center">
+      <TypographyH3>
         Create New Account
       </TypographyH3>
       <Form {...form}>
@@ -86,7 +86,7 @@ export default function CreateAccount() {
             disabled={isPending}
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
+                <FormLabel>
                   Account Name
                 </FormLabel>
                 <FormControl>
@@ -108,7 +108,7 @@ export default function CreateAccount() {
             name="type"
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
+                <FormLabel>
                   Account Type
                 </FormLabel>
                 <FormControl>
@@ -140,7 +140,7 @@ export default function CreateAccount() {
             disabled={isPending}
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
+                <FormLabel>
                   Description
                 </FormLabel>
                 <FormControl>

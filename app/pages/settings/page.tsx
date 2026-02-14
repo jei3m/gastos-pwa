@@ -1,5 +1,4 @@
 'use client';
-import { TypographyH4 } from '@/components/custom/typography';
 import { Separator } from '@/components/ui/separator';
 import { createAuthClient } from 'better-auth/react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,6 @@ import {
   CalendarDays,
   User,
   LogOut,
-  PlusIcon,
   CircleAlert,
   CheckCircle,
   XCircle,
@@ -24,22 +22,12 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from '@/context/account-context';
-import PulseLoader from '@/components/custom/pulse-loader';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Account } from '@/types/accounts.types';
-import Link from 'next/link';
 import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-import {
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import { categoryTypes } from '@/lib/data';
-import { Tabs } from '@radix-ui/react-tabs';
-import { Category } from '@/types/categories.types';
-import CategoryCard from '@/components/categories/category-card';
+import { useMemo, useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
+import AccountsSection from '@/components/settings/accounts-section';
+import CategoriesSection from '@/components/settings/categories-section';
 
 const authClient = createAuthClient();
 
@@ -216,140 +204,20 @@ export default function Settings() {
       </section>
 
       {/* Accounts Section */}
-      <section className={cn('space-y-4')}>
-        <TypographyH4 className="font-semibold">
-          Accounts
-        </TypographyH4>
-        <Separator className="-mt-2 bg-muted-foreground" />
-        {isAccountsLoading ? (
-          <PulseLoader />
-        ) : (
-          <>
-            {accounts && accounts.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-2">
-                {accounts.map((account: Account) => (
-                  <Link
-                    href={`/pages/accounts/${account.id}`}
-                    key={account.id}
-                  >
-                    <Card className="border-2 h-full">
-                      <CardHeader>
-                        <div className="flex flex-rows items-center justify-between">
-                          <div className="text-xl font-bold">
-                            {isAccountsLoading ? (
-                              <Skeleton className="h-4 w-[140px] bg-gray-300" />
-                            ) : (
-                              account?.name
-                            )}
-                          </div>
-                          <div className="text-md text-gray-600 font-normal">
-                            {isAccountsLoading ? (
-                              <Skeleton className="h-4 w-[140px] bg-gray-300" />
-                            ) : (
-                              account?.type
-                            )}
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <Separator className="-mt-2" />
-                      <CardContent className="space-y-2 break-all">
-                        {account.description}
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-10">
-                <TypographyH4 className="text-gray-400 font-semibold text-center">
-                  No Accounts
-                </TypographyH4>
-                <p className="text-gray-500 text-sm text-center">
-                  Start by adding your first account
-                </p>
-              </div>
-            )}
-            <Link
-              className="w-full"
-              href={'/pages/accounts/add'}
-            >
-              <Button className="w-full">
-                <PlusIcon size={40} className="-mr-1" /> Add
-                New Account
-              </Button>
-            </Link>
-          </>
-        )}
-      </section>
+      <AccountsSection
+        accounts={accounts}
+        isAccountsLoading={isAccountsLoading}
+        isMobile={isMobile}
+      />
 
       {/* Categories Section */}
-      <section className={cn('space-y-4')}>
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-        >
-          <div className="flex justify-between items-center">
-            <TypographyH4 className="font-semibold">
-              Categories
-            </TypographyH4>
-            <TabsList
-              defaultValue="expense"
-              className="border-black border-2 p-1"
-            >
-              {categoryTypes.map((type, index) => (
-                <TabsTrigger
-                  value={type.toLowerCase()}
-                  key={index}
-                  className={`${
-                    type === 'Expense'
-                      ? 'data-[state=active]:bg-red-400'
-                      : 'data-[state=active]:bg-green-300'
-                  }`}
-                >
-                  {type}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-        </Tabs>
-        <Separator className="-mt-2 bg-muted-foreground" />
-        {isCategoriesLoading ? (
-          <PulseLoader />
-        ) : (
-          <>
-            {categories && categories.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-2">
-                {categories.map((category: Category) => (
-                  <CategoryCard
-                    key={category.id}
-                    category={category}
-                    hideAmount={true}
-                    showDescription={true}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-10">
-                <TypographyH4 className="text-gray-400 font-semibold text-center">
-                  No Categories
-                </TypographyH4>
-                <p className="text-gray-500 text-sm text-center">
-                  Start by adding your first category
-                </p>
-              </div>
-            )}
-            <Link
-              className="w-full"
-              href={'/pages/categories/add'}
-            >
-              <Button className="w-full">
-                <PlusIcon size={40} className="-mr-1" /> Add
-                New Category
-              </Button>
-            </Link>
-          </>
-        )}
-      </section>
+      <CategoriesSection
+        categories={categories}
+        isCategoriesLoading={isCategoriesLoading}
+        isMobile={isMobile}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
     </main>
   );
 }

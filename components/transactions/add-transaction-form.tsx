@@ -173,7 +173,7 @@ export default function AddTransactionForm({
       'date',
       new Date().toLocaleDateString('en-CA')
     );
-  }, [selectedAccountID]);
+  }, [selectedAccountID, form]);
 
   const isLoading = useMemo(() => {
     return transactionType !== 'transfer'
@@ -245,15 +245,13 @@ export default function AddTransactionForm({
             disabled={isLoading}
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
-                  Amount
-                </FormLabel>
+                <FormLabel>Amount</FormLabel>
                 <FormControl>
                   <Input
                     required
                     placeholder="0.00"
                     {...field}
-                    className="h-9 rounded-lg border-2 border-black bg-white"
+                    className="rounded-lg border-2 border-black bg-white"
                     type="number"
                     inputMode="decimal"
                     pattern="[0-9\.]*"
@@ -269,16 +267,14 @@ export default function AddTransactionForm({
               name="refCategoriesID"
               render={({ field }) => (
                 <FormItem className="-space-y-1">
-                  <FormLabel className="text-md font-medium">
-                    Category
-                  </FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
+                      <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full">
                         <SelectValue placeholder="Select Category..." />
                       </SelectTrigger>
                       <SelectContent className="border-2">
@@ -364,7 +360,7 @@ export default function AddTransactionForm({
                         required
                         placeholder="0.00"
                         {...field}
-                        className="h-9 rounded-lg border-2 border-black bg-white"
+                        className="rounded-lg border-2 border-black bg-white"
                         type="number"
                         inputMode="decimal"
                         pattern="[0-9\.]*"
@@ -382,16 +378,13 @@ export default function AddTransactionForm({
             disabled={isLoading}
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
-                  Note
-                </FormLabel>
+                <FormLabel>Note</FormLabel>
                 <FormControl>
                   <Input
                     required
                     placeholder="Transaction note..."
                     {...field}
-                    className="h-9
-                    rounded-lg border-2
+                    className="rounded-lg border-2
                     border-black bg-white"
                   />
                 </FormControl>
@@ -405,9 +398,7 @@ export default function AddTransactionForm({
               name="date"
               render={({ field }) => (
                 <FormItem className="-space-y-1 w-full">
-                  <FormLabel className="text-md font-medium">
-                    Date
-                  </FormLabel>
+                  <FormLabel>Date</FormLabel>
                   <FormControl>
                     <Popover
                       open={datePickerOpen}
@@ -418,7 +409,7 @@ export default function AddTransactionForm({
                           disabled={isLoading}
                           variant="outline"
                           id="date"
-                          className="justify-between font-normal border-2 bg-white text-[16px]"
+                          className="justify-between font-normal border-2 bg-white text-[16px] h-9 md:h-10"
                         >
                           {transactionDate
                             ? new Date(
@@ -471,9 +462,7 @@ export default function AddTransactionForm({
               name="time"
               render={({ field }) => (
                 <FormItem className="-space-y-1 w-full">
-                  <FormLabel className="text-md font-medium">
-                    Time
-                  </FormLabel>
+                  <FormLabel>Time</FormLabel>
                   <FormControl>
                     <TimePicker
                       value={timeStringToDate(field.value)}

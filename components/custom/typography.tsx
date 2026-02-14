@@ -52,7 +52,7 @@ export function TypographyH3({
     <h3
       {...props}
       className={cn(
-        'scroll-m-20 text-2xl font-extrabold tracking-tight',
+        'scroll-m-20 text-2xl md:text-3xl font-extrabold tracking-tight',
         className
       )}
     >
@@ -72,7 +72,7 @@ export function TypographyH4({
     <h4
       {...props}
       className={cn(
-        'scroll-m-20 text-xl font-semibold tracking-tight',
+        'scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight',
         className
       )}
     >
@@ -92,7 +92,7 @@ export function TypographyH5({
     <h5
       {...props}
       className={cn(
-        'scroll-m-20 text-lg font-regular tracking-tight',
+        'scroll-m-20 text-lg md:text-xl font-regular tracking-tight',
         className
       )}
     >

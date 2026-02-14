@@ -64,7 +64,7 @@ export default function Transactions() {
     window.addEventListener('scroll', handleScroll);
     return () =>
       window.removeEventListener('scroll', handleScroll);
-  }, [isFetchingNextPage, hasNextPage]);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   // Listen to errors
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function Transactions() {
 
   return (
     <main
-      className={`flex flex-col space-y-2 min-h-screen pb-18`}
+      className={`flex flex-col space-y-2 md:space-y-4 min-h-screen pb-18`}
     >
       {/* Total Amount Section */}
       <TotalAmountSection
@@ -95,7 +95,7 @@ export default function Transactions() {
       />
 
       {/* Transactions Section */}
-      <section className="flex flex-col space-y-2 px-3 mb-2">
+      <section className="flex flex-col space-y-2 md:space-y-4 px-3 mb-2">
         <TypographyH4>Recent Transactions</TypographyH4>
         {!selectedAccountID ? (
           <NoSelectedAccountDiv data="transactions" />
@@ -105,7 +105,7 @@ export default function Transactions() {
           <>
             {transactions && transactions.length > 0 ? (
               <>
-                <div className="grid md:grid-cols-2 gap-2">
+                <div className="grid gap-2 md:gap-4">
                   {transactions.map(
                     (transaction, index) => (
                       <TransactionCard
