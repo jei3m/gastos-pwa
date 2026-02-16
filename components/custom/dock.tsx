@@ -62,6 +62,9 @@ export const Dock: React.FC<DockProps> = ({
                 <Link
                   href={item.route}
                   key={`${item.label}-${index}`}
+                  onClick={() => {
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <button
                     className={cn(
