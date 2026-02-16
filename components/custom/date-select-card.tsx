@@ -262,7 +262,7 @@ function DateSelectCard({
   return (
     <section
       className={`
-        transition-all duration-150
+        transition-all
         ease-in-out
         ${
           isScrolled && isMobile

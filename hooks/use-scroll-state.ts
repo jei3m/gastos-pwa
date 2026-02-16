@@ -1,21 +1,19 @@
 import { useState, useEffect } from 'react';
 
 export function useScrollState(threshold: number = 40) {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.scrollY > threshold;
+    }
+    return false;
+  });
 
-  useEffect(() => {
-    // Just reset scroll position, no state update
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, []);
+  console.log(isScrolled);
 
   useEffect(() => {
     const onScroll = () => {
       setIsScrolled(window.scrollY > threshold);
     };
-
-    // Set initial state based on current position
-    onScroll();
-
     window.addEventListener('scroll', onScroll, {
       passive: true,
     });

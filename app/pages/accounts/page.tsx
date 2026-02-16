@@ -97,7 +97,7 @@ export default function Accounts() {
       {/* Net Worth Section */}
       <section
         className={cn(
-          'transition-all duration-150 ease-in-out',
+          'transition-all ease-in-out',
           isScrolled && isMobile
             ? 'sticky top-0 z-10'
             : 'pt-2 md:pt-4 px-3 flex md:flex-col md:flex-row gap-2 md:gap-4'
