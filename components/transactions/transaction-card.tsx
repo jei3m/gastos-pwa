@@ -98,20 +98,31 @@ function TransactionCard({
               key={index}
               href={`/pages/transactions/${detail.id}`}
             >
-              <div className="space-y-3 md:space-y-4 flex flex-row items-center justify-between text-sm md:text-md">
+              <div className="space-y-3 md:space-y-4 flex flex-row justify-between text-sm md:text-md">
                 <div className="flex flex-col">
                   <span>{detail.category}</span>
-                  <span className="text-gray-600">
+                  <span className="text-gray-500">
                     {detail.note}
                   </span>
                 </div>
-                <span
-                  className={`${detail.type === 'income' ? 'text-primary' : 'text-red-500'}`}
-                >
-                  PHP
-                  {detail.type === 'income' ? ' +' : ' -'}
-                  {formatAmount(detail.amount)}
-                </span>
+                <div className="flex flex-col text-sm md:text-md">
+                  <span
+                    className={`${detail.type === 'income' ? 'text-primary' : 'text-red-500'}`}
+                  >
+                    PHP
+                    {detail.type === 'income' ? ' +' : ' -'}
+                    {formatAmount(detail.amount)}
+                  </span>
+                  <span className="text-gray-500 text-right">
+                    {new Date(
+                      `2000-01-01T${detail.time}`
+                    ).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}
+                  </span>
+                </div>
               </div>
             </Link>
           )
