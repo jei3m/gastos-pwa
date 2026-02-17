@@ -1,38 +1,26 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authClient } from '@/lib/auth/auth-client';
 import { Button } from '@/components/ui/button';
-import { fetchSession } from '@/utils/session';
 import Image from 'next/image';
-import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { session, signIn } from '@/lib/auth/auth-client';
 
 export default function Login() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    fetchSession().then(({ session }) => {
-      if (session) {
-        router.push('/pages/transactions');
-      }
-    });
+    if (!session) {
+      router.push('/pages/transactions');
+    }
   }, [router]);
 
   async function handleGoogleSignIn() {
-    setGoogleLoading(true);
-    const { error } = await authClient.signIn.social({
+    // setGoogleLoading(true);
+    await signIn.social({
       provider: 'google',
     });
-
-    if (error?.status === 429) {
-      setGoogleLoading(false);
-      toast.warning(error.message);
-    } else if (error) {
-      setGoogleLoading(false);
-      toast.error(error.message);
-    }
   }
 
   return (

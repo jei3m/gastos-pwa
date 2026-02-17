@@ -1,6 +1,5 @@
 'use client';
 import { Separator } from '@/components/ui/separator';
-import { createAuthClient } from 'better-auth/react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -24,24 +23,22 @@ import { useRouter } from 'next/navigation';
 import { useAccount } from '@/context/account-context';
 import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import AccountsSection from '@/components/settings/accounts-section';
 import CategoriesSection from '@/components/settings/categories-section';
-
-const authClient = createAuthClient();
+import { session, signOut } from '@/lib/auth/auth-client';
 
 export default function Settings() {
   const [activeTab, setActiveTab] =
     useState<string>('expense');
-  const { data: session } = authClient.useSession();
   const isMobile = useIsMobile();
   const router = useRouter();
   const { accounts, isAccountsLoading, selectedAccountID } =
     useAccount();
 
   const handleLogout = async () => {
-    authClient.signOut({
+    signOut({
       fetchOptions: {
         onSuccess: () => {
           router.push('/auth/login');
