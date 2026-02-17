@@ -27,7 +27,10 @@ import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import AccountsSection from '@/components/settings/accounts-section';
 import CategoriesSection from '@/components/settings/categories-section';
-import { session, signOut } from '@/lib/auth/auth-client';
+import {
+  authClient,
+  signOut,
+} from '@/lib/auth/auth-client';
 
 export default function Settings() {
   const [activeTab, setActiveTab] =
@@ -36,6 +39,7 @@ export default function Settings() {
   const router = useRouter();
   const { accounts, isAccountsLoading, selectedAccountID } =
     useAccount();
+  const { data: session } = authClient.useSession();
 
   const handleLogout = async () => {
     signOut({

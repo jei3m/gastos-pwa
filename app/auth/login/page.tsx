@@ -4,11 +4,12 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
-import { session, signIn } from '@/lib/auth/auth-client';
+import { authClient, signIn } from '@/lib/auth/auth-client';
 
 export default function Login() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
+  const { data: session } = authClient.useSession();
 
   useEffect(() => {
     if (!session) {
@@ -17,7 +18,7 @@ export default function Login() {
   }, [router]);
 
   async function handleGoogleSignIn() {
-    // setGoogleLoading(true);
+    setGoogleLoading(true);
     await signIn.social({
       provider: 'google',
     });
