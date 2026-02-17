@@ -16,6 +16,7 @@ Gastos is a comprehensive budget tracking application designed to help users man
 - **Responsive Design**: Optimized for mobile, tablet, and desktop devices
 - **Google oAuth**: Quick and easy registration using your Google account
 - **Date Range Filtering**: Analyze finances within specific time periods
+- **Rate Limiting**: Protected API routes to ensure fair usage and stability
 
 ## Technologies Used
 
@@ -28,6 +29,8 @@ Gastos is a comprehensive budget tracking application designed to help users man
 - **ShadCN**: Accessible UI components built on Radix UI
 - **Lucide Icons**: Beautiful, consistent icon library
 - **MySQL**: Relational database management system
+- **Redis**: In-memory data store for session management and rate limiting
+- **Upstash**: Serverless platform to use Redis without infrastructure overhead
 - **Zod**: Schema validation
 - **React Hook Form**: Form management and validation
 
