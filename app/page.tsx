@@ -14,7 +14,7 @@ export default function Page() {
     } else {
       router.push('/auth/login');
     }
-  }, [router]);
+  }, [router, session]);
 
   return (
     <>
