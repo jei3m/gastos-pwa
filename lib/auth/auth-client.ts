@@ -14,3 +14,8 @@ export const authClient = createAuthClient({
     },
   },
 });
+
+export const { signIn, signOut } = createAuthClient();
+
+export const { data: session } =
+  await authClient.getSession();
