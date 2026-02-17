@@ -30,8 +30,6 @@ export const auth = betterAuth({
     enabled: true,
     window: 60,
     max: 10,
-    storage: 'database',
-    modelName: 'rate_limit',
   },
   advanced: {
     ipAddress: {
