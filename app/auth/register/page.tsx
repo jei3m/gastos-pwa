@@ -6,20 +6,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { fetchSession } from '@/utils/session';
 import { toast } from 'sonner';
 
 export default function Register() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const router = useRouter();
+  const { data: session } = authClient.useSession();
 
   useEffect(() => {
-    fetchSession().then(({ session }) => {
-      if (session) {
-        router.push('/pages/transactions');
-      }
-    });
+    if (session) {
+      router.push('/pages/transactions');
+    }
   }, [router]);
 
   async function handleSubmit(

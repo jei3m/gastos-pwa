@@ -8,8 +8,6 @@ export function useScrollState(threshold: number = 40) {
     return false;
   });
 
-  console.log(isScrolled);
-
   useEffect(() => {
     const onScroll = () => {
       setIsScrolled(window.scrollY > threshold);
