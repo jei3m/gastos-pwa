@@ -13,7 +13,7 @@ export default function Login() {
   const { data: session } = authClient.useSession();
 
   useEffect(() => {
-    if (!session) {
+    if (session) {
       router.push('/pages/transactions');
     }
   }, [router, session]);
