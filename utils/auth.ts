@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
-import { db } from '@/utils/db';
+import { db, redis } from '@/utils/db';
 
 export const auth = betterAuth({
   database: db,
@@ -12,7 +12,9 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: 10 * 60, // 10mins
+      strategy: 'compact',
     },
+    refreshCache: true,
   },
   plugins: [nextCookies()],
   baseURL: process.env.BETTER_AUTH_URL,
@@ -35,6 +37,22 @@ export const auth = betterAuth({
     ipAddress: {
       ipAddressHeaders: ['x-client-ip', 'x-forwarded-for'],
       disableIpTracking: false,
+    },
+  },
+  secondaryStorage: {
+    get: async (key) => {
+      const response = await redis.get(key);
+      if (!response) {
+        return null;
+      }
+      return JSON.stringify(response);
+    },
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, { ex: ttl });
+      else await redis.set(key, value);
+    },
+    delete: async (key) => {
+      await redis.del(key);
     },
   },
 });
