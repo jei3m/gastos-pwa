@@ -1,9 +1,10 @@
 import mysql from 'mysql2/promise';
+import { Redis } from '@upstash/redis';
+
+export const isProduction =
+  process.env.NODE_ENV === 'production';
 
 const getDbConfig = () => {
-  const isProduction =
-    process.env.NODE_ENV === 'production';
-
   if (isProduction) {
     return {
       host: process.env.MYSQL_HOST_PROD,
@@ -32,3 +33,8 @@ export const db = mysql.createPool({
 });
 
 export const connection = await db.getConnection();
+
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
