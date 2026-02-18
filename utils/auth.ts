@@ -30,6 +30,7 @@ export const auth = betterAuth({
     enabled: true,
     window: 60,
     max: 10,
+    storage: 'memory',
   },
   advanced: {
     ipAddress: {
