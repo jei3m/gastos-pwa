@@ -90,7 +90,7 @@ export default function Accounts() {
   return (
     <main
       className={cn(
-        'flex flex-col space-y-2 md:space-y-4 min-h-screen',
+        'flex flex-col space-y-2 md:space-y-4 min-h-screen overflow-y-auto',
         isMobile ? 'pb-20' : 'pb-4'
       )}
     >
@@ -99,7 +99,7 @@ export default function Accounts() {
         className={cn(
           'transition-all ease-in-out',
           isScrolled && isMobile
-            ? 'sticky top-0 z-10'
+            ? 'fixed w-full top-0 z-10'
             : 'pt-2 md:pt-4 px-3 flex md:flex-col md:flex-row gap-2 md:gap-4'
         )}
       >
@@ -234,9 +234,13 @@ export default function Accounts() {
           <div className="w-full border-t-2 border-black" />
         )}
       </section>
-
       {/* Accounts Section */}
-      <section className="flex flex-col space-y-2 md:space-y-4 px-3 mb-2">
+      <section
+        className={cn(
+          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
+          isScrolled && isMobile && 'mt-[104px]'
+        )}
+      >
         <Tabs
           value={accountType}
           onValueChange={setAccountType}

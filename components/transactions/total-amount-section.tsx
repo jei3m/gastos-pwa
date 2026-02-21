@@ -33,7 +33,7 @@ export default function TotalAmountSection({
         ease-in-out
         ${
           isScrolled && isMobile
-            ? 'sticky top-0 z-10'
+            ? 'fixed w-full top-0 z-10'
             : 'pt-2 md:pt-4 px-3'
         }
       `}
