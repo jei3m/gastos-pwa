@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TypographyH3 } from '@/components/custom/typography';
 import AccountSelector from './account-selector';
-import { cn } from '@/lib/utils';
 
 function Navbar() {
   const isMobile = useIsMobile();
