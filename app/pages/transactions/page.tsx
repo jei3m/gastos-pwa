@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TypographyH4 } from '@/components/custom/typography';
 import { useAccount } from '@/context/account-context';

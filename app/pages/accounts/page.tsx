@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import PulseLoader from '@/components/custom/pulse-loader';
 import {

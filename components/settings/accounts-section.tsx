@@ -65,7 +65,10 @@ export default function AccountsSection({
       <Separator className="-mt-2 bg-muted-foreground" />
       {accounts && accounts.length > 0 ? (
         <>
-          <Carousel setApi={setApi} className="w-full mb-2 md:mb-4">
+          <Carousel
+            setApi={setApi}
+            className="w-full mb-2 md:mb-4"
+          >
             <CarouselContent>
               {chunkArray(accounts, itemsPerPage).map(
                 (pageAccounts, pageIndex) => (

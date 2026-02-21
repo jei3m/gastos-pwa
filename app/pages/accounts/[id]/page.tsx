@@ -38,10 +38,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {
-  accountByIDQueryOptions,
-  accountsQueryOptions,
-} from '@/lib/tq-options/accounts.tq.options';
+import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 
 export default function EditAccount() {
