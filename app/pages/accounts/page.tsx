@@ -90,8 +90,8 @@ export default function Accounts() {
   return (
     <main
       className={cn(
-        'flex flex-col space-y-2 md:space-y-4 min-h-screen overflow-y-auto',
-        isMobile ? 'pb-20' : 'pb-4'
+        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        isMobile ? 'pb-18 min-h-screen' : 'pb-4'
       )}
     >
       {/* Net Worth Section */}
