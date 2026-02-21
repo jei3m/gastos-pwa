@@ -91,7 +91,7 @@ export default function Settings() {
       {/* User Section */}
       <section className={cn('space-y-4')}>
         {/* Profile Card */}
-        <Card className={cn('border-2 mt-4')}>
+        <Card className={cn('border-2 mt-2 md:mt-4')}>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex justify-between">
               <div className="flex gap-2 items-center">
