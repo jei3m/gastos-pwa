@@ -95,9 +95,10 @@ export default function Categories() {
 
   return (
     <main
-      className={`flex flex-col space-y-2 md:space-y-4 min-h-screen overflow-y-auto
-      ${isMobile ? 'pb-15' : 'pb-18'}
-    `}
+      className={cn(
+        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        isMobile ? 'pb-18 min-h-screen' : 'pb-4'
+      )}
     >
       {/* Date Card Section */}
       <DateSelectCard
