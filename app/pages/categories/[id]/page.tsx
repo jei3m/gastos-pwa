@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ import {
 } from '@/lib/tq-functions/categories.tq.functions';
 import { editCategorySchema } from '@/lib/schema/categories.schema';
 import { toast } from 'sonner';
-import { Trash2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import {
   useMutation,
   useQuery,
@@ -39,7 +39,6 @@ import IconPicker from '@/components/custom/icon-picker';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 
 export default function EditCategory() {
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const params = useParams();
   const queryClient = useQueryClient();
@@ -60,13 +59,13 @@ export default function EditCategory() {
     name: 'type',
   });
 
-  const { mutate: editCategoryMutation } = useMutation({
+  const {
+    mutate: editCategoryMutation,
+    isPending: isEditCategoryPending,
+  } = useMutation({
     mutationFn: (
       values: z.infer<typeof editCategorySchema>
     ) => editCategory(id, values),
-    onMutate: () => {
-      setIsLoading(true);
-    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: categoryByIDQueryOptions(id).queryKey,
@@ -78,16 +77,13 @@ export default function EditCategory() {
     onError: (error) => {
       toast.error(error.message);
     },
-    onSettled: () => {
-      setIsLoading(false);
-    },
   });
 
-  const { mutate: deleteCategoryMutation } = useMutation({
+  const {
+    mutate: deleteCategoryMutation,
+    isPending: isDeleteCategoryPending,
+  } = useMutation({
     mutationFn: (id: string) => deleteCategory(id),
-    onMutate: () => {
-      setIsLoading(true);
-    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: categoryByIDQueryOptions(id).queryKey,
@@ -97,9 +93,6 @@ export default function EditCategory() {
     },
     onError: (error) => {
       toast.error(error.message);
-    },
-    onSettled: () => {
-      setIsLoading(false);
     },
   });
 
@@ -112,7 +105,7 @@ export default function EditCategory() {
   // Fetch category data
   const {
     data,
-    isPending,
+    isPending: isCategoryPending,
     error: categoryError,
   } = useQuery(categoryByIDQueryOptions(id));
 
@@ -121,14 +114,14 @@ export default function EditCategory() {
     if (categoryError) {
       toast.error(categoryError.message);
     }
-    if (!data || isPending) return;
+    if (!data || isCategoryPending) return;
     form.reset({
       name: data.name,
       icon: data.icon,
       type: data.type || 'expense',
       description: data.description || '',
     });
-  }, [categoryError, data, isPending, form]);
+  }, [categoryError, data, isCategoryPending, form]);
 
   useEffect(() => {
     if (form?.formState?.errors?.type?.message) {
@@ -137,12 +130,24 @@ export default function EditCategory() {
     }
   }, [form?.formState?.errors?.type?.message]);
 
+  const isLoading = useMemo(() => {
+    return (
+      isEditCategoryPending ||
+      isDeleteCategoryPending ||
+      isCategoryPending
+    );
+  }, [
+    isCategoryPending,
+    isDeleteCategoryPending,
+    isEditCategoryPending,
+  ]);
+
   return (
     <main className="flex flex-col space-y-4 p-3">
       <div className="flex justify-between items-center">
         <TypographyH3>Edit Category</TypographyH3>
         <CustomAlertDialog
-          isDisabled={isLoading || isPending}
+          isDisabled={isLoading}
           trigger={
             <Trash2 size={20} className="text-red-500" />
           }
@@ -263,17 +268,20 @@ export default function EditCategory() {
             <Button
               onClick={() => router.back()}
               className="bg-red-500 border-2 hover:none"
-              disabled={isLoading || isPending}
+              disabled={isLoading}
               type="button"
             >
               Cancel
             </Button>
             <Button
-              className="border-2"
+              className="border-2 space-x-2"
               type="submit"
-              disabled={isLoading || isPending}
+              disabled={isLoading}
             >
-              {isLoading ? 'Submitting...' : 'Update'}
+              {isLoading && (
+                <Loader2 className="animate-spin" />
+              )}
+              Submit
             </Button>
           </div>
         </form>

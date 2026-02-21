@@ -18,7 +18,7 @@ export default function Register() {
     if (session) {
       router.push('/pages/transactions');
     }
-  }, [router]);
+  }, [router, session]);
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>

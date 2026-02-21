@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export function success(
+  // eslint-disable-next-line
   data: Record<string, any>,
   status = 200
 ) {

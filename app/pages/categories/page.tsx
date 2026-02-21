@@ -26,6 +26,7 @@ import {
   useRouter,
 } from 'next/navigation';
 import { useScrollState } from '@/hooks/use-scroll-state';
+import { cn } from '@/lib/utils';
 
 export default function Categories() {
   const isScrolled = useScrollState();
@@ -94,7 +95,7 @@ export default function Categories() {
 
   return (
     <main
-      className={`flex flex-col space-y-2 md:space-y-4 min-h-screen
+      className={`flex flex-col space-y-2 md:space-y-4 min-h-screen overflow-y-auto
       ${isMobile ? 'pb-15' : 'pb-18'}
     `}
     >
@@ -169,9 +170,13 @@ export default function Categories() {
           </>
         }
       />
-
       {/* Categories Section */}
-      <section className="flex flex-col space-y-2 md:space-y-4 px-3 mb-2">
+      <section
+        className={cn(
+          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
+          isScrolled && isMobile && 'mt-[90px]'
+        )}
+      >
         <Tabs
           defaultValue="expense"
           value={categoryType}

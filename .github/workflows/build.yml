@@ -10,10 +10,6 @@ env:
   UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
 
 on:
-  push:
-    branches: [dev]
-  pull_request:
-    branches: [dev]
   workflow_call:
   workflow_dispatch:
 

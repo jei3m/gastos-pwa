@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TypographyH4 } from '@/components/custom/typography';
 import { useAccount } from '@/context/account-context';
@@ -15,6 +15,7 @@ import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import { toast } from 'sonner';
 import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
 import { useScrollState } from '@/hooks/use-scroll-state';
+import { cn } from '@/lib/utils';
 
 export default function Transactions() {
   const isMobile = useIsMobile();
@@ -83,9 +84,7 @@ export default function Transactions() {
   }, [accountError, transactionsError]);
 
   return (
-    <main
-      className={`flex flex-col space-y-2 md:space-y-4 min-h-screen pb-18`}
-    >
+    <main className="flex flex-col space-y-2 md:space-y-4 min-h-screen pb-18 overflow-y-auto">
       {/* Total Amount Section */}
       <TotalAmountSection
         isLoading={isAccountLoading}
@@ -95,7 +94,12 @@ export default function Transactions() {
       />
 
       {/* Transactions Section */}
-      <section className="flex flex-col space-y-2 md:space-y-4 px-3 mb-2">
+      <section
+        className={cn(
+          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
+          isScrolled && isMobile && 'mt-[134px]'
+        )}
+      >
         <TypographyH4>Recent Transactions</TypographyH4>
         {!selectedAccountID ? (
           <NoSelectedAccountDiv data="transactions" />

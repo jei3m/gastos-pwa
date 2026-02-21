@@ -35,7 +35,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ChevronDownIcon, Trash2 } from 'lucide-react';
+import {
+  ChevronDownIcon,
+  Loader2,
+  Trash2,
+} from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { transactionTypes } from '@/lib/data';
 import {
@@ -568,10 +572,13 @@ export default function EditTransactionForm({
               Cancel
             </Button>
             <Button
-              className="border-2"
+              className="border-2 space-x-2"
               type="submit"
               disabled={isLoading}
             >
+              {isLoading && (
+                <Loader2 className="animate-spin" />
+              )}
               Submit
             </Button>
           </div>

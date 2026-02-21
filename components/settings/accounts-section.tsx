@@ -35,7 +35,6 @@ export default function AccountsSection({
 }: AccountsSectionProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
 
   const itemsPerPage = isMobile ? 4 : 6;
 
@@ -43,7 +42,6 @@ export default function AccountsSection({
     if (!api) return;
 
     const updateState = () => {
-      setCount(api.scrollSnapList().length);
       setCurrent(api.selectedScrollSnap());
     };
 
@@ -67,7 +65,10 @@ export default function AccountsSection({
       <Separator className="-mt-2 bg-muted-foreground" />
       {accounts && accounts.length > 0 ? (
         <>
-          <Carousel setApi={setApi} className="w-full">
+          <Carousel
+            setApi={setApi}
+            className="w-full mb-2 md:mb-4"
+          >
             <CarouselContent>
               {chunkArray(accounts, itemsPerPage).map(
                 (pageAccounts, pageIndex) => (
@@ -113,7 +114,7 @@ export default function AccountsSection({
             </CarouselContent>
           </Carousel>
           {accounts.length > itemsPerPage && (
-            <div className="flex justify-center items-center gap-2 mt-2">
+            <div className="flex justify-center items-center gap-2 mb-2 md:mb-4">
               <button
                 onClick={() => api?.scrollPrev()}
                 className="p-2 rounded-full hover:bg-gray-100"

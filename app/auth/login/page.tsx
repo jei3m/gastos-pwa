@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
-import { authClient, signIn } from '@/lib/auth/auth-client';
+import { authClient } from '@/lib/auth/auth-client';
+import { toast } from 'sonner';
 
 export default function Login() {
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -12,16 +13,24 @@ export default function Login() {
   const { data: session } = authClient.useSession();
 
   useEffect(() => {
-    if (!session) {
+    if (session) {
       router.push('/pages/transactions');
     }
-  }, [router]);
+  }, [router, session]);
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
-    await signIn.social({
+    const { error } = await authClient.signIn.social({
       provider: 'google',
     });
+
+    if (error?.status === 429) {
+      setGoogleLoading(false);
+      toast.warning(error.message);
+    } else if (error) {
+      setGoogleLoading(false);
+      toast.error(error.message);
+    }
   }
 
   return (

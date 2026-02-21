@@ -40,7 +40,6 @@ export default function CategoriesSection({
 }: CategoriesSectionProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
 
   const itemsPerPage = isMobile ? 4 : 6;
 
@@ -48,7 +47,6 @@ export default function CategoriesSection({
     if (!api) return;
 
     const updateState = () => {
-      setCount(api.scrollSnapList().length);
       setCurrent(api.selectedScrollSnap());
     };
 
@@ -103,7 +101,10 @@ export default function CategoriesSection({
       <Separator className="-mt-2 bg-muted-foreground" />
       {categories && categories.length > 0 ? (
         <>
-          <Carousel setApi={setApi} className="w-full">
+          <Carousel
+            setApi={setApi}
+            className="w-full mb-2 md:mb-4"
+          >
             <CarouselContent>
               {chunkArray(categories, itemsPerPage).map(
                 (pageCategories, pageIndex) => (
@@ -126,7 +127,7 @@ export default function CategoriesSection({
             </CarouselContent>
           </Carousel>
           {categories.length > 0 && (
-            <div className="flex justify-center items-center gap-2 mt-2">
+            <div className="flex justify-center items-center gap-2 mb-2 md:mb-4">
               <button
                 onClick={() => api?.scrollPrev()}
                 className="p-2 rounded-full hover:bg-gray-100"

@@ -24,16 +24,15 @@ import {
   ShoppingCart,
   Ellipsis,
   ArrowDownUp,
+  type LucideProps,
 } from 'lucide-react';
 
 // Define types or interface
-export type IconType = string;
-
 export interface IconData {
   id: string;
   name: string;
-  icon: React.ComponentType<any>;
-  type: IconType;
+  icon: React.ComponentType<LucideProps>;
+  type: string;
 }
 
 export type IconKey = (typeof icons)[number]['id'];
@@ -215,7 +214,7 @@ export const icons: IconData[] = [
 
 // Helper functions to get icons by type
 export const getIconsByType = (
-  type: IconType
+  type: string
 ): IconData[] => {
   return icons.filter(
     (icon) => icon.type.toLowerCase() === type.toLowerCase()

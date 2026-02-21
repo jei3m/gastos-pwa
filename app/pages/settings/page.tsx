@@ -27,10 +27,7 @@ import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import AccountsSection from '@/components/settings/accounts-section';
 import CategoriesSection from '@/components/settings/categories-section';
-import {
-  authClient,
-  signOut,
-} from '@/lib/auth/auth-client';
+import { authClient } from '@/lib/auth/auth-client';
 
 export default function Settings() {
   const [activeTab, setActiveTab] =
@@ -42,7 +39,7 @@ export default function Settings() {
   const { data: session } = authClient.useSession();
 
   const handleLogout = async () => {
-    signOut({
+    await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
           router.push('/auth/login');
@@ -94,7 +91,7 @@ export default function Settings() {
       {/* User Section */}
       <section className={cn('space-y-4')}>
         {/* Profile Card */}
-        <Card className={cn('border-2 mt-4')}>
+        <Card className={cn('border-2 mt-2 md:mt-4')}>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex justify-between">
               <div className="flex gap-2 items-center">

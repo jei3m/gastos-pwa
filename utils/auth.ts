@@ -28,8 +28,9 @@ export const auth = betterAuth({
   },
   rateLimit: {
     enabled: true,
-    window: 60,
-    max: 10,
+    window: 10,
+    max: 30,
+    storage: 'memory',
   },
   advanced: {
     ipAddress: {
