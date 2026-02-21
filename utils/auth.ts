@@ -18,6 +18,8 @@ export const auth = betterAuth({
   },
   plugins: [nextCookies()],
   baseURL: process.env.BETTER_AUTH_URL,
+  basePath: '/api/auth',
+  trustedOrigins: [process.env.BETTER_AUTH_URL!],
   socialProviders: {
     google: {
       prompt: 'select_account',
