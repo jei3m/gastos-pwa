@@ -84,7 +84,12 @@ export default function Transactions() {
   }, [accountError, transactionsError]);
 
   return (
-    <main className="flex flex-col space-y-2 md:space-y-4 min-h-screen pb-18 overflow-y-auto">
+    <main
+      className={cn(
+        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        isMobile ? 'min-h-screen pb-18' : 'pb-4'
+      )}
+    >
       {/* Total Amount Section */}
       <TotalAmountSection
         isLoading={isAccountLoading}
