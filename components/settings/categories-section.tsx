@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Category } from '@/types/categories.types';
@@ -68,7 +67,7 @@ export default function CategoriesSection({
   }
 
   return (
-    <section className={cn('space-y-4')}>
+    <section className="space-y-4 mb-2">
       <Tabs
         value={activeTab}
         onValueChange={handleTabChange}
