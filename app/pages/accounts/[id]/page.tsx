@@ -90,8 +90,8 @@ export default function EditAccount() {
   } = useMutation({
     mutationFn: (id: string) => deleteAccount(id),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: accountsQueryOptions().queryKey,
+      queryClient.removeQueries({
+        queryKey: accountByIDQueryOptions(id!).queryKey,
       });
       toast.success(data.responseMessage);
       router.push('/pages/accounts');
