@@ -1,6 +1,6 @@
 import { useState, useLayoutEffect } from 'react';
 
-export function useScrollState(threshold: number = 40) {
+export function useScrollState(threshold: number = 20) {
   const [isScrolled, setIsScrolled] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.scrollY > threshold;
