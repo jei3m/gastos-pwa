@@ -30,6 +30,7 @@ import {
 import { categoryTypes } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
 import IconPicker from '@/components/custom/icon-picker';
+import { Loader2 } from 'lucide-react';
 
 export default function CreateCategory() {
   const router = useRouter();
@@ -193,11 +194,14 @@ export default function CreateCategory() {
               Cancel
             </Button>
             <Button
-              className="border-2"
+              className="border-2 space-x-2"
               type="submit"
               disabled={isPending}
             >
-              {isPending ? 'Submitting...' : 'Submit'}
+              {isPending && (
+                <Loader2 className="animate-spin" />
+              )}
+              Submit
             </Button>
           </div>
         </form>

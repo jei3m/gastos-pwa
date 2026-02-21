@@ -30,6 +30,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
+import { Loader2 } from 'lucide-react';
 
 export default function CreateAccount() {
   const router = useRouter();
@@ -160,11 +161,14 @@ export default function CreateAccount() {
               Cancel
             </Button>
             <Button
-              className="border-2"
+              className="border-2 space-x-2"
               type="submit"
               disabled={isPending}
             >
-              {isPending ? 'Submitting...' : 'Submit'}
+              {isPending && (
+                <Loader2 className="animate-spin" />
+              )}
+              Submit
             </Button>
           </div>
         </form>

@@ -31,7 +31,7 @@ import {
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Trash2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   useMutation,
@@ -115,7 +115,7 @@ export default function EditAccount() {
     }, 50);
   }, [account, isAccountPending, form]);
 
-  const isDisabled = useMemo(() => {
+  const isLoading = useMemo(() => {
     return (
       isEditPending || isDeletePending || isAccountPending
     );
@@ -126,7 +126,7 @@ export default function EditAccount() {
       <div className="flex flex-row space-x-2 items-center">
         <TypographyH3>Edit Account</TypographyH3>
         <CustomAlertDialog
-          isDisabled={isDisabled}
+          isDisabled={isLoading}
           trigger={
             <Trash2 size={24} className="text-red-500" />
           }
@@ -153,7 +153,7 @@ export default function EditAccount() {
           <FormField
             control={form.control}
             name="name"
-            disabled={isDisabled}
+            disabled={isLoading}
             render={({ field }) => (
               <FormItem className="-space-y-1">
                 <FormLabel>Account Name</FormLabel>
@@ -180,7 +180,7 @@ export default function EditAccount() {
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
-                    disabled={isDisabled}
+                    disabled={isLoading}
                   >
                     <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
                       <SelectValue placeholder="Select Account Type..." />
@@ -202,7 +202,7 @@ export default function EditAccount() {
           <FormField
             control={form.control}
             name="description"
-            disabled={isDisabled}
+            disabled={isLoading}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
@@ -222,16 +222,20 @@ export default function EditAccount() {
             <Button
               onClick={() => router.back()}
               className="bg-red-500 border-2 hover:none"
-              disabled={isDisabled}
+              disabled={isLoading}
               type="button"
             >
               Cancel
             </Button>
             <Button
-              className="border-2"
-              disabled={isDisabled}
+              className="border-2 space-x-2"
+              type="submit"
+              disabled={isLoading}
             >
-              {isDisabled ? 'Submitting...' : 'Submit'}
+              {isLoading && (
+                <Loader2 className="animate-spin" />
+              )}
+              Submit
             </Button>
           </div>
         </form>

@@ -32,7 +32,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, Loader2 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { transactionTypes } from '@/lib/data';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
@@ -537,11 +537,14 @@ export default function AddTransactionForm({
               />
             ) : (
               <Button
-                className="border-2"
+                className="border-2 space-x-2"
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? 'Submitting...' : 'Submit'}
+                {isLoading && (
+                  <Loader2 className="animate-spin" />
+                )}
+                Submit
               </Button>
             )}
           </div>
