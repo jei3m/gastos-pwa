@@ -29,16 +29,14 @@ function TransactionCard({
   return (
     <Card className="border-2">
       <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <span className="text-md md:text-xl">
-            {new Date(transaction.date).toLocaleDateString(
-              'en-US',
-              {
-                month: 'long',
-                day: 'numeric',
-              }
-            )}
-          </span>
+        <CardTitle className="flex justify-between items-center text-md md:text-xl">
+          {new Date(transaction.date).toLocaleDateString(
+            'en-US',
+            {
+              month: 'long',
+              day: 'numeric',
+            }
+          )}
           <div className="flex items-center gap-2 md:gap-4">
             <Popover>
               <PopoverTrigger>
@@ -75,8 +73,7 @@ function TransactionCard({
               className={cn(
                 transaction.total.startsWith('-')
                   ? 'text-red-500'
-                  : 'text-primary',
-                'text-md md:text-lg'
+                  : 'text-primary'
               )}
             >
               PHP
@@ -98,14 +95,14 @@ function TransactionCard({
               key={index}
               href={`/pages/transactions/${detail.id}`}
             >
-              <div className="space-y-3 md:space-y-4 flex flex-row justify-between text-sm md:text-md">
+              <div className="space-y-3 md:space-y-4 flex flex-row justify-between text-sm md:text-lg">
                 <div className="flex flex-col">
                   <span>{detail.category}</span>
                   <span className="text-gray-500">
                     {detail.note}
                   </span>
                 </div>
-                <div className="flex flex-col text-sm md:text-md">
+                <div className="flex flex-col">
                   <span
                     className={`${detail.type === 'income' ? 'text-primary' : 'text-red-500'}`}
                   >
