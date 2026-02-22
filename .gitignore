@@ -43,3 +43,6 @@ next-env.d.ts
 Qwen.md
 settings.json
 settings.json.orig
+
+# service worker
+public/sw.js
