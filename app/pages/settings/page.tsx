@@ -85,7 +85,7 @@ export default function Settings() {
     <main
       className={cn(
         'space-y-6 px-3 mx-auto',
-        isMobile ? 'pb-20' : 'pb-4'
+        isMobile ? 'pb-18' : 'pb-4'
       )}
     >
       {/* User Section */}
