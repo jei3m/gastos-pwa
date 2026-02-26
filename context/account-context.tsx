@@ -2,20 +2,15 @@
 import {
   createContext,
   useContext,
-  useEffect,
-  useState,
   ReactNode,
 } from 'react';
-import {
-  getSelectedAccountID,
-  setAccountIDInStorage,
-} from '@/utils/account';
 import { Account } from '@/types/accounts.types';
 import {
   QueryObserverResult,
   useQuery,
 } from '@tanstack/react-query';
 import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 type AccountContextType = {
   selectedAccountID: string | null;
@@ -35,7 +30,7 @@ export function AccountProvider({
   children: ReactNode;
 }) {
   const [selectedAccountID, setSelectedAccountID] =
-    useState<string | null>(null);
+    useLocalStorage<string | null>('accountID', undefined);
 
   const {
     data: accounts,
@@ -47,22 +42,14 @@ export function AccountProvider({
     return refetch();
   };
 
-  // Initialize the selected account from localStorage
-  useEffect(() => {
-    const accountID = getSelectedAccountID();
-    // eslint-disable-next-line
-    setSelectedAccountID(accountID);
-  }, []);
-
   const setSelectedAccount = (uuid: string) => {
-    setAccountIDInStorage(uuid); // Update localStorage
-    setSelectedAccountID(uuid); // Update state
+    setSelectedAccountID(uuid);
   };
 
   return (
     <AccountContext.Provider
       value={{
-        selectedAccountID,
+        selectedAccountID: selectedAccountID ?? null,
         setSelectedAccount,
         refetchAccountsData,
         isAccountsLoading,
