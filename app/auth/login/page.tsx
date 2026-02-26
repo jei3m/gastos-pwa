@@ -6,11 +6,13 @@ import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
 import { authClient } from '@/lib/auth/auth-client';
 import { toast } from 'sonner';
+import { useAccount } from '@/context/account-context';
 
 export default function Login() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const { setSelectedAccount } = useAccount();
 
   useEffect(() => {
     if (session) {
@@ -31,6 +33,7 @@ export default function Login() {
       setGoogleLoading(false);
       toast.error(error.message);
     }
+    setSelectedAccount('');
   }
 
   return (
