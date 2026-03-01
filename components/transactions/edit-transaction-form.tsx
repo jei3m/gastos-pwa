@@ -180,6 +180,7 @@ export default function EditTransactionForm({
     categoryQueryOptions(
       transactionType!,
       selectedAccountID!,
+      !!transactionType && !!selectedAccountID,
       null,
       null,
       'list'

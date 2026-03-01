@@ -107,6 +107,7 @@ export default function AddTransactionForm({
     categoryQueryOptions(
       transactionType,
       selectedAccountID!,
+      !!transactionType && !!selectedAccountID,
       null,
       null,
       'list'

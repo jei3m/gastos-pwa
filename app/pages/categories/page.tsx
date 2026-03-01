@@ -73,6 +73,7 @@ export default function Categories() {
     categoryQueryOptions(
       categoryType,
       selectedAccountID,
+      !!categoryType && !!selectedAccountID,
       dateStart,
       dateEnd
     )
