@@ -8,6 +8,7 @@ import {
 export function categoryQueryOptions(
   categoryType: string,
   selectedAccountID: string | null,
+  isEnabled: boolean,
   dateStart?: string | null,
   dateEnd?: string | null,
   filter?: string
@@ -30,7 +31,7 @@ export function categoryQueryOptions(
         filter
       );
     },
-    enabled: !!categoryType && !!selectedAccountID,
+    enabled: isEnabled,
     retry: false,
   });
 }
