@@ -32,7 +32,7 @@ export const fetchAccountByID = async (
     if (!data.success) {
       throw Error(data.message);
     }
-    return data.data[0];
+    return data.data[0] || null;
   } catch (error) {
     if (error instanceof Error) {
       throw Error(error.message);
