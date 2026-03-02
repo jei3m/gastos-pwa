@@ -8,6 +8,7 @@ import { Account } from '@/types/accounts.types';
 import Link from 'next/link';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAccount } from '@/context/account-context';
 
 interface TotalAmountSectionProps {
   isScrolled: boolean;
@@ -26,6 +27,8 @@ export default function TotalAmountSection({
     'hideBalance',
     false
   );
+  const { selectedAccountID } = useAccount();
+
   return (
     <section
       className={`
@@ -103,28 +106,49 @@ export default function TotalAmountSection({
           {(!isMobile || !isScrolled) && (
             <div className="w-full flex flex-row justify-center space-x-2">
               <>
-                <Link
-                  href={`/pages/transactions/add?type=income`}
-                  className="w-full"
-                >
-                  <Button className="w-full flex flex-row -space-x-1">
+                {selectedAccountID ? (
+                  <Link
+                    href={`/pages/transactions/add?type=income`}
+                    className="w-full"
+                  >
+                    <Button className="w-full flex flex-row -space-x-1">
+                      <ArrowDownLeft strokeWidth={3} />
+                      <span>Income</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    className="w-full flex flex-1 -space-x-1"
+                    disabled={true}
+                  >
                     <ArrowDownLeft strokeWidth={3} />
                     <span>Income</span>
                   </Button>
-                </Link>
+                )}
 
-                <Link
-                  href={`/pages/transactions/add?type=expense`}
-                  className="w-full"
-                >
+                {selectedAccountID ? (
+                  <Link
+                    href={`/pages/transactions/add?type=expense`}
+                    className="w-full"
+                  >
+                    <Button
+                      variant="destructive"
+                      className="w-full flex flex-row -space-x-1"
+                    >
+                      <ArrowUpRight strokeWidth={3} />
+                      <span>Expense</span>
+                    </Button>
+                  </Link>
+                ) : (
                   <Button
                     variant="destructive"
-                    className="w-full flex flex-row -space-x-1"
+                    className="w-full flex flex-1 -space-x-1"
+                    disabled={true}
                   >
                     <ArrowUpRight strokeWidth={3} />
                     <span>Expense</span>
                   </Button>
-                </Link>
+                )}
               </>
             </div>
           )}
