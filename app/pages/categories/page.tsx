@@ -206,39 +206,32 @@ export default function Categories() {
             </TabsList>
           </div>
         </Tabs>
-        {isPending ? (
+        {!selectedAccountID ? (
+          <NoSelectedAccountDiv data="categories" />
+        ) : isPending ? (
           <PulseLoader />
         ) : (
           <>
-            {selectedAccountID ? (
-              <>
-                {categories && categories.length > 0 ? (
-                  <div className="grid md:grid-cols-2 gap-2 md:gap-4">
-                    {categories.map(
-                      (category: Category) => (
-                        <CategoryCard
-                          key={category.id}
-                          category={category}
-                          hideAmount={false}
-                          isEdit={false}
-                        />
-                      )
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-10">
-                    <TypographyH4 className="text-gray-400 font-semibold text-center">
-                      No Categories
-                    </TypographyH4>
-                    <p className="text-gray-500 text-sm text-center">
-                      No {categoryType} activity for this
-                      period
-                    </p>
-                  </div>
-                )}
-              </>
+            {categories && categories.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-2 md:gap-4">
+                {categories.map((category: Category) => (
+                  <CategoryCard
+                    key={category.id}
+                    category={category}
+                    hideAmount={false}
+                    isEdit={false}
+                  />
+                ))}
+              </div>
             ) : (
-              <NoSelectedAccountDiv data="categories" />
+              <div className="flex flex-col items-center justify-center py-10">
+                <TypographyH4 className="text-gray-400 font-semibold text-center">
+                  No Categories
+                </TypographyH4>
+                <p className="text-gray-500 text-sm text-center">
+                  No {categoryType} activity for this period
+                </p>
+              </div>
             )}
           </>
         )}
