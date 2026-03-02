@@ -40,12 +40,15 @@ import {
 } from '@tanstack/react-query';
 import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
+import { useAccount } from '@/context/account-context';
 
 export default function EditAccount() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const queryClient = useQueryClient();
+  const { selectedAccountID, setSelectedAccount } =
+    useAccount();
 
   const { data: account, isPending: isAccountPending } =
     useQuery(accountByIDQueryOptions(id));
@@ -74,7 +77,7 @@ export default function EditAccount() {
       });
       toast.success(data.responseMessage);
       form.reset();
-      router.push('/pages/accounts');
+      router.push('/pages/settings');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -90,8 +93,11 @@ export default function EditAccount() {
       queryClient.removeQueries({
         queryKey: accountByIDQueryOptions(id!).queryKey,
       });
+      if (id === selectedAccountID) {
+        setSelectedAccount('');
+      }
       toast.success(data.responseMessage);
-      router.push('/pages/accounts');
+      router.push('/pages/settings');
     },
     onError: (error) => {
       toast.error(error.message);
