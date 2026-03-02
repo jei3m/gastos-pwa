@@ -72,6 +72,7 @@ export default function Settings() {
     categoryQueryOptions(
       activeTab!,
       selectedAccountID!,
+      !!activeTab,
       null,
       null,
       'list'

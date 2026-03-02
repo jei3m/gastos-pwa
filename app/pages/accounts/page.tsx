@@ -108,12 +108,12 @@ export default function Accounts() {
           className={cn(
             isScrolled && isMobile
               ? '-mt-2 border-0 rounded-none'
-              : 'border-2 mt-0',
+              : 'border-2 my-auto',
             isMobile ? 'w-full' : 'flex-3'
           )}
         >
-          <CardContent className="space-y-2">
-            <div className="flex flex-row items-center">
+          <CardContent>
+            <div className="flex flex-row items-center -mb-0.5">
               <h3 className="text-gray-600 font-normal text-lg">
                 Total Net Worth
               </h3>
@@ -150,9 +150,9 @@ export default function Accounts() {
         {!isMobile && (
           <>
             {/* Total Digital Net Worth Card */}
-            <Card className="border-2 mt-0 flex-3">
-              <CardContent className="space-y-2">
-                <div className="flex flex-row items-center">
+            <Card className="border-2 my-auto flex-3">
+              <CardContent>
+                <div className="flex flex-row items-center -mb-0.5">
                   <h3 className="text-gray-600 font-normal text-lg">
                     Digital Net Worth
                   </h3>
@@ -190,9 +190,9 @@ export default function Accounts() {
               </CardContent>
             </Card>
             {/* Total Cash Net Worth Card */}
-            <Card className="border-2 mt-0 flex-3">
-              <CardContent className="space-y-2">
-                <div className="flex flex-row items-center">
+            <Card className="border-2 my-auto flex-3">
+              <CardContent>
+                <div className="flex flex-row items-center -mb-0.5">
                   <h3 className="text-gray-600 font-normal text-lg">
                     Cash Net Worth
                   </h3>

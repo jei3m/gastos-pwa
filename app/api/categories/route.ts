@@ -63,7 +63,7 @@ export async function GET(request: Request) {
     const dateEnd = url.searchParams.get('dateEnd');
     const type = url.searchParams.get('type');
 
-    if (!accountID) {
+    if (!accountID && filter !== 'list') {
       throw Error('There is no selected account');
     }
 
