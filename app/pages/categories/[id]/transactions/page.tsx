@@ -117,16 +117,16 @@ export default function Transactions() {
         className={cn(
           'transition-all ease-in-out',
           isScrolled && isMobile
-            ? 'sticky top-0 z-10'
-            : 'pt-2 md:pt-4 px-3'
+            ? 'fixed w-full top-0 z-10'
+            : 'pt-2 md:pt-4 px-3 flex md:flex-col md:flex-row gap-2 md:gap-4'
         )}
       >
         <Card
           className={cn(
-            'border-2',
             isScrolled && isMobile
-              ? `${isMobile ? 'border-0 rounded-none' : 'border-2'}`
-              : 'border-2 mt-0'
+              ? 'border-0 rounded-none'
+              : 'border-2 my-auto',
+            isMobile ? 'w-full' : 'flex-3'
           )}
         >
           <CardHeader className="flex flex-row justify-between items-center">
@@ -191,7 +191,12 @@ export default function Transactions() {
       </section>
 
       {/* Transactions Section */}
-      <section className="flex flex-col space-y-2 md:space-y-4 px-3 mb-2">
+      <section
+        className={cn(
+          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
+          isScrolled && isMobile && 'mt-[104px]'
+        )}
+      >
         <div className="flex flex-row items-center pt-2 -ml-1">
           <div
             onClick={() => router.back()}
