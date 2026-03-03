@@ -13,8 +13,6 @@ import {
   User,
   LogOut,
   CircleAlert,
-  CheckCircle,
-  XCircle,
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -24,7 +22,6 @@ import { useAccount } from '@/context/account-context';
 import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
 import AccountsSection from '@/components/settings/accounts-section';
 import CategoriesSection from '@/components/settings/categories-section';
 import { authClient } from '@/lib/auth/auth-client';
@@ -150,23 +147,6 @@ export default function Settings() {
                   <div className="text-sm font-medium text-muted-foreground">
                     Email
                   </div>
-                  {session?.user?.emailVerified ? (
-                    <Badge
-                      variant="outline"
-                      className="text-green-600 border-green-200 bg-green-50"
-                    >
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Verified
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="outline"
-                      className="text-amber-600 border-amber-200 bg-amber-50"
-                    >
-                      <XCircle className="h-3 w-3 mr-1" />
-                      Not Verified
-                    </Badge>
-                  )}
                 </div>
                 <div className="text-foreground font-medium">
                   {session?.user?.email || 'N/A'}
