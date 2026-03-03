@@ -1,5 +1,6 @@
 'use client';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,8 +14,6 @@ import {
   User,
   LogOut,
   CircleAlert,
-  CheckCircle,
-  XCircle,
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -24,7 +23,6 @@ import { useAccount } from '@/context/account-context';
 import { categoryQueryOptions } from '@/lib/tq-options/categories.tq.options';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
 import AccountsSection from '@/components/settings/accounts-section';
 import CategoriesSection from '@/components/settings/categories-section';
 import { authClient } from '@/lib/auth/auth-client';
@@ -36,7 +34,8 @@ export default function Settings() {
   const router = useRouter();
   const { accounts, isAccountsLoading, selectedAccountID } =
     useAccount();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } =
+    authClient.useSession();
 
   const handleLogout = async () => {
     await authClient.signOut({
@@ -120,7 +119,7 @@ export default function Settings() {
                   alt="Profile Picture"
                   src={
                     session?.user?.image ||
-                    '/icons/icons-96x96.png'
+                    '/images/profile-picture.png'
                   }
                   width={80}
                   height={80}
@@ -142,7 +141,11 @@ export default function Settings() {
                   Name
                 </div>
                 <div className="text-foreground font-medium">
-                  {session?.user?.name || 'N/A'}
+                  {isPending ? (
+                    <Skeleton className="h-6 w-32 bg-gray-300" />
+                  ) : (
+                    session?.user?.name || 'N/A'
+                  )}
                 </div>
               </div>
               <div className="space-y-1 text-left">
@@ -150,26 +153,13 @@ export default function Settings() {
                   <div className="text-sm font-medium text-muted-foreground">
                     Email
                   </div>
-                  {session?.user?.emailVerified ? (
-                    <Badge
-                      variant="outline"
-                      className="text-green-600 border-green-200 bg-green-50"
-                    >
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Verified
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="outline"
-                      className="text-amber-600 border-amber-200 bg-amber-50"
-                    >
-                      <XCircle className="h-3 w-3 mr-1" />
-                      Not Verified
-                    </Badge>
-                  )}
                 </div>
                 <div className="text-foreground font-medium">
-                  {session?.user?.email || 'N/A'}
+                  {isPending ? (
+                    <Skeleton className="h-6 w-40 bg-gray-300" />
+                  ) : (
+                    session?.user?.email || 'N/A'
+                  )}
                 </div>
               </div>
             </div>
@@ -182,9 +172,13 @@ export default function Settings() {
                 <span>Account Created</span>
               </div>
               <div className="text-foreground font-medium">
-                {session?.user?.createdAt
-                  ? formatDate(session.user.createdAt)
-                  : 'N/A'}
+                {isPending ? (
+                  <Skeleton className="h-6 w-28 bg-gray-300" />
+                ) : session?.user?.createdAt ? (
+                  formatDate(session.user.createdAt)
+                ) : (
+                  'N/A'
+                )}
               </div>
             </div>
             <div className="space-y-1">
@@ -193,9 +187,13 @@ export default function Settings() {
                 <span>Session Expiry</span>
               </div>
               <div className="text-foreground font-medium">
-                {session?.session?.expiresAt
-                  ? formatDate(session.session.expiresAt)
-                  : 'N/A'}
+                {isPending ? (
+                  <Skeleton className="h-6 w-28 bg-gray-300" />
+                ) : session?.session?.expiresAt ? (
+                  formatDate(session.session.expiresAt)
+                ) : (
+                  'N/A'
+                )}
               </div>
             </div>
           </CardFooter>

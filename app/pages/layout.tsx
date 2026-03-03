@@ -18,7 +18,7 @@ export default function TransactionsLayout({
           <div className="max-w-[800px] m-auto">
             {children}
           </div>
-          <Toaster position="top-center" expand={false} />
+          <Toaster />
           <Dock showLabels={true} />
         </div>
       </SidebarProvider>
