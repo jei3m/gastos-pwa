@@ -10,7 +10,6 @@ import {
 import { formatAmount } from '@/utils/format-amount';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TypographyH4 } from '@/components/custom/typography';
-import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import { useQuery } from '@tanstack/react-query';
@@ -23,14 +22,19 @@ import {
 } from '@/components/ui/tabs';
 import { accountTypes } from '@/lib/data';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Eye, EyeOff } from 'lucide-react';
+import { CheckCircle, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScrollState } from '@/hooks/use-scroll-state';
+import { useAccount } from '@/context/account-context';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 export default function Accounts() {
   const [accountType, setAccountType] = useState('All');
   const isMobile = useIsMobile();
   const isScrolled = useScrollState();
+  const { setSelectedAccount, selectedAccountID } =
+    useAccount();
 
   const [hideNetWorthTotal, setHideNetWorthTotal] =
     useLocalStorage('hideNetWorthTotal', false);
@@ -85,6 +89,15 @@ export default function Accounts() {
     );
 
     return netWorth.toFixed(2);
+  };
+
+  const handleSelectAccount = (
+    id: string,
+    name: string
+  ) => {
+    if (selectedAccountID === id) return;
+    setSelectedAccount(id);
+    toast.success(`Selected ${name} as Active Account`);
   };
 
   return (
@@ -234,6 +247,7 @@ export default function Accounts() {
           <div className="w-full border-t-2 border-black" />
         )}
       </section>
+
       {/* Accounts Section */}
       <section
         className={cn(
@@ -266,51 +280,65 @@ export default function Accounts() {
           <>
             <div className="grid md:grid-cols-2 gap-2 md:gap-4">
               {filteredAccounts.map((account: Account) => (
-                <Link
-                  href={`/pages/accounts/${account.id}`}
+                <Card
+                  className="border-2 h-full"
                   key={account.id}
+                  onClick={() =>
+                    handleSelectAccount(
+                      account.id,
+                      account.name
+                    )
+                  }
                 >
-                  <Card className="border-2 h-full">
-                    <CardHeader>
-                      <div className="flex flex-rows items-center justify-between">
-                        <div className="text-lg md:text-xl font-bold">
-                          {isAccountsLoading ? (
-                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
-                          ) : (
-                            account?.name
-                          )}
-                        </div>
-                        <div className="text-md text-gray-600 font-normal">
-                          {isAccountsLoading ? (
-                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
-                          ) : (
-                            account?.type
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <Separator className="-mt-2" />
-                    <CardContent className="space-y-2">
-                      <div className="flex flex-col">
-                        <h3 className="text-gray-600 font-normal text-lg">
-                          Balance
-                        </h3>
+                  <CardHeader>
+                    <div className="flex flex-rows items-center justify-between">
+                      <div className="text-lg md:text-xl font-bold">
                         {isAccountsLoading ? (
-                          <h1 className="text-2xl font-extrabold flex">
-                            <Skeleton className="h-10 w-[50%] bg-gray-300" />
-                          </h1>
+                          <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
                         ) : (
-                          <h1 className="text-2xl font-extrabold">
-                            PHP{' '}
-                            {formatAmount(
-                              account?.totalBalance
-                            )}
-                          </h1>
+                          account?.name
+                        )}
+                        {selectedAccountID ===
+                          account.id && (
+                          <Badge
+                            variant="outline"
+                            className="ml-2 text-green-600 border-green-200 bg-green-50"
+                          >
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Active
+                          </Badge>
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                      <div className="text-md text-gray-600 font-normal">
+                        {isAccountsLoading ? (
+                          <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
+                        ) : (
+                          account?.type
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <Separator className="-mt-2" />
+                  <CardContent className="space-y-2">
+                    <div className="flex flex-col">
+                      <h3 className="text-gray-600 font-normal text-lg">
+                        Balance
+                      </h3>
+                      {isAccountsLoading ? (
+                        <h1 className="text-2xl md:text-3xl font-extrabold flex">
+                          <Skeleton className="h-10 w-[50%] bg-gray-300" />
+                        </h1>
+                      ) : (
+                        <h1 className="text-2xl font-extrabold">
+                          PHP{' '}
+                          {formatAmount(
+                            account?.totalBalance
+                          )}
+                        </h1>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </>
