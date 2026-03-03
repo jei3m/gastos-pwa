@@ -73,7 +73,7 @@ export async function GET(
       hasMore: hasMore,
       currentPage: page,
       categoryDetails: categoryDetails,
-      data: rows,
+      data: rows || [],
     });
   } catch (error) {
     return fail(

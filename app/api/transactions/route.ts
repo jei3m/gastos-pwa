@@ -115,7 +115,7 @@ export async function GET(request: Request) {
     return success({
       hasMore: hasMore,
       currentPage: page,
-      data: rows,
+      data: rows || [],
     });
   } catch (error) {
     return fail(
