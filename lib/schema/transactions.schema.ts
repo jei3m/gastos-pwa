@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const createTransactionSchema = z
   .object({
-    note: z.string().trim().max(20, {
-      message: 'Note has a maximum of 20 characters only',
+    note: z.string().trim().max(30, {
+      message: 'Note has a maximum of 30 characters only',
     }),
     amount: z
       .string()
@@ -106,8 +106,8 @@ export const createTransactionSchema = z
 
 export const editTransactionSchema = z
   .object({
-    note: z.string().trim().max(20, {
-      message: 'Note has a maximum of 20 characters only',
+    note: z.string().trim().max(30, {
+      message: 'Note has a maximum of 30 characters only',
     }),
     amount: z
       .string()
