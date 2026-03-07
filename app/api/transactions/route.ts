@@ -80,6 +80,7 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const accountID = url.searchParams.get('accountID');
+    const searchTerm = url.searchParams.get('searchTerm');
     const page = parseInt(
       url.searchParams.get('page') || '1',
       10
@@ -106,6 +107,7 @@ export async function GET(request: Request) {
         accountID,
         limit,
         offset,
+        searchTerm,
       }
     );
 
