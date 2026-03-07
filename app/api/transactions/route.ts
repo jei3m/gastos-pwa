@@ -98,6 +98,7 @@ export async function GET(request: Request) {
     >(getTransactionsCount(), {
       userID,
       accountID,
+      searchTerm,
     });
 
     const [rows] = await db.query<RowDataPacket[]>(
