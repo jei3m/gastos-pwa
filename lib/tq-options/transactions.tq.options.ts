@@ -10,12 +10,21 @@ import {
 } from '../tq-functions/transactions.tq.functions';
 
 export function transactionsInfiniteQueryOptions(
-  selectedAccountID: string | null
+  selectedAccountID: string | null,
+  searchTerm: string
 ) {
   return infiniteQueryOptions({
-    queryKey: ['transactions', selectedAccountID],
+    queryKey: [
+      'transactions',
+      selectedAccountID,
+      searchTerm,
+    ],
     queryFn: ({ pageParam }) =>
-      fetchTransactions(selectedAccountID, pageParam),
+      fetchTransactions(
+        selectedAccountID,
+        pageParam,
+        searchTerm
+      ),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       return lastPage.hasMore
