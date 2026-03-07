@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TypographyH4 } from '@/components/custom/typography';
 import { useAccount } from '@/context/account-context';
@@ -16,8 +16,16 @@ import { toast } from 'sonner';
 import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
 import { useScrollState } from '@/hooks/use-scroll-state';
 import { cn } from '@/lib/utils';
+import useDebounce from '@/hooks/use-debounce';
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 export default function Transactions() {
+  const [searchFilter, setSearchFilter] = useState('');
+  const debouncedSearchTerm = useDebounce(
+    searchFilter,
+    300
+  );
   const isMobile = useIsMobile();
   const { selectedAccountID } = useAccount();
   const isScrolled = useScrollState();
@@ -36,7 +44,10 @@ export default function Transactions() {
     isPending,
     error: transactionsError,
   } = useInfiniteQuery(
-    transactionsInfiniteQueryOptions(selectedAccountID)
+    transactionsInfiniteQueryOptions(
+      selectedAccountID,
+      debouncedSearchTerm
+    )
   );
 
   const transactions = useMemo(() => {
@@ -105,7 +116,23 @@ export default function Transactions() {
           isScrolled && isMobile && 'mt-[134px]'
         )}
       >
-        <TypographyH4>Recent Transactions</TypographyH4>
+        <div className="flex items-center justify-between">
+          <TypographyH4>Transactions</TypographyH4>
+          <div className="relative w-48 md:w-64">
+            <Search
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+              size={18}
+            />
+            <Input
+              placeholder="Search by note..."
+              value={searchFilter}
+              onChange={(e) =>
+                setSearchFilter(e.target.value)
+              }
+              className="pl-8 bg-white border-black border-2"
+            />
+          </div>
+        </div>
         {!selectedAccountID ? (
           <NoSelectedAccountDiv data="transactions" />
         ) : isAccountLoading || isPending ? (
@@ -134,7 +161,9 @@ export default function Transactions() {
                   No Transactions
                 </TypographyH4>
                 <p className="text-gray-500 text-sm text-center">
-                  Start by adding your first transaction
+                  {debouncedSearchTerm
+                    ? 'No transactions were found with your search query'
+                    : 'Start by adding your first transaction'}
                 </p>
               </div>
             )}
