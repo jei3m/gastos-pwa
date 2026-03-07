@@ -126,7 +126,8 @@ export default function AddTransactionForm({
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: transactionsInfiniteQueryOptions(
-          selectedAccountID!
+          selectedAccountID!,
+          ''
         ).queryKey,
       });
       form.reset();
