@@ -1,5 +1,10 @@
 'use client';
-import { createElement, useEffect, useMemo } from 'react';
+import {
+  createElement,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   TypographyH4,
   TypographyH5,
@@ -40,14 +45,9 @@ export default function Transactions() {
   const dateStart =
     searchParams.get('dateStart') || undefined;
   const dateEnd = searchParams.get('dateEnd') || undefined;
-  const isScrolled = useScrollState();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isScrolled = useScrollState(scrollRef);
   const isMobile = useIsMobile();
-
-  // Scroll to top on load
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    window.scroll(0, 0);
-  }, []);
 
   const {
     data: transactionsData,
@@ -86,14 +86,14 @@ export default function Transactions() {
 
   // Handle scroll for pagination
   useEffect(() => {
+    const sr = scrollRef.current;
+    if (!sr) return;
+
     const handleScroll = () => {
       if (isFetchingNextPage || !hasNextPage) return;
 
-      const scrollPosition =
-        window.innerHeight +
-        document.documentElement.scrollTop;
-      const scrollHeight =
-        document.documentElement.scrollHeight;
+      const scrollPosition = sr.clientHeight + sr.scrollTop;
+      const scrollHeight = sr.scrollHeight;
       const isBottomReached =
         scrollPosition + 1 >= scrollHeight;
 
@@ -101,9 +101,9 @@ export default function Transactions() {
         fetchNextPage();
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    sr.addEventListener('scroll', handleScroll);
     return () =>
-      window.removeEventListener('scroll', handleScroll);
+      sr.removeEventListener('scroll', handleScroll);
   }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   const isExpense = (type: string) => {
@@ -111,7 +111,13 @@ export default function Transactions() {
   };
 
   return (
-    <main className="flex flex-col space-y-2 md:space-y-4 min-h-screen pb-18">
+    <main
+      ref={scrollRef}
+      className={cn(
+        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        isMobile ? 'h-screen pb-29' : 'pb-4'
+      )}
+    >
       {/* Category Details Section */}
       <section
         className={cn(

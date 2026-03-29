@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import PulseLoader from '@/components/custom/pulse-loader';
 import {
@@ -32,7 +32,8 @@ import { Badge } from '@/components/ui/badge';
 export default function Accounts() {
   const [accountType, setAccountType] = useState('All');
   const isMobile = useIsMobile();
-  const isScrolled = useScrollState();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isScrolled = useScrollState(scrollRef);
   const { setSelectedAccount, selectedAccountID } =
     useAccount();
 
@@ -102,9 +103,10 @@ export default function Accounts() {
 
   return (
     <main
+      ref={scrollRef}
       className={cn(
         'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
-        isMobile ? 'pb-18 min-h-screen' : 'pb-4'
+        isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
       {/* Net Worth Section */}

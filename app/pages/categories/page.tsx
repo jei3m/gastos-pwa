@@ -1,5 +1,10 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { categoryTypes } from '@/lib/data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Category } from '@/types/categories.types';
@@ -29,7 +34,8 @@ import { useScrollState } from '@/hooks/use-scroll-state';
 import { cn } from '@/lib/utils';
 
 export default function Categories() {
-  const isScrolled = useScrollState();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isScrolled = useScrollState(scrollRef);
   const [categoryType, setCategoryType] =
     useState('expense');
   const { selectedAccountID } = useAccount();
@@ -96,9 +102,10 @@ export default function Categories() {
 
   return (
     <main
+      ref={scrollRef}
       className={cn(
         'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
-        isMobile ? 'pb-18 min-h-screen' : 'pb-4'
+        isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
       {/* Date Card Section */}

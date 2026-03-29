@@ -1,5 +1,10 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TypographyH4 } from '@/components/custom/typography';
 import { useAccount } from '@/context/account-context';
@@ -28,7 +33,8 @@ export default function Transactions() {
   );
   const isMobile = useIsMobile();
   const { selectedAccountID } = useAccount();
-  const isScrolled = useScrollState();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isScrolled = useScrollState(scrollRef);
 
   const {
     data: account,
@@ -58,14 +64,14 @@ export default function Transactions() {
 
   // Handle scroll for pagination
   useEffect(() => {
+    const sr = scrollRef.current;
+    if (!sr) return;
+
     const handleScroll = () => {
       if (isFetchingNextPage || !hasNextPage) return;
 
-      const scrollPosition =
-        window.innerHeight +
-        document.documentElement.scrollTop;
-      const scrollHeight =
-        document.documentElement.scrollHeight;
+      const scrollPosition = sr.clientHeight + sr.scrollTop;
+      const scrollHeight = sr.scrollHeight;
       const isBottomReached =
         scrollPosition + 1 >= scrollHeight;
 
@@ -73,9 +79,9 @@ export default function Transactions() {
         fetchNextPage();
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    sr.addEventListener('scroll', handleScroll);
     return () =>
-      window.removeEventListener('scroll', handleScroll);
+      sr.removeEventListener('scroll', handleScroll);
   }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   // Listen to errors
@@ -96,9 +102,10 @@ export default function Transactions() {
 
   return (
     <main
+      ref={scrollRef}
       className={cn(
         'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
-        isMobile ? 'min-h-screen pb-18' : 'pb-4'
+        isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
       {/* Total Amount Section */}
