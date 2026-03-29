@@ -34,7 +34,11 @@ export default function Transactions() {
   const isMobile = useIsMobile();
   const { selectedAccountID } = useAccount();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const isScrolled = useScrollState(scrollRef);
+  const isScrolled = useScrollState(
+    scrollRef,
+    20,
+    isMobile
+  );
 
   const {
     data: account,
@@ -64,25 +68,46 @@ export default function Transactions() {
 
   // Handle scroll for pagination
   useEffect(() => {
-    const sr = scrollRef.current;
-    if (!sr) return;
+    if (isMobile) {
+      const sr = scrollRef.current;
+      if (!sr) return;
 
-    const handleScroll = () => {
-      if (isFetchingNextPage || !hasNextPage) return;
+      const handleScroll = () => {
+        if (isFetchingNextPage || !hasNextPage) return;
 
-      const scrollPosition = sr.clientHeight + sr.scrollTop;
-      const scrollHeight = sr.scrollHeight;
-      const isBottomReached =
-        scrollPosition + 1 >= scrollHeight;
+        const scrollPosition =
+          sr.clientHeight + sr.scrollTop;
+        const scrollHeight = sr.scrollHeight;
+        const isBottomReached =
+          scrollPosition + 1 >= scrollHeight;
 
-      if (isBottomReached) {
-        fetchNextPage();
-      }
-    };
-    sr.addEventListener('scroll', handleScroll);
-    return () =>
-      sr.removeEventListener('scroll', handleScroll);
-  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+        if (isBottomReached) {
+          fetchNextPage();
+        }
+      };
+      sr.addEventListener('scroll', handleScroll);
+      return () =>
+        sr.removeEventListener('scroll', handleScroll);
+    } else {
+      const handleScroll = () => {
+        if (isFetchingNextPage || !hasNextPage) return;
+
+        const scrollPosition =
+          window.scrollY + window.innerHeight;
+        const scrollHeight =
+          document.documentElement.scrollHeight;
+        const isBottomReached =
+          scrollPosition + 1 >= scrollHeight;
+
+        if (isBottomReached) {
+          fetchNextPage();
+        }
+      };
+      window.addEventListener('scroll', handleScroll);
+      return () =>
+        window.removeEventListener('scroll', handleScroll);
+    }
+  }, [isMobile, isFetchingNextPage, hasNextPage, fetchNextPage]);
 
   // Listen to errors
   useEffect(() => {
