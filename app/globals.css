@@ -93,7 +93,7 @@ html {
 }
 
 body {
-  @apply !min-w-full;
+  @apply !min-w-full overflow-y-hidden;
 }
 
 @layer base {
