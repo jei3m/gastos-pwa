@@ -183,7 +183,7 @@ export default function Categories() {
       <section
         className={cn(
           'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
-          isScrolled && isMobile && 'mt-[90px]'
+          isScrolled && isMobile && 'mt-[90px] mb-[30dvh]'
         )}
       >
         <Tabs
