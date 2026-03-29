@@ -1,4 +1,5 @@
 import { formatAmount } from '@/utils/format-amount';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Separator } from '../ui/separator';
 import { Skeleton } from '../ui/skeleton';
@@ -31,24 +32,24 @@ export default function TotalAmountSection({
 
   return (
     <section
-      className={`
-        transition-all
-        ease-in-out
-        ${
-          isScrolled && isMobile
-            ? 'fixed w-full top-0 z-10'
-            : 'pt-2 md:pt-4 px-3'
-        }
-      `}
+      className={cn(
+        'transition-all ease-in-out',
+        isScrolled && isMobile
+          ? 'fixed w-full top-0 z-10'
+          : 'pt-2 md:pt-4 px-3'
+      )}
     >
       <Card
-        className={`
-          ${
-            isScrolled && isMobile
-              ? `-mt-2 ${isMobile ? 'border-0 rounded-none' : 'border-2'}`
-              : 'border-2 mt-0'
-          }
-        `}
+        className={cn(
+          isScrolled && isMobile
+            ? cn(
+                '-mt-2',
+                isMobile
+                  ? 'border-0 rounded-none'
+                  : 'border-2'
+              )
+            : 'border-2 mt-0'
+        )}
       >
         <CardHeader>
           <div className="flex flex-rows items-center justify-between">
