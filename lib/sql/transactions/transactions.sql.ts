@@ -87,7 +87,7 @@ export const getTransactions = () => {
         ref_user_id,
         ref_accounts_id
     ORDER BY date DESC
-        LIMIT :limit
+    LIMIT :limit
     OFFSET :offset;`;
 };
 
@@ -221,7 +221,9 @@ export const getTransactionsByCategory = () => {
             date,
             ref_user_id,
             ref_accounts_id
-        ORDER BY date DESC;
+        ORDER BY date DESC
+        LIMIT :limit
+        OFFSET :offset;
     `;
 };
 
