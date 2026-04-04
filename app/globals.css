@@ -93,7 +93,13 @@ html {
 }
 
 body {
-  @apply !min-w-full overflow-y-hidden md:overflow-y-auto;
+  @apply !min-w-full;
+}
+
+@media (max-width: 767px) {
+  body {
+    overflow-y: hidden;
+  }
 }
 
 @layer base {
