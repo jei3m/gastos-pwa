@@ -65,13 +65,11 @@ import { Account } from '@/types/accounts.types';
 import { cn } from '@/lib/utils';
 
 interface EditTransactionFormProps {
-  id?: string;
   isModal?: boolean;
   onClose?: () => void;
 }
 
 export default function EditTransactionForm({
-  id: propId,
   isModal = false,
   onClose,
 }: EditTransactionFormProps) {
@@ -81,7 +79,9 @@ export default function EditTransactionForm({
   const { selectedAccountID, accounts } = useAccount();
   const queryClient = useQueryClient();
   const params = useParams();
-  const id = propId || (params.id as string);
+  const id =
+    (params['transaction-id'] as string) ||
+    (params.id as string);
 
   const filteredAccounts =
     accounts?.filter(

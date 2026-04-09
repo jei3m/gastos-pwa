@@ -80,6 +80,7 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const accountID = url.searchParams.get('accountID');
+    const searchTerm = url.searchParams.get('searchTerm');
     const page = parseInt(
       url.searchParams.get('page') || '1',
       10
@@ -97,6 +98,7 @@ export async function GET(request: Request) {
     >(getTransactionsCount(), {
       userID,
       accountID,
+      searchTerm,
     });
 
     const [rows] = await db.query<RowDataPacket[]>(
@@ -106,6 +108,7 @@ export async function GET(request: Request) {
         accountID,
         limit,
         offset,
+        searchTerm,
       }
     );
 
@@ -115,7 +118,7 @@ export async function GET(request: Request) {
     return success({
       hasMore: hasMore,
       currentPage: page,
-      data: rows,
+      data: rows || [],
     });
   } catch (error) {
     return fail(

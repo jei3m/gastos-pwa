@@ -26,7 +26,7 @@ export async function GET(
       id,
     });
 
-    return success({ data: rows });
+    return success({ data: rows || [] });
   } catch (error) {
     return fail(
       500,

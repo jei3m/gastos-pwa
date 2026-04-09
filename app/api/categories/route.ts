@@ -81,7 +81,7 @@ export async function GET(request: Request) {
     );
 
     return success({
-      data: selectQuery,
+      data: selectQuery || [],
     });
   } catch (error) {
     return fail(

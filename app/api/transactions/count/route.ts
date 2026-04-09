@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       accountID,
     });
 
-    return success({ data: rows });
+    return success({ data: rows || [] });
   } catch (error) {
     return fail(
       500,

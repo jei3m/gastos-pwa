@@ -84,8 +84,8 @@ export default function Settings() {
   return (
     <main
       className={cn(
-        'space-y-6 px-3 mx-auto',
-        isMobile ? 'pb-18' : 'pb-4'
+        'flex flex-col space-y-2 md:space-y-6 px-3 mx-auto overflow-y-auto',
+        isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
       {/* User Section */}

@@ -1,5 +1,10 @@
 'use client';
-import { useEffect, useMemo } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TypographyH4 } from '@/components/custom/typography';
 import { useAccount } from '@/context/account-context';
@@ -16,11 +21,24 @@ import { toast } from 'sonner';
 import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
 import { useScrollState } from '@/hooks/use-scroll-state';
 import { cn } from '@/lib/utils';
+import useDebounce from '@/hooks/use-debounce';
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 export default function Transactions() {
+  const [searchFilter, setSearchFilter] = useState('');
+  const debouncedSearchTerm = useDebounce(
+    searchFilter,
+    300
+  );
   const isMobile = useIsMobile();
   const { selectedAccountID } = useAccount();
-  const isScrolled = useScrollState();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isScrolled = useScrollState(
+    scrollRef,
+    20,
+    isMobile
+  );
 
   const {
     data: account,
@@ -36,7 +54,10 @@ export default function Transactions() {
     isPending,
     error: transactionsError,
   } = useInfiniteQuery(
-    transactionsInfiniteQueryOptions(selectedAccountID)
+    transactionsInfiniteQueryOptions(
+      selectedAccountID,
+      debouncedSearchTerm
+    )
   );
 
   const transactions = useMemo(() => {
@@ -47,25 +68,51 @@ export default function Transactions() {
 
   // Handle scroll for pagination
   useEffect(() => {
-    const handleScroll = () => {
-      if (isFetchingNextPage || !hasNextPage) return;
+    if (isMobile) {
+      const sr = scrollRef.current;
+      if (!sr) return;
 
-      const scrollPosition =
-        window.innerHeight +
-        document.documentElement.scrollTop;
-      const scrollHeight =
-        document.documentElement.scrollHeight;
-      const isBottomReached =
-        scrollPosition + 1 >= scrollHeight;
+      const handleScroll = () => {
+        if (isFetchingNextPage || !hasNextPage) return;
 
-      if (isBottomReached) {
-        fetchNextPage();
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () =>
-      window.removeEventListener('scroll', handleScroll);
-  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+        const scrollPosition =
+          sr.clientHeight + sr.scrollTop;
+        const scrollHeight = sr.scrollHeight;
+        const isBottomReached =
+          scrollPosition + 1 >= scrollHeight;
+
+        if (isBottomReached) {
+          fetchNextPage();
+        }
+      };
+      sr.addEventListener('scroll', handleScroll);
+      return () =>
+        sr.removeEventListener('scroll', handleScroll);
+    } else {
+      const handleScroll = () => {
+        if (isFetchingNextPage || !hasNextPage) return;
+
+        const scrollPosition =
+          window.scrollY + window.innerHeight;
+        const scrollHeight =
+          document.documentElement.scrollHeight;
+        const isBottomReached =
+          scrollPosition + 1 >= scrollHeight;
+
+        if (isBottomReached) {
+          fetchNextPage();
+        }
+      };
+      window.addEventListener('scroll', handleScroll);
+      return () =>
+        window.removeEventListener('scroll', handleScroll);
+    }
+  }, [
+    isMobile,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  ]);
 
   // Listen to errors
   useEffect(() => {
@@ -85,9 +132,10 @@ export default function Transactions() {
 
   return (
     <main
+      ref={scrollRef}
       className={cn(
         'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
-        isMobile ? 'min-h-screen pb-18' : 'pb-4'
+        isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
       {/* Total Amount Section */}
@@ -102,10 +150,26 @@ export default function Transactions() {
       <section
         className={cn(
           'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
-          isScrolled && isMobile && 'mt-[134px]'
+          isScrolled && isMobile && 'mt-[120px]'
         )}
       >
-        <TypographyH4>Recent Transactions</TypographyH4>
+        <div className="flex items-center justify-between">
+          <TypographyH4>Transactions</TypographyH4>
+          <div className="relative w-48 md:w-64">
+            <Search
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+              size={18}
+            />
+            <Input
+              placeholder="Search by note..."
+              value={searchFilter}
+              onChange={(e) =>
+                setSearchFilter(e.target.value)
+              }
+              className="pl-8 bg-white border-black border-2"
+            />
+          </div>
+        </div>
         {!selectedAccountID ? (
           <NoSelectedAccountDiv data="transactions" />
         ) : isAccountLoading || isPending ? (
@@ -134,7 +198,9 @@ export default function Transactions() {
                   No Transactions
                 </TypographyH4>
                 <p className="text-gray-500 text-sm text-center">
-                  Start by adding your first transaction
+                  {debouncedSearchTerm
+                    ? 'No transactions were found with your search query'
+                    : 'Start by adding your first transaction'}
                 </p>
               </div>
             )}

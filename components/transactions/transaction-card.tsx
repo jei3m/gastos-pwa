@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -26,6 +27,13 @@ interface TransactionCardProps {
 function TransactionCard({
   transaction,
 }: TransactionCardProps) {
+  const pathname = usePathname();
+  const isCategoryRoute = pathname.match(
+    /^\/pages\/categories\/[^/]+\/transactions$/
+  );
+  const hrefPrefix = isCategoryRoute
+    ? pathname
+    : '/pages/transactions';
   return (
     <Card className="border-2">
       <CardHeader>
@@ -96,7 +104,7 @@ function TransactionCard({
           (detail: TransactionDetails, index: number) => (
             <Link
               key={index}
-              href={`/pages/transactions/${detail.id}`}
+              href={`${hrefPrefix}/${detail.id}`}
             >
               <div className="space-y-3 md:space-y-4 flex flex-row justify-between text-sm md:text-md">
                 <div className="flex flex-col">

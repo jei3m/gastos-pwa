@@ -1,5 +1,10 @@
 'use client';
-import { createElement, useEffect, useMemo } from 'react';
+import {
+  createElement,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   TypographyH4,
   TypographyH5,
@@ -40,14 +45,13 @@ export default function Transactions() {
   const dateStart =
     searchParams.get('dateStart') || undefined;
   const dateEnd = searchParams.get('dateEnd') || undefined;
-  const isScrolled = useScrollState();
+  const scrollRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-
-  // Scroll to top on load
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    window.scroll(0, 0);
-  }, []);
+  const isScrolled = useScrollState(
+    scrollRef,
+    20,
+    isMobile
+  );
 
   const {
     data: transactionsData,
@@ -86,32 +90,64 @@ export default function Transactions() {
 
   // Handle scroll for pagination
   useEffect(() => {
-    const handleScroll = () => {
-      if (isFetchingNextPage || !hasNextPage) return;
+    if (isMobile) {
+      const sr = scrollRef.current;
+      if (!sr) return;
 
-      const scrollPosition =
-        window.innerHeight +
-        document.documentElement.scrollTop;
-      const scrollHeight =
-        document.documentElement.scrollHeight;
-      const isBottomReached =
-        scrollPosition + 1 >= scrollHeight;
+      const handleScroll = () => {
+        if (isFetchingNextPage || !hasNextPage) return;
 
-      if (isBottomReached) {
-        fetchNextPage();
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () =>
-      window.removeEventListener('scroll', handleScroll);
-  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+        const scrollPosition =
+          sr.clientHeight + sr.scrollTop;
+        const scrollHeight = sr.scrollHeight;
+        const isBottomReached =
+          scrollPosition + 1 >= scrollHeight;
+
+        if (isBottomReached) {
+          fetchNextPage();
+        }
+      };
+      sr.addEventListener('scroll', handleScroll);
+      return () =>
+        sr.removeEventListener('scroll', handleScroll);
+    } else {
+      const handleScroll = () => {
+        if (isFetchingNextPage || !hasNextPage) return;
+
+        const scrollPosition =
+          window.scrollY + window.innerHeight;
+        const scrollHeight =
+          document.documentElement.scrollHeight;
+        const isBottomReached =
+          scrollPosition + 1 >= scrollHeight;
+
+        if (isBottomReached) {
+          fetchNextPage();
+        }
+      };
+      window.addEventListener('scroll', handleScroll);
+      return () =>
+        window.removeEventListener('scroll', handleScroll);
+    }
+  }, [
+    isMobile,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  ]);
 
   const isExpense = (type: string) => {
     return type === 'Expense';
   };
 
   return (
-    <main className="flex flex-col space-y-2 md:space-y-4 min-h-screen pb-18">
+    <main
+      ref={scrollRef}
+      className={cn(
+        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        isMobile ? 'h-screen pb-29' : 'pb-4'
+      )}
+    >
       {/* Category Details Section */}
       <section
         className={cn(

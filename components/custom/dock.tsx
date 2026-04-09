@@ -26,7 +26,7 @@ export const Dock: React.FC<DockProps> = ({
         };
       default:
         return {
-          container: `p-0 ${isMobile ? 'pb-2' : 'pb-0'}`,
+          container: cn('p-0', isMobile ? 'pb-2' : 'pb-0'),
           item: 'p-2 min-w-14',
           icon: 'h-7 w-7',
           text: 'text-[10px] -mt-1',
@@ -40,13 +40,10 @@ export const Dock: React.FC<DockProps> = ({
         <div className="px-0">
           <nav
             className={cn(
-              `overflow-x-hidden flex flex-col justify-center 
-                w-full bg-card fixed m-auto
-              ${
-                isMobile
-                  ? 'border-t-2 w-full bottom-0'
-                  : 'border-2 rounded-lg mb-2 max-w-[676px] m-auto bottom-2'
-              }`,
+              'overflow-x-hidden flex flex-col justify-center w-full bg-card fixed m-auto',
+              isMobile
+                ? 'border-t-2 w-full bottom-0'
+                : 'border-2 rounded-lg mb-2 max-w-[676px] m-auto bottom-2',
               orientation === 'horizontal'
                 ? 'flex-row'
                 : 'flex-col',

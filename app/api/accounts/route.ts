@@ -60,7 +60,7 @@ export async function GET() {
       userID: await fetchUserID(),
     });
 
-    return success({ data: rows });
+    return success({ data: rows || [] });
   } catch (error) {
     return fail(
       500,

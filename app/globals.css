@@ -96,6 +96,12 @@ body {
   @apply !min-w-full;
 }
 
+@media (max-width: 767px) {
+  body {
+    overflow-y: hidden;
+  }
+}
+
 @layer base {
   html,
   body {

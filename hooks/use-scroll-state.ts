@@ -1,23 +1,44 @@
-import { useState, useLayoutEffect } from 'react';
+import {
+  useState,
+  useLayoutEffect,
+  RefObject,
+} from 'react';
 
-export function useScrollState(threshold: number = 20) {
-  const [isScrolled, setIsScrolled] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.scrollY > threshold;
-    }
-    return false;
-  });
+export function useScrollState(
+  ref: RefObject<HTMLElement | null>,
+  threshold: number = 20,
+  isMobile: boolean = true
+) {
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useLayoutEffect(() => {
-    const onScroll = () => {
+    if (isMobile) {
+      const sr = ref.current;
+      if (!sr) return;
+
+      setIsScrolled(sr.scrollTop > threshold);
+
+      const onScroll = () => {
+        setIsScrolled(sr.scrollTop > threshold);
+      };
+      sr.addEventListener('scroll', onScroll, {
+        passive: true,
+      });
+      return () =>
+        sr.removeEventListener('scroll', onScroll);
+    } else {
       setIsScrolled(window.scrollY > threshold);
-    };
-    window.addEventListener('scroll', onScroll, {
-      passive: true,
-    });
-    return () =>
-      window.removeEventListener('scroll', onScroll);
-  }, [threshold]);
+
+      const onScroll = () => {
+        setIsScrolled(window.scrollY > threshold);
+      };
+      window.addEventListener('scroll', onScroll, {
+        passive: true,
+      });
+      return () =>
+        window.removeEventListener('scroll', onScroll);
+    }
+  }, [ref, threshold, isMobile]);
 
   return isScrolled;
 }

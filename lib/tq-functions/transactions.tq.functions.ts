@@ -28,7 +28,8 @@ export const createTransaction = async (
 
 export const fetchTransactions = async (
   selectedAccountID: string | null,
-  page: number
+  page: number,
+  searchTerm: string
 ) => {
   try {
     const params = new URLSearchParams();
@@ -36,6 +37,7 @@ export const fetchTransactions = async (
     if (selectedAccountID)
       params.append('accountID', selectedAccountID);
     if (page) params.append('page', page.toString());
+    if (searchTerm) params.append('searchTerm', searchTerm);
 
     const res = await fetch(
       `/api/transactions?${params.toString() || ''}`,
