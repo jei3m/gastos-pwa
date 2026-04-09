@@ -254,7 +254,7 @@ export default function Accounts() {
       <section
         className={cn(
           'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
-          isScrolled && isMobile && 'mt-[104px]'
+          isScrolled && isMobile && 'mt-[76px]'
         )}
       >
         <Tabs

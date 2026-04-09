@@ -107,7 +107,12 @@ export default function Transactions() {
       return () =>
         window.removeEventListener('scroll', handleScroll);
     }
-  }, [isMobile, isFetchingNextPage, hasNextPage, fetchNextPage]);
+  }, [
+    isMobile,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  ]);
 
   // Listen to errors
   useEffect(() => {
@@ -145,7 +150,7 @@ export default function Transactions() {
       <section
         className={cn(
           'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
-          isScrolled && isMobile && 'mt-[134px]'
+          isScrolled && isMobile && 'mt-[120px]'
         )}
       >
         <div className="flex items-center justify-between">
