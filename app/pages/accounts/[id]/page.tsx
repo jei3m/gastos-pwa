@@ -41,6 +41,7 @@ import {
 import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 import { useAccount } from '@/context/account-context';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function EditAccount() {
   const router = useRouter();
@@ -71,6 +72,11 @@ export default function EditAccount() {
     mutationFn: (
       values: z.infer<typeof updateAccountSchema>
     ) => editAccount(id, values),
+    onMutate: (values) => {
+      if (!values.isDropdown && id === selectedAccountID) {
+        setSelectedAccount('');
+      }
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: accountByIDQueryOptions(id!).queryKey,
@@ -117,6 +123,7 @@ export default function EditAccount() {
         name: account.name || '',
         type: account.type.toLowerCase() || '',
         description: account.description || '',
+        isDropdown: account.isDropdown || 0,
       });
     }, 50);
   }, [account, isAccountPending, form]);
@@ -221,6 +228,25 @@ export default function EditAccount() {
 										border-black bg-white"
                   />
                 </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="isDropdown"
+            disabled={isLoading}
+            render={({ field }) => (
+              <FormItem className="flex items-center">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value === 1}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked ? 1 : 0);
+                    }}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormLabel>Add to Dropdown</FormLabel>
               </FormItem>
             )}
           />
