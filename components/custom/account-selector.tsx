@@ -27,7 +27,11 @@ export default function AccountSelector() {
   } = useAccount();
 
   const filteredAccounts = accounts
-    ? accounts.filter((account) => account.isDropdown === 1)
+    ? accounts.filter(
+        (account) =>
+          account.isDropdown === 1 ||
+          account.id === selectedAccountID
+      )
     : [];
 
   const handleSelect = (id: string) => {
