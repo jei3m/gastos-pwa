@@ -26,16 +26,18 @@ import { useMemo, useState } from 'react';
 import AccountsSection from '@/components/settings/accounts-section';
 import CategoriesSection from '@/components/settings/categories-section';
 import { authClient } from '@/lib/auth/auth-client';
+import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 
 export default function Settings() {
   const [activeTab, setActiveTab] =
     useState<string>('expense');
   const isMobile = useIsMobile();
   const router = useRouter();
-  const { accounts, isAccountsLoading, selectedAccountID } =
-    useAccount();
+  const { selectedAccountID } = useAccount();
   const { data: session, isPending } =
     authClient.useSession();
+  const { data: accounts, isPending: isAccountsLoading } =
+    useQuery(accountsQueryOptions());
 
   const handleLogout = async () => {
     await authClient.signOut({
@@ -84,7 +86,7 @@ export default function Settings() {
   return (
     <main
       className={cn(
-        'flex flex-col space-y-2 md:space-y-6 px-3 mx-auto overflow-y-auto',
+        'flex flex-col space-y-4 md:space-y-6 px-3 mx-auto overflow-y-auto',
         isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
