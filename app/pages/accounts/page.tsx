@@ -34,7 +34,7 @@ export default function Accounts() {
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
   const isScrolled = useScrollState(scrollRef);
-  const { setSelectedAccount, selectedAccountID } =
+  const { setSelectedAccountID, selectedAccountID } =
     useAccount();
 
   const [hideNetWorthTotal, setHideNetWorthTotal] =
@@ -97,7 +97,7 @@ export default function Accounts() {
     name: string
   ) => {
     if (selectedAccountID === id) return;
-    setSelectedAccount(id);
+    setSelectedAccountID(id);
     toast.success(`Selected ${name} as Active Account`);
   };
 

@@ -21,7 +21,7 @@ export default function AccountSelector() {
 
   const {
     selectedAccountID,
-    setSelectedAccount,
+    setSelectedAccountID,
     isAccountsLoading,
     accounts,
   } = useAccount();
@@ -35,7 +35,7 @@ export default function AccountSelector() {
     : [];
 
   const handleSelect = (id: string) => {
-    setSelectedAccount(id);
+    setSelectedAccountID(id);
     setOpen(false);
   };
 

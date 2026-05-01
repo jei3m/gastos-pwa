@@ -48,7 +48,7 @@ export default function EditAccount() {
   const params = useParams();
   const id = params.id as string;
   const queryClient = useQueryClient();
-  const { selectedAccountID, setSelectedAccount } =
+  const { selectedAccountID, setSelectedAccountID } =
     useAccount();
 
   const { data: account, isPending: isAccountPending } =
@@ -74,7 +74,7 @@ export default function EditAccount() {
     ) => editAccount(id, values),
     onMutate: (values) => {
       if (!values.isDropdown && id === selectedAccountID) {
-        setSelectedAccount('');
+        setSelectedAccountID('');
       }
     },
     onSuccess: (data) => {
@@ -100,7 +100,7 @@ export default function EditAccount() {
         queryKey: accountByIDQueryOptions(id!).queryKey,
       });
       if (id === selectedAccountID) {
-        setSelectedAccount('');
+        setSelectedAccountID('');
       }
       toast.success(data.responseMessage);
       router.push('/pages/settings');
