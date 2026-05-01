@@ -13,7 +13,8 @@ import { connection } from '@/utils/db';
 // Create New Account
 export async function POST(req: NextRequest) {
   try {
-    const { name, type, description } = await req.json();
+    const { name, type, description, isDropdown } =
+      await req.json();
 
     const [resultCreate] = await db.query<responseRow[]>(
       createAccounts(),
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
         name,
         type,
         description,
+        isDropdown,
       }
     );
 
