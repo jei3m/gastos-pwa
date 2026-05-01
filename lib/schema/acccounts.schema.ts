@@ -8,6 +8,7 @@ export const createAccountSchema = z.object({
     message: 'Please select an account type',
   }),
   description: z.string(),
+  isDropdown: z.number().min(0).max(1),
 });
 
 export const updateAccountSchema = z.object({
@@ -18,4 +19,5 @@ export const updateAccountSchema = z.object({
     message: 'Please select an account type',
   }),
   description: z.string(),
+  isDropdown: z.number().min(0).max(1),
 });
