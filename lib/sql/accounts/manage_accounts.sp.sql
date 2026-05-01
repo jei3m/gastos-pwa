@@ -9,7 +9,8 @@ CREATE PROCEDURE `manage_accounts`(
 	IN p_user_id CHAR(36),
     IN p_name VARCHAR(10),
     IN p_type ENUM('Cash', 'Digital'),
-    IN p_description text,
+    IN p_description TEXT,
+    IN p_is_dropdown TINYINT,
 
     OUT p_response JSON
 )
@@ -35,7 +36,8 @@ main: BEGIN
                 ref_user_id,
                 name,
                 type,
-                description
+                description,
+                is_dropdown
             )
             VALUES
             (
@@ -43,7 +45,8 @@ main: BEGIN
                 p_user_id,
                 p_name,
                 p_type,
-                p_description
+                p_description,
+                p_is_dropdown
             );
 
             SET v_affected_rows = ROW_COUNT();
@@ -85,7 +88,8 @@ main: BEGIN
             SET
                name = p_name,
                type = p_type,
-               description = p_description
+               description = p_description,
+               is_dropdown = p_is_dropdown
             WHERE 
                 ref_user_id = p_user_id
                 AND id = p_id
