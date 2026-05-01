@@ -70,6 +70,7 @@ export const deleteAccount = () => {
                 NULL,
                 NULL,
                 NULL,
+                NULL,
                 @response
             );
             SELECT @response AS response;`;
