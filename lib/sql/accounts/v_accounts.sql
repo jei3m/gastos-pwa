@@ -7,7 +7,8 @@ SELECT
     name,
     type,
     description,
-    total_balance AS totalBalance
+    total_balance AS totalBalance,
+    is_dropdown AS isDropdown
 FROM 
     accounts;
 /* END Select Query */

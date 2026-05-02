@@ -31,6 +31,7 @@ import {
 } from '@tanstack/react-query';
 import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import { Loader2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function CreateAccount() {
   const router = useRouter();
@@ -43,6 +44,7 @@ export default function CreateAccount() {
         name: '',
         type: '',
         description: '',
+        isDropdown: 0,
       },
     }
   );
@@ -146,6 +148,25 @@ export default function CreateAccount() {
                   />
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="isDropdown"
+            disabled={isPending}
+            render={({ field }) => (
+              <FormItem className="flex items-center">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value === 1}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked ? 1 : 0);
+                    }}
+                    disabled={isPending}
+                  />
+                </FormControl>
+                <FormLabel>Add to Dropdown</FormLabel>
               </FormItem>
             )}
           />

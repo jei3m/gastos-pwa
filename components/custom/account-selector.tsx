@@ -21,13 +21,21 @@ export default function AccountSelector() {
 
   const {
     selectedAccountID,
-    setSelectedAccount,
+    setSelectedAccountID,
     isAccountsLoading,
     accounts,
   } = useAccount();
 
+  const filteredAccounts = accounts
+    ? accounts.filter(
+        (account) =>
+          account.isDropdown === 1 ||
+          account.id === selectedAccountID
+      )
+    : [];
+
   const handleSelect = (id: string) => {
-    setSelectedAccount(id);
+    setSelectedAccountID(id);
     setOpen(false);
   };
 
@@ -65,9 +73,9 @@ export default function AccountSelector() {
             </div>
           ) : (
             <>
-              {accounts && (
+              {filteredAccounts && (
                 <>
-                  {accounts.map((account) => (
+                  {filteredAccounts.map((account) => (
                     <SelectItem
                       key={account.id}
                       value={account.id}

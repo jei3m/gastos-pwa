@@ -7,6 +7,7 @@ export const createAccounts = () => {
                 :name,
                 :type,
                 :description,
+                :isDropdown,
                 @response
             );
             SELECT @response AS response;`;
@@ -18,11 +19,13 @@ export const getAccounts = () => {
                 name,
                 type,
                 description,
-                totalBalance
+                totalBalance,
+                isDropdown
             FROM
                 v_accounts
             WHERE
                 ref_user_id = :userID
+                AND (:isDropdown IS NULL OR isDropdown = :isDropdown) 
             ORDER BY name ASC;`;
 };
 
@@ -33,7 +36,8 @@ export const getAccountByID = () => {
                 name,
                 type,
                 description,
-                totalBalance
+                totalBalance,
+                isDropdown
             FROM
                 v_accounts
             WHERE
@@ -51,6 +55,7 @@ export const updateAccount = () => {
                 :name,
                 :type,
                 :description,
+                :isDropdown,
                 @response
             );
             SELECT @response AS response;`;
@@ -62,6 +67,7 @@ export const deleteAccount = () => {
                 :actionType,
                 :id,
                 :userID,
+                NULL,
                 NULL,
                 NULL,
                 NULL,

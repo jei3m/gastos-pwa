@@ -14,7 +14,7 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 
 type AccountContextType = {
   selectedAccountID: string | null;
-  setSelectedAccount: (uuid: string) => void;
+  setSelectedAccountID: (uuid: string) => void;
   refetchAccountsData: () => Promise<QueryObserverResult>;
   isAccountsLoading: boolean;
   accounts: Account[];
@@ -42,15 +42,11 @@ export function AccountProvider({
     return refetch();
   };
 
-  const setSelectedAccount = (uuid: string) => {
-    setSelectedAccountID(uuid);
-  };
-
   return (
     <AccountContext.Provider
       value={{
         selectedAccountID: selectedAccountID ?? null,
-        setSelectedAccount,
+        setSelectedAccountID,
         refetchAccountsData,
         isAccountsLoading,
         accounts,

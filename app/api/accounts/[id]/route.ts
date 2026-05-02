@@ -45,7 +45,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { name, type, description } = await req.json();
+    const { name, type, description, isDropdown } =
+      await req.json();
     const { id } = await params;
 
     const [resultUpdate] = await db.query<responseRow[]>(
@@ -57,6 +58,7 @@ export async function PUT(
         name,
         type,
         description,
+        isDropdown,
       }
     );
 

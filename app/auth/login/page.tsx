@@ -12,7 +12,7 @@ export default function Login() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
   const { data: session } = authClient.useSession();
-  const { setSelectedAccount } = useAccount();
+  const { setSelectedAccountID } = useAccount();
 
   useEffect(() => {
     if (session) {
@@ -33,7 +33,7 @@ export default function Login() {
       setGoogleLoading(false);
       toast.error(error.message);
     }
-    setSelectedAccount('');
+    setSelectedAccountID('');
   }
 
   return (
