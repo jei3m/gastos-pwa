@@ -32,6 +32,7 @@ import {
 } from 'next/navigation';
 import { useScrollState } from '@/hooks/use-scroll-state';
 import { cn } from '@/lib/utils';
+import { CategoryPieChart } from '@/components/categories/categories-pie-chart-card';
 
 export default function Categories() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -102,7 +103,6 @@ export default function Categories() {
 
   return (
     <main
-      ref={scrollRef}
       className={cn(
         'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
         isMobile ? 'h-screen pb-29' : 'pb-4'
@@ -110,7 +110,6 @@ export default function Categories() {
     >
       {/* Date Card Section */}
       <DateSelectCard
-        isScrolled={isScrolled}
         onDateRangeChange={handleDateRangeChange}
         content={
           <>
@@ -182,8 +181,7 @@ export default function Categories() {
       {/* Categories Section */}
       <section
         className={cn(
-          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
-          isScrolled && isMobile && 'mt-[80px] mb-[30dvh]'
+          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2'
         )}
       >
         <Tabs
@@ -192,7 +190,7 @@ export default function Categories() {
           onValueChange={setCategoryType}
         >
           <div className="flex flex-row justify-between items-center w-full">
-            <TypographyH4>Categories</TypographyH4>
+            <TypographyH4>Breakdown</TypographyH4>
             <TabsList
               defaultValue="expense"
               className="border-black border-2 p-1"
@@ -220,16 +218,25 @@ export default function Categories() {
         ) : (
           <>
             {categories && categories.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-2 md:gap-4">
-                {categories.map((category: Category) => (
-                  <CategoryCard
-                    key={category.id}
-                    category={category}
-                    hideAmount={false}
-                    isEdit={false}
-                  />
-                ))}
-              </div>
+              <>
+                <CategoryPieChart
+                  categories={categories}
+                  categoryType={categoryType}
+                  dateStart={dateStart}
+                  dateEnd={dateEnd}
+                />
+                <TypographyH4>Categories</TypographyH4>
+                <div className="grid md:grid-cols-2 gap-2 md:gap-4">
+                  {categories.map((category: Category) => (
+                    <CategoryCard
+                      key={category.id}
+                      category={category}
+                      hideAmount={false}
+                      isEdit={false}
+                    />
+                  ))}
+                </div>
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-10">
                 <TypographyH4 className="text-gray-400 font-semibold text-center">
