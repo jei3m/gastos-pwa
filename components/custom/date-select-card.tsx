@@ -40,13 +40,11 @@ interface DateTransactionCardProps {
     dateDisplay: string
   ) => void;
   content?: ReactNode;
-  isScrolled: boolean;
 }
 
 function DateSelectCard({
   content,
   onDateRangeChange,
-  isScrolled,
 }: DateTransactionCardProps) {
   const [activeTab, setActiveTab] = useState('weekly');
   const [currentDate, setCurrentDate] = useState(
@@ -263,21 +261,11 @@ function DateSelectCard({
     <section
       className={`
         transition-all
-        ease-in-out
-        ${
-          isScrolled && isMobile
-            ? 'fixed w-full top-0 z-10'
-            : 'pt-2 md:pt-4 px-3'
-        }
+        ease-in-out pt-2 md:pt-4 px-3
       `}
     >
       <Card
-        className={`
-          ${
-            isScrolled
-              ? `-mt-2 ${isMobile ? 'border-0 rounded-none' : 'border-2'}`
-              : 'border-2 mt-0'
-          }
+        className={`border-2 mt-0'
         `}
       >
         <CardHeader
@@ -379,7 +367,7 @@ function DateSelectCard({
             </div>
           </div>
         </CardHeader>
-        {content && (!isMobile || !isScrolled) && (
+        {content && (
           <>
             <Separator />
             <CardContent className="flex flex-col gap-y-2">
@@ -388,9 +376,6 @@ function DateSelectCard({
           </>
         )}
       </Card>
-      {isMobile && isScrolled && (
-        <div className="w-full border-t-2 border-black" />
-      )}
     </section>
   );
 }
