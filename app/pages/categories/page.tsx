@@ -1,10 +1,5 @@
 'use client';
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { categoryTypes } from '@/lib/data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Category } from '@/types/categories.types';
@@ -30,13 +25,10 @@ import {
   useSearchParams,
   useRouter,
 } from 'next/navigation';
-import { useScrollState } from '@/hooks/use-scroll-state';
 import { cn } from '@/lib/utils';
 import { CategoryPieChart } from '@/components/categories/categories-pie-chart-card';
 
 export default function Categories() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const isScrolled = useScrollState(scrollRef);
   const [categoryType, setCategoryType] =
     useState('expense');
   const { selectedAccountID } = useAccount();

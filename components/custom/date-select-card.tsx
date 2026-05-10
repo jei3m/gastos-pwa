@@ -5,7 +5,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Card,
   CardContent,
@@ -51,7 +50,6 @@ function DateSelectCard({
     new Date()
   );
   const newDate = new Date(currentDate);
-  const isMobile = useIsMobile();
   const [isCustomRange, setIsCustomRange] = useState(false);
   const [datePickerOpen, setDatePickerOpen] =
     useState(false);
