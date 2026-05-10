@@ -345,7 +345,9 @@ function ChartLegendContent({
                 }}
               />
             )}
-            {itemConfig?.label}
+            <span className="truncate min-w-0">
+              {itemConfig?.label}
+            </span>
           </div>
         );
       })}
