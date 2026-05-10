@@ -14,6 +14,7 @@ import {
   type ChartConfig,
 } from '@/components/ui/chart';
 import { Category } from '@/types/categories.types';
+import { Inbox } from 'lucide-react';
 
 interface CategoryPieChartProps {
   categories: Category[];
@@ -35,29 +36,26 @@ export function CategoryPieChart({
         cat.type.toLowerCase() ===
         categoryType.toLowerCase()
     );
-
-    // Tailwind 500 color palettes
     const expenseColors = [
-      '#ef4444', // red-500
-      '#f97316', // orange-500
-      '#f59e0b', // amber-500
-      '#eab308', // yellow-500
-      '#ec4899', // pink-500
-      '#f43f5e', // rose-500
+      '#ef4444',
+      '#f97316',
+      '#f59e0b',
+      '#eab308',
+      '#ec4899',
+      '#f43f5e',
     ];
     const incomeColors = [
-      '#22c55e', // green-500
-      '#10b981', // emerald-500
-      '#84cc16', // lime-500
-      '#14b8a6', // teal-500
-      '#06b6d4', // cyan-500
+      '#22c55e',
+      '#10b981',
+      '#84cc16',
+      '#14b8a6',
+      '#06b6d4',
     ];
     const colorPalette =
       categoryType.toLowerCase() === 'expense'
         ? expenseColors
         : incomeColors;
 
-    // Generate chart data and config dynamically
     const data = filteredCategories.map((cat, index) => {
       const color =
         colorPalette[index % colorPalette.length];
@@ -68,7 +66,6 @@ export function CategoryPieChart({
       };
     });
 
-    // Build chart config for the legend
     const config: ChartConfig = {
       value: {
         label: 'Amount (PHP)',
@@ -86,7 +83,6 @@ export function CategoryPieChart({
     return { chartData: data, chartConfig: config };
   }, [categories, categoryType]);
 
-  // Format date range for description
   const dateRangeText =
     dateStart && dateEnd
       ? `${dateStart} – ${dateEnd}`
@@ -99,37 +95,48 @@ export function CategoryPieChart({
   const chartTitle =
     categoryType === 'expense' ? 'Expense' : 'Income';
 
-  if (chartData.length === 0) return null;
-
   return (
     <Card className="flex flex-col border-2 mt-0">
-      <CardHeader className="-mb-18 items-center">
-        <CardTitle>{chartTitle}</CardTitle>
-        <CardDescription>{dateRangeText}</CardDescription>
+      <CardHeader className="items-center pb-2">
+        <CardTitle className="text-lg md:text-xl">
+          {chartTitle}
+        </CardTitle>
+        <CardDescription className="text-sm md:text-md">
+          {dateRangeText}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 -mb-4">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[300px]"
-        >
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={80}
-              isAnimationActive={false}
-            />
-            <ChartLegend
-              content={
-                <ChartLegendContent nameKey="name" />
-              }
-              className="-mt-16 flex-wrap gap-2 *:basis-1/4 *:justify-center"
-            />
-          </PieChart>
-        </ChartContainer>
+      <CardContent className="flex-1 flex flex-col items-center gap-2">
+        {chartData.length > 0 ? (
+          <ChartContainer
+            config={chartConfig}
+            className="h-60 w-full -mt-2"
+          >
+            <PieChart className="flex flex-col md:flex-row">
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={80}
+                isAnimationActive={false}
+              />
+              <ChartLegend
+                content={
+                  <ChartLegendContent nameKey="name" />
+                }
+                className="flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+              />
+            </PieChart>
+          </ChartContainer>
+        ) : (
+          <div className="-my-10 flex flex-col items-center justify-center gap-4 py-12 text-muted-foreground">
+            <div className="rounded-full bg-muted p-4">
+              <Inbox size={80} strokeWidth={1.5} />
+            </div>
+            <p className="text-sm text-center">
+              No {categoryType} breakdown for this period
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
