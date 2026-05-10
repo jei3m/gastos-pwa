@@ -92,7 +92,7 @@ export function TypographyH5({
     <h5
       {...props}
       className={cn(
-        'scroll-m-20 text-lg md:text-xl font-regular tracking-tight',
+        'scroll-m-20 text-md md:text-xl font-regular tracking-tight',
         className
       )}
     >
