@@ -14,7 +14,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 // Icon Imports
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Inbox } from 'lucide-react';
 import { TypographyH4 } from '@/components/custom/typography';
 import { useAccount } from '@/context/account-context';
 import DateSelectCard from '@/components/custom/date-select-card';
@@ -217,32 +217,30 @@ export default function Categories() {
           <PulseLoader />
         ) : (
           <>
+            <CategoryPieChart
+              categories={categories}
+              categoryType={categoryType}
+              dateStart={dateStart}
+              dateEnd={dateEnd}
+            />
+            <TypographyH4>Categories</TypographyH4>
             {categories && categories.length > 0 ? (
-              <>
-                <CategoryPieChart
-                  categories={categories}
-                  categoryType={categoryType}
-                  dateStart={dateStart}
-                  dateEnd={dateEnd}
-                />
-                <TypographyH4>Categories</TypographyH4>
-                <div className="grid md:grid-cols-2 gap-2 md:gap-4">
-                  {categories.map((category: Category) => (
-                    <CategoryCard
-                      key={category.id}
-                      category={category}
-                      hideAmount={false}
-                      isEdit={false}
-                    />
-                  ))}
-                </div>
-              </>
+              <div className="grid md:grid-cols-2 gap-2 md:gap-4">
+                {categories.map((category: Category) => (
+                  <CategoryCard
+                    key={category.id}
+                    category={category}
+                    hideAmount={false}
+                    isEdit={false}
+                  />
+                ))}
+              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-10">
-                <TypographyH4 className="text-gray-400 font-semibold text-center">
-                  No Categories
-                </TypographyH4>
-                <p className="text-gray-500 text-sm text-center">
+              <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
+                <div>
+                  <Inbox size={80} strokeWidth={1.5} />
+                </div>
+                <p className="text-sm text-center">
                   No {categoryType} activity for this period
                 </p>
               </div>
