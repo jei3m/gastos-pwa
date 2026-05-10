@@ -130,7 +130,7 @@ export default function Accounts() {
           <CardContent>
             <div className="flex flex-row items-center -mb-0.5">
               <h3 className="text-gray-600 font-normal text-lg">
-                Total Net Worth
+                {isMobile ? 'Total Balance' : 'Net Worth'}
               </h3>
               <Button
                 variant="ghost"
@@ -280,7 +280,7 @@ export default function Accounts() {
           <PulseLoader />
         ) : (
           <>
-            <div className="grid md:grid-cols-2 gap-2 md:gap-4">
+            <div className="grid grid-cols-2 gap-2 md:gap-4">
               {filteredAccounts.map((account: Account) => (
                 <Card
                   className="border-2 h-full"
@@ -293,37 +293,72 @@ export default function Accounts() {
                   }
                 >
                   <CardHeader>
-                    <div className="flex flex-rows items-center justify-between">
-                      <div className="text-lg md:text-xl font-bold">
-                        {isAccountsLoading ? (
-                          <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
-                        ) : (
-                          account?.name
-                        )}
-                        {selectedAccountID ===
-                          account.id && (
-                          <Badge
-                            variant="outline"
-                            className="ml-2 text-green-600 border-green-200 bg-green-50"
-                          >
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Active
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="text-md text-gray-600 font-normal">
-                        {isAccountsLoading ? (
-                          <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
-                        ) : (
-                          account?.type
-                        )}
-                      </div>
+                    {/* Mobile layout */}
+                    <div className="block md:hidden">
+                      {isAccountsLoading ? (
+                        <div className="flex flex-row items-start justify-between">
+                          <div className="w-full">
+                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300 mb-1" />
+                            <Skeleton className="h-3 md:h-4 w-[100px] bg-gray-300" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-row items-start justify-between -mb-1">
+                          <div className="w-full">
+                            <div className="text-md md:text-xl font-bold">
+                              {account?.name}
+                            </div>
+                            <div className="text-sm md:text-md text-gray-600">
+                              {account?.type}
+                            </div>
+                          </div>
+                          {selectedAccountID ===
+                            account.id && (
+                            <span className="inline-flex items-center flex-shrink-0 mt-1">
+                              <span className="h-3 w-3 rounded-full bg-green-500 ring-4 ring-green-200" />
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Desktop layout */}
+                    <div className="hidden md:block">
+                      {isAccountsLoading ? (
+                        <div className="flex flex-row items-center justify-between">
+                          <div className="text-lg md:text-xl font-bold">
+                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
+                          </div>
+                          <div className="text-md text-gray-600 font-normal">
+                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-row items-center justify-between">
+                          <div className="text-lg md:text-xl font-bold">
+                            {account?.name}
+                            {selectedAccountID ===
+                              account.id && (
+                              <Badge
+                                variant="outline"
+                                className="ml-2 text-green-600 border-green-200 bg-green-50"
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Active
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-md text-gray-600 font-normal">
+                            {account?.type}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CardHeader>
-                  <Separator className="-mt-2" />
-                  <CardContent className="space-y-2">
+                  <Separator />
+                  <CardContent className="-mb-2 md:mb-0 space-y-2">
                     <div className="flex flex-col">
-                      <h3 className="text-gray-600 font-normal text-lg">
+                      <h3 className="text-gray-600 font-normal text-sm md:text-lg hidden md:block">
                         Balance
                       </h3>
                       {isAccountsLoading ? (
@@ -331,7 +366,7 @@ export default function Accounts() {
                           <Skeleton className="h-10 w-[50%] bg-gray-300" />
                         </h1>
                       ) : (
-                        <h1 className="text-2xl font-extrabold">
+                        <h1 className="text-lg md:text-2xl font-extrabold mt-2 md:mt-0">
                           PHP{' '}
                           {formatAmount(
                             account?.totalBalance
