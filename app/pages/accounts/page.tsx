@@ -303,9 +303,9 @@ export default function Accounts() {
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-row items-start justify-between -mb-1">
+                        <div className="flex flex-row items-start justify-between -mb-2">
                           <div className="w-full">
-                            <div className="text-md md:text-xl font-bold">
+                            <div className="-mb-1 text-md md:text-xl font-bold">
                               {account?.name}
                             </div>
                             <div className="text-sm md:text-md text-gray-600">
@@ -366,7 +366,7 @@ export default function Accounts() {
                           <Skeleton className="h-10 w-[50%] bg-gray-300" />
                         </h1>
                       ) : (
-                        <h1 className="text-lg md:text-2xl font-extrabold mt-2 md:mt-0">
+                        <h1 className="text-lg md:text-2xl font-extrabold mt-0">
                           PHP{' '}
                           {formatAmount(
                             account?.totalBalance
