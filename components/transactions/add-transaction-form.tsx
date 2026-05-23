@@ -75,6 +75,16 @@ export default function AddTransactionForm({
       (account: Account) => account.id !== selectedAccountID
     ) || [];
 
+  const selectedAccount = accounts?.find(
+    (a: Account) => a.id === selectedAccountID
+  );
+  const isSharedAccount =
+    selectedAccount && selectedAccount.memberCount > 1;
+
+  const availableTypes = isSharedAccount
+    ? transactionTypes.filter((t) => t !== 'Transfer')
+    : transactionTypes;
+
   const form = useForm<
     z.infer<typeof createTransactionSchema>
   >({
@@ -110,7 +120,7 @@ export default function AddTransactionForm({
       !!transactionType && !!selectedAccountID,
       null,
       null,
-      'list'
+      'options'
     )
   );
   const categories = useMemo(() => {
@@ -214,13 +224,12 @@ export default function AddTransactionForm({
                     className="-mt-1"
                   >
                     <TabsList className="bg-white border-2 w-full h-10">
-                      {transactionTypes.map(
-                        (type, index) => (
-                          <TabsTrigger
-                            value={type.toLowerCase()}
-                            key={index}
-                            disabled={isLoading}
-                            className={`text-md
+                      {availableTypes.map((type, index) => (
+                        <TabsTrigger
+                          value={type.toLowerCase()}
+                          key={index}
+                          disabled={isLoading}
+                          className={`text-md
                             ${
                               field.value.toLowerCase() ===
                                 'expense' ||
@@ -229,11 +238,10 @@ export default function AddTransactionForm({
                                 ? 'data-[state=active]:bg-red-400'
                                 : 'data-[state=active]:bg-green-300'
                             }`}
-                          >
-                            {type}
-                          </TabsTrigger>
-                        )
-                      )}
+                        >
+                          {type}
+                        </TabsTrigger>
+                      ))}
                     </TabsList>
                   </Tabs>
                 </FormControl>
