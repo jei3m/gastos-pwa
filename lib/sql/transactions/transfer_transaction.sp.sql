@@ -20,7 +20,7 @@ main: BEGIN
 
     DECLARE v_affected_rows INT;
     DECLARE v_total_balance, v_amount, v_transfer_fee, v_total_amount DECIMAL(12,2);
-    DECLARE v_income_categories_id, v_expense_categories_id, v_ref_accounts_id, v_ref_transfer_to_accounts_id CHAR(36); -- "Transfer" category for both income and expense
+    DECLARE v_income_categories_id, v_expense_categories_id, v_ref_accounts_id, v_ref_transfer_to_accounts_id, v_account_owner_id CHAR(36);
 	DECLARE v_transfer_to_account_name VARCHAR(10);
     DECLARE v_new_balance DECIMAL(12,2);
 
@@ -44,8 +44,23 @@ main: BEGIN
                 accounts
             WHERE
                 id = p_ref_accounts_id
-                AND ref_user_id = p_ref_user_id
+                AND (ref_user_id = p_ref_user_id
+                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
             LIMIT 1;
+
+			-- Validate if user is account owner
+			IF NOT EXISTS (
+				SELECT 1
+				FROM accounts
+				WHERE id = p_ref_accounts_id
+					AND ref_user_id = p_ref_user_id
+			) THEN
+				SET p_response = JSON_OBJECT(
+					'responseCode', 403,
+					'responseMessage', 'Transfers are only allowed for the account owner'
+				);
+				LEAVE main;
+			END IF;
 
             -- Validate total_balance
 			SET v_total_amount = p_amount + p_transfer_fee;
