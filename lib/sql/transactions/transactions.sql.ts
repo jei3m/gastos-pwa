@@ -80,8 +80,9 @@ export const getTransactions = () => {
         ref_accounts_id AS accountID
     FROM transactions_cte
     WHERE
-        ref_user_id = :userID
-        AND ref_accounts_id = :accountID
+        ref_accounts_id = :accountID
+        AND (:userID IN (SELECT user_id FROM v_account_members_table WHERE account_id = :accountID)
+             OR ref_user_id = :userID)
     GROUP BY
         date,
         ref_user_id,
@@ -128,27 +129,30 @@ export const getTransactionsCount = () => {
     FROM
         transactions_cte
     WHERE
-        ref_user_id = :userID
-        AND ref_accounts_id = :accountID;`;
+        ref_accounts_id = :accountID
+        AND (:userID IN (SELECT user_id FROM v_account_members_table WHERE account_id = :accountID)
+             OR ref_user_id = :userID);`;
 };
 
 export const getTransactionByID = () => {
   return `SELECT
-                id,
-                note,
-                amount,
-                transferFee,
-                isTransfer,
-                type,
-                time,
-                date,
-                refCategoriesID,
-                refTransferToAccountsID
+                v.id,
+                v.note,
+                v.amount,
+                v.transferFee,
+                v.isTransfer,
+                v.type,
+                v.time,
+                v.date,
+                v.refCategoriesID,
+                v.refTransferToAccountsID
             FROM
-                v_transaction_details
+                v_transaction_details v
+            JOIN v_transactions_table t ON v.id = t.id
             WHERE
-                id = :id
-                AND refUserID = :userID
+                v.id = :id
+                AND (v.refUserID = :userID
+                     OR t.ref_accounts_id IN (SELECT account_id FROM v_account_members_table WHERE user_id = :userID))
             LIMIT 1;`;
 };
 
@@ -169,8 +173,9 @@ export const getTransactionsByCategory = () => {
             FROM v_transactions_table t
             LEFT JOIN v_categories_table c on t.ref_categories_id = c.id
             WHERE t.ref_categories_id = :categoryID
-                AND t.ref_user_id = :userID
                 AND t.ref_accounts_id = :accountID
+                AND (:userID IN (SELECT user_id FROM v_account_members_table WHERE account_id = :accountID)
+                     OR t.ref_user_id = :userID)
                 AND (:dateStart IS NULL OR t.date >= :dateStart)
                 AND (:dateEnd IS NULL OR t.date <= :dateEnd)
             GROUP BY
@@ -229,14 +234,18 @@ export const getTransactionsByCategory = () => {
 
 export const getTransactionsByCategoryCount = () => {
   return `
-        SELECT DISTINCT
+        SELECT
             COUNT (date) AS count
-        FROM v_transactions_table
-        WHERE ref_user_id = :userID
-            AND ref_accounts_id = :accountID
-            AND ref_categories_id = :categoryID
-            AND (:dateStart IS NULL OR date >= :dateStart)
-            AND (:dateEnd IS NULL OR date <= :dateEnd);
+        FROM (
+            SELECT DISTINCT date
+            FROM v_transactions_table t
+            WHERE t.ref_accounts_id = :accountID
+                AND t.ref_categories_id = :categoryID
+                AND (:userID IN (SELECT user_id FROM v_account_members_table WHERE account_id = :accountID)
+                     OR t.ref_user_id = :userID)
+                AND (:dateStart IS NULL OR t.date >= :dateStart)
+                AND (:dateEnd IS NULL OR t.date <= :dateEnd)
+        ) AS date_groups;
     `;
 };
 
