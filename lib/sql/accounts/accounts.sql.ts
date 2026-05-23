@@ -14,36 +14,65 @@ export const createAccounts = () => {
 };
 
 export const getAccounts = () => {
-  return `SELECT 
-                id,
-                name,
-                type,
-                description,
-                totalBalance,
-                isDropdown
+  return `
+            WITH v_account_members_table_cte AS (
+                SELECT
+                    account_id,
+                    COUNT(account_id) AS memberCount
+                FROM v_account_members_table
+                GROUP BY account_id
+            )
+            SELECT 
+                a.id,
+                a.name,
+                a.type,
+                a.description,
+                a.totalBalance,
+                a.isDropdown,
+                COALESCE(m.memberCount, 1) AS memberCount
             FROM
-                v_accounts
+                v_accounts a
+            LEFT JOIN v_account_members_table_cte m ON a.id = m.account_id
             WHERE
-                ref_user_id = :userID
-                AND (:isDropdown IS NULL OR isDropdown = :isDropdown) 
-            ORDER BY name ASC;`;
+                a.id IN (
+                    SELECT account_id
+                    FROM v_account_members_table
+                    WHERE user_id = :userID
+                )
+                AND (:isDropdown IS NULL OR a.isDropdown = :isDropdown) 
+            ORDER BY a.name ASC;
+        `;
 };
 
 export const getAccountByID = () => {
-  return `SELECT 
-                id,
-                id,
-                name,
-                type,
-                description,
-                totalBalance,
-                isDropdown
+  return `
+            WITH v_account_members_table_cte AS (
+                SELECT
+                    account_id,
+                    COUNT(account_id) AS memberCount
+                FROM v_account_members_table
+                GROUP BY account_id
+            )
+            SELECT 
+                a.id,
+                a.name,
+                a.type,
+                a.description,
+                a.totalBalance,
+                a.isDropdown,
+                COALESCE(m.memberCount, 1) AS memberCount
             FROM
-                v_accounts
+                v_accounts a
+            LEFT JOIN v_account_members_table_cte m ON a.id = m.account_id
             WHERE
-                ref_user_id = :userID
-                AND id = :id
-            LIMIT 1;`;
+                a.id = :id
+                AND a.id IN (
+                    SELECT account_id
+                    FROM v_account_members_table
+                    WHERE user_id = :userID
+                )
+            LIMIT 1;
+        `;
 };
 
 export const updateAccount = () => {
