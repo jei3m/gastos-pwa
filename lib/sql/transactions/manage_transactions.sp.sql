@@ -46,7 +46,8 @@ main: BEGIN
                 accounts
             WHERE
                 id = p_ref_accounts_id
-                AND ref_user_id = p_ref_user_id
+                AND (ref_user_id = p_ref_user_id
+                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
             LIMIT 1;
             -- Validate total_balance
             IF v_total_balance + (p_amount * CASE WHEN p_type = 'income' THEN 1 ELSE -1 END) < 0 THEN
@@ -91,7 +92,8 @@ main: BEGIN
                     total_balance = v_total_balance + (p_amount * CASE WHEN p_type = 'income' THEN 1 ELSE -1 END)
                 WHERE
                     id = p_ref_accounts_id
-                    AND ref_user_id = p_ref_user_id
+                    AND (ref_user_id = p_ref_user_id
+                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
                 LIMIT 1;
 
 				SET p_response = JSON_OBJECT(
@@ -141,7 +143,8 @@ main: BEGIN
                 accounts
             WHERE
                 id = v_ref_accounts_id
-                AND ref_user_id = p_ref_user_id
+                AND (ref_user_id = p_ref_user_id
+                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
             LIMIT 1;
 
             -- Calculate v_new_balance
@@ -184,7 +187,8 @@ main: BEGIN
                     total_balance = v_new_balance
                 WHERE
                     id = v_ref_accounts_id
-                    AND ref_user_id = p_ref_user_id
+                    AND (ref_user_id = p_ref_user_id
+                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
                 LIMIT 1;
 
                 SET p_response = JSON_OBJECT(
@@ -234,7 +238,8 @@ main: BEGIN
                 accounts
             WHERE
                 id = v_ref_accounts_id
-                AND ref_user_id = p_ref_user_id
+                AND (ref_user_id = p_ref_user_id
+                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
             LIMIT 1;
 
             -- Calculate new balance before deleting
@@ -267,7 +272,8 @@ main: BEGIN
                     total_balance = v_new_balance
                 WHERE
                     id = v_ref_accounts_id
-                    AND ref_user_id = p_ref_user_id
+                    AND (ref_user_id = p_ref_user_id
+                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
                 LIMIT 1;
 
                 SET p_response = JSON_OBJECT(
