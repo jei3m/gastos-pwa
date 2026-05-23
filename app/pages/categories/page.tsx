@@ -1,10 +1,5 @@
 'use client';
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { categoryTypes } from '@/lib/data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Category } from '@/types/categories.types';
@@ -14,7 +9,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 // Icon Imports
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Inbox } from 'lucide-react';
 import { TypographyH4 } from '@/components/custom/typography';
 import { useAccount } from '@/context/account-context';
 import DateSelectCard from '@/components/custom/date-select-card';
@@ -30,12 +25,10 @@ import {
   useSearchParams,
   useRouter,
 } from 'next/navigation';
-import { useScrollState } from '@/hooks/use-scroll-state';
 import { cn } from '@/lib/utils';
+import { CategoryPieChart } from '@/components/categories/categories-pie-chart-card';
 
 export default function Categories() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const isScrolled = useScrollState(scrollRef);
   const [categoryType, setCategoryType] =
     useState('expense');
   const { selectedAccountID } = useAccount();
@@ -102,7 +95,6 @@ export default function Categories() {
 
   return (
     <main
-      ref={scrollRef}
       className={cn(
         'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
         isMobile ? 'h-screen pb-29' : 'pb-4'
@@ -110,7 +102,6 @@ export default function Categories() {
     >
       {/* Date Card Section */}
       <DateSelectCard
-        isScrolled={isScrolled}
         onDateRangeChange={handleDateRangeChange}
         content={
           <>
@@ -182,8 +173,7 @@ export default function Categories() {
       {/* Categories Section */}
       <section
         className={cn(
-          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
-          isScrolled && isMobile && 'mt-[80px] mb-[30dvh]'
+          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2'
         )}
       >
         <Tabs
@@ -192,7 +182,7 @@ export default function Categories() {
           onValueChange={setCategoryType}
         >
           <div className="flex flex-row justify-between items-center w-full">
-            <TypographyH4>Categories</TypographyH4>
+            <TypographyH4>Breakdown</TypographyH4>
             <TabsList
               defaultValue="expense"
               className="border-black border-2 p-1"
@@ -219,6 +209,13 @@ export default function Categories() {
           <PulseLoader />
         ) : (
           <>
+            <CategoryPieChart
+              categories={categories}
+              categoryType={categoryType}
+              dateStart={dateStart}
+              dateEnd={dateEnd}
+            />
+            <TypographyH4>Categories</TypographyH4>
             {categories && categories.length > 0 ? (
               <div className="grid md:grid-cols-2 gap-2 md:gap-4">
                 {categories.map((category: Category) => (
@@ -231,11 +228,11 @@ export default function Categories() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-10">
-                <TypographyH4 className="text-gray-400 font-semibold text-center">
-                  No Categories
-                </TypographyH4>
-                <p className="text-gray-500 text-sm text-center">
+              <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
+                <div>
+                  <Inbox size={80} strokeWidth={1.5} />
+                </div>
+                <p className="text-sm text-center">
                   No {categoryType} activity for this period
                 </p>
               </div>
