@@ -82,6 +82,11 @@ export default function AccountSelector() {
                       value={account.id}
                     >
                       {account.name}
+                      {account.memberCount > 1 && (
+                        <span className="text-xs text-muted-foreground">
+                          (Shared)
+                        </span>
+                      )}
                     </SelectItem>
                   ))}
                 </>
