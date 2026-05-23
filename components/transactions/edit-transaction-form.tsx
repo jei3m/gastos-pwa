@@ -88,6 +88,16 @@ export default function EditTransactionForm({
       (account: Account) => account.id !== selectedAccountID
     ) || [];
 
+  const selectedAccount = accounts?.find(
+    (a: Account) => a.id === selectedAccountID
+  );
+  const isSharedAccount =
+    selectedAccount && selectedAccount.memberCount > 1;
+
+  const availableTypes = isSharedAccount
+    ? transactionTypes.filter((t) => t !== 'Transfer')
+    : transactionTypes;
+
   const form = useForm<
     z.infer<typeof editTransactionSchema>
   >({
@@ -279,13 +289,12 @@ export default function EditTransactionForm({
                     className="-mt-1"
                   >
                     <TabsList className="bg-white border-2 w-full h-10">
-                      {transactionTypes.map(
-                        (category, index) => (
-                          <TabsTrigger
-                            value={category.toLowerCase()}
-                            key={index}
-                            disabled={true}
-                            className={`text-md
+                      {availableTypes.map((type, index) => (
+                        <TabsTrigger
+                          value={type.toLowerCase()}
+                          key={index}
+                          disabled={isLoading}
+                          className={`text-md
                             ${
                               field.value.toLowerCase() ===
                                 'expense' ||
@@ -294,11 +303,10 @@ export default function EditTransactionForm({
                                 ? 'data-[state=active]:bg-red-400'
                                 : 'data-[state=active]:bg-green-300'
                             }`}
-                          >
-                            {category}
-                          </TabsTrigger>
-                        )
-                      )}
+                        >
+                          {type}
+                        </TabsTrigger>
+                      ))}
                     </TabsList>
                   </Tabs>
                 </FormControl>
