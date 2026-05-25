@@ -254,7 +254,7 @@ export default function EditTransactionForm({
   const { data: session } = authClient.useSession();
 
   const isCreator = useMemo(() => {
-    return transaction?.userID === session?.user.id;
+    return transaction?.refUserID === session?.user.id;
   }, [transaction, session]);
 
   const isDisabled = useMemo(() => {
