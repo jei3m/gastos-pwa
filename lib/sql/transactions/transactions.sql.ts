@@ -76,7 +76,6 @@ export const getTransactions = () => {
                 'time', time
             )
         ) AS details,
-        ref_user_id AS userID,
         ref_accounts_id AS accountID
     FROM transactions_cte
     WHERE
@@ -85,7 +84,6 @@ export const getTransactions = () => {
              OR ref_user_id = :userID)
     GROUP BY
         date,
-        ref_user_id,
         ref_accounts_id
     ORDER BY date DESC
     LIMIT :limit
@@ -125,7 +123,7 @@ export const getTransactionsCount = () => {
             time DESC
     )
     SELECT
-        COUNT(date) AS count
+        COUNT(DISTINCT date) AS count
     FROM
         transactions_cte
     WHERE
@@ -145,7 +143,8 @@ export const getTransactionByID = () => {
                 v.time,
                 v.date,
                 v.refCategoriesID,
-                v.refTransferToAccountsID
+                v.refTransferToAccountsID,
+                v.refUserID AS refUserID
             FROM
                 v_transaction_details v
             JOIN v_transactions_table t ON v.id = t.id
@@ -219,12 +218,10 @@ export const getTransactionsByCategory = () => {
                     'time', time
                 )
             ) AS details,
-            ref_user_id AS userID,
             ref_accounts_id AS accountID
         FROM transactions_cte
         GROUP BY
             date,
-            ref_user_id,
             ref_accounts_id
         ORDER BY date DESC
         LIMIT :limit
