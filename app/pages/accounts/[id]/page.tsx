@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +40,6 @@ import {
 } from '@tanstack/react-query';
 import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
-import { membersQueryOptions } from '@/lib/tq-options/members.tq.options';
 import { useAccount } from '@/context/account-context';
 import { Checkbox } from '@/components/ui/checkbox';
 import AccountSharingSection from '@/components/accounts/account-sharing-section';
@@ -59,10 +58,7 @@ export default function EditAccount() {
   const { data: account, isPending: isAccountPending } =
     useQuery(accountByIDQueryOptions(id));
 
-  const { data: membersData } = useQuery(
-    membersQueryOptions(id)
-  );
-  const isOwner = membersData?.isOwner ?? false;
+  const isOwner = account?.isOwner ?? false;
 
   const form = useForm<z.infer<typeof createAccountSchema>>(
     {
@@ -75,13 +71,77 @@ export default function EditAccount() {
     }
   );
 
+  const [queuedEmails, setQueuedEmails] = useState<
+    string[]
+  >([]);
+  const [
+    queuedCancelledInvites,
+    setQueuedCancelledInvites,
+  ] = useState<string[]>([]);
+  const [queuedRemovedMembers, setQueuedRemovedMembers] =
+    useState<string[]>([]);
+
+  const handleAddEmail = (email: string) => {
+    if (email && !queuedEmails.includes(email)) {
+      setQueuedEmails([...queuedEmails, email]);
+    }
+  };
+
+  const handleRemoveEmail = (email: string) => {
+    setQueuedEmails(
+      queuedEmails.filter((e) => e !== email)
+    );
+  };
+
+  const handleQueueCancelInvitation = (
+    invitationId: string
+  ) => {
+    if (!queuedCancelledInvites.includes(invitationId)) {
+      setQueuedCancelledInvites([
+        ...queuedCancelledInvites,
+        invitationId,
+      ]);
+    }
+  };
+
+  const handleUnqueueCancelInvitation = (
+    invitationId: string
+  ) => {
+    setQueuedCancelledInvites(
+      queuedCancelledInvites.filter(
+        (id) => id !== invitationId
+      )
+    );
+  };
+
+  const handleQueueRemoveMember = (userId: string) => {
+    if (!queuedRemovedMembers.includes(userId)) {
+      setQueuedRemovedMembers([
+        ...queuedRemovedMembers,
+        userId,
+      ]);
+    }
+  };
+
+  const handleUnqueueRemoveMember = (userId: string) => {
+    setQueuedRemovedMembers(
+      queuedRemovedMembers.filter((id) => id !== userId)
+    );
+  };
+
   const {
     mutate: editAccountMutation,
     isPending: isEditPending,
   } = useMutation({
     mutationFn: (
       values: z.infer<typeof updateAccountSchema>
-    ) => editAccount(id, values),
+    ) =>
+      editAccount(id, {
+        ...values,
+        emails: queuedEmails,
+        cancelInvitationIds: queuedCancelledInvites,
+        removeMemberIds: queuedRemovedMembers,
+      }),
     onMutate: (values) => {
       if (!values.isDropdown && id === selectedAccountID) {
         setSelectedAccountID('');
@@ -136,6 +196,12 @@ export default function EditAccount() {
         isDropdown: account.isDropdown || 0,
       });
     }, 50);
+
+    return () => {
+      setQueuedEmails([]);
+      setQueuedCancelledInvites([]);
+      setQueuedRemovedMembers([]);
+    };
   }, [account, isAccountPending, form]);
 
   const isLoading = useMemo(() => {
@@ -282,6 +348,31 @@ export default function EditAccount() {
                 </FormItem>
               )}
             />
+            {/* Sharing Section */}
+            {!isAccountPending && account && (
+              <AccountSharingSection
+                accountID={id}
+                queuedEmails={queuedEmails}
+                onAddEmail={handleAddEmail}
+                onRemoveEmail={handleRemoveEmail}
+                queuedCancelledInvites={
+                  queuedCancelledInvites
+                }
+                onQueueCancelInvitation={
+                  handleQueueCancelInvitation
+                }
+                onUnqueueCancelInvitation={
+                  handleUnqueueCancelInvitation
+                }
+                queuedRemovedMembers={queuedRemovedMembers}
+                onQueueRemoveMember={
+                  handleQueueRemoveMember
+                }
+                onUnqueueRemoveMember={
+                  handleUnqueueRemoveMember
+                }
+              />
+            )}
             {isOwner && (
               <div className="flex flex-row justify-between">
                 <Button
@@ -307,10 +398,6 @@ export default function EditAccount() {
           </form>
         </Form>
       </section>
-      {/* Sharing Section */}
-      {!isAccountPending && account && (
-        <AccountSharingSection accountID={id} />
-      )}
     </main>
   );
 }
