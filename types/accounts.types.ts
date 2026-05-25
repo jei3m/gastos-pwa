@@ -33,6 +33,7 @@ export interface CreateAccount {
   type: string;
   description: string;
   isDropdown: number;
+  emails?: string[];
 }
 
 export interface EditAccount {
@@ -40,4 +41,7 @@ export interface EditAccount {
   type: string;
   description: string;
   isDropdown: number;
+  emails?: string[];
+  cancelInvitationIds?: string[];
+  removeMemberIds?: string[];
 }
