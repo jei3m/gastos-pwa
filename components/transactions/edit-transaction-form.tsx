@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/popover';
 import {
   ChevronDownIcon,
+  ChevronLeft,
   Loader2,
   Trash2,
 } from 'lucide-react';
@@ -63,6 +64,7 @@ import { transactionByIDQueryOptions } from '@/lib/tq-options/transactions.tq.op
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 import { Account } from '@/types/accounts.types';
 import { cn } from '@/lib/utils';
+import { authClient } from '@/lib/auth/auth-client';
 
 interface EditTransactionFormProps {
   isModal?: boolean;
@@ -249,6 +251,16 @@ export default function EditTransactionForm({
     isDeleteTransactionPending,
   ]);
 
+  const { data: session } = authClient.useSession();
+
+  const isCreator = useMemo(() => {
+    return transaction?.userID === session?.user.id;
+  }, [transaction, session]);
+
+  const isDisabled = useMemo(() => {
+    return isLoading || !isCreator;
+  }, [isLoading, isCreator]);
+
   return (
     <main
       className={cn(
@@ -257,19 +269,36 @@ export default function EditTransactionForm({
       )}
     >
       {!isModal && (
-        <div className="flex justify-between items-center">
-          <TypographyH3>Edit Transaction</TypographyH3>
-          <CustomAlertDialog
-            isDisabled={isLoading}
-            trigger={
-              <Trash2 size={24} className="text-red-500" />
-            }
-            title="Are you sure?"
-            description="This action cannot be undone. It will be permanently deleted."
-            confirmMessage="Yes, I'm sure"
-            onConfirm={() => deleteTransactionMutation(id)}
-          />
-        </div>
+        <>
+          {isCreator ? (
+            <div className="flex justify-between items-center">
+              <TypographyH3>Edit Transaction</TypographyH3>
+              <CustomAlertDialog
+                isDisabled={isDisabled}
+                trigger={
+                  <Trash2
+                    size={24}
+                    className="text-red-500"
+                  />
+                }
+                title="Are you sure?"
+                description="This action cannot be undone. It will be permanently deleted."
+                confirmMessage="Yes, I'm sure"
+                onConfirm={() =>
+                  deleteTransactionMutation(id)
+                }
+              />
+            </div>
+          ) : (
+            <div
+              onClick={() => router.back()}
+              className="flex items-center cursor-pointer"
+            >
+              <ChevronLeft className="mr-2" size={22} />
+              <TypographyH3>Edit Transaction</TypographyH3>
+            </div>
+          )}
+        </>
       )}
       <Form {...form}>
         <form
@@ -279,7 +308,7 @@ export default function EditTransactionForm({
           <FormField
             control={form.control}
             name="type"
-            disabled={isLoading}
+            disabled={isDisabled}
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -293,7 +322,7 @@ export default function EditTransactionForm({
                         <TabsTrigger
                           value={type.toLowerCase()}
                           key={index}
-                          disabled={isLoading}
+                          disabled={isDisabled}
                           className={`text-md
                             ${
                               field.value.toLowerCase() ===
@@ -317,7 +346,7 @@ export default function EditTransactionForm({
           <FormField
             control={form.control}
             name="amount"
-            disabled={isLoading}
+            disabled={isDisabled}
             render={({ field }) => (
               <FormItem className="-space-y-1">
                 <FormLabel className="text-md font-medium">
@@ -344,7 +373,7 @@ export default function EditTransactionForm({
             <FormField
               control={form.control}
               name="refCategoriesID"
-              disabled={isLoading}
+              disabled={isDisabled}
               render={({ field }) => (
                 <FormItem className="-space-y-1">
                   <FormLabel className="text-md font-medium">
@@ -354,7 +383,7 @@ export default function EditTransactionForm({
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
-                      disabled={isLoading}
+                      disabled={isDisabled}
                     >
                       <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
                         <SelectValue placeholder="Select Category..." />
@@ -395,7 +424,7 @@ export default function EditTransactionForm({
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
-                        disabled={isLoading}
+                        disabled={isDisabled}
                       >
                         <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg">
                           <SelectValue placeholder="Select Account..." />
@@ -428,7 +457,7 @@ export default function EditTransactionForm({
               <FormField
                 control={form.control}
                 name="transferFee"
-                disabled={isLoading}
+                disabled={isDisabled}
                 render={({ field }) => (
                   <FormItem className="flex-2">
                     <FormLabel className="-mb-1 text-md font-medium">
@@ -454,7 +483,7 @@ export default function EditTransactionForm({
           <FormField
             control={form.control}
             name="note"
-            disabled={isLoading}
+            disabled={isDisabled}
             render={({ field }) => (
               <FormItem className="-space-y-1">
                 <FormLabel className="text-md font-medium">
@@ -490,7 +519,7 @@ export default function EditTransactionForm({
                     >
                       <PopoverTrigger asChild>
                         <Button
-                          disabled={isLoading}
+                          disabled={isDisabled}
                           variant="outline"
                           id="date"
                           className="justify-between font-normal border-2 bg-white text-[16px] h-9 md:h-10"
@@ -559,7 +588,7 @@ export default function EditTransactionForm({
                           field.onChange(timeString);
                         }
                       }}
-                      disabled={isLoading}
+                      disabled={isDisabled}
                     />
                   </FormControl>
                   <FormMessage />
@@ -567,30 +596,32 @@ export default function EditTransactionForm({
               )}
             />
           </div>
-          <div className="flex flex-row justify-between">
-            <Button
-              onClick={() => {
-                isModal && onClose
-                  ? onClose()
-                  : router.back();
-              }}
-              className="bg-red-500 border-2 hover:none"
-              disabled={isLoading}
-              type="button"
-            >
-              Cancel
-            </Button>
-            <Button
-              className="border-2 space-x-2"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading && (
-                <Loader2 className="animate-spin" />
-              )}
-              Submit
-            </Button>
-          </div>
+          {isCreator && (
+            <div className="flex flex-row justify-between">
+              <Button
+                onClick={() => {
+                  isModal && onClose
+                    ? onClose()
+                    : router.back();
+                }}
+                className="bg-red-500 border-2 hover:none"
+                disabled={isDisabled}
+                type="button"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="border-2 space-x-2"
+                type="submit"
+                disabled={isDisabled}
+              >
+                {isLoading && (
+                  <Loader2 className="animate-spin" />
+                )}
+                Submit
+              </Button>
+            </div>
+          )}
         </form>
       </Form>
     </main>
