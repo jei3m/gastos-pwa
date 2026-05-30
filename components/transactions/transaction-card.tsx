@@ -1,4 +1,5 @@
 'use client';
+import { createElement } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -17,15 +18,23 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, SquareDashed } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getIconById } from '@/lib/icons';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/avatar';
 
 interface TransactionCardProps {
   transaction: Transaction;
+  isShared?: boolean;
 }
 
 function TransactionCard({
   transaction,
+  isShared = false,
 }: TransactionCardProps) {
   const pathname = usePathname();
   const isCategoryRoute = pathname.match(
@@ -106,14 +115,56 @@ function TransactionCard({
               key={index}
               href={`${hrefPrefix}/${detail.id}`}
             >
-              <div className="space-y-3 md:space-y-4 flex flex-row justify-between text-sm md:text-md">
-                <div className="flex flex-col">
-                  <span>{detail.category}</span>
-                  <span className="text-gray-500">
-                    {detail.note}
-                  </span>
+              <div className="space-y-3 md:space-y-4 flex flex-row justify-between text-sm md:text-md py-1">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative shrink-0">
+                    <div
+                      className={cn(
+                        'p-2 rounded-lg',
+                        detail.type === 'income'
+                          ? 'bg-primary/15'
+                          : 'bg-red-500/15'
+                      )}
+                    >
+                      {createElement(
+                        getIconById(detail.icon ?? '')
+                          ?.icon || SquareDashed,
+                        {
+                          size: 26,
+                          className: cn(
+                            detail.type === 'income'
+                              ? 'text-primary'
+                              : 'text-red-500'
+                          ),
+                        }
+                      )}
+                    </div>
+                    {isShared && detail.userName && (
+                      <div className="absolute -bottom-1.5 -right-1.5">
+                        <Avatar className="size-6 border-2 border-background">
+                          <AvatarImage
+                            src={detail.userImage ?? ''}
+                            alt={detail.userName}
+                          />
+                          <AvatarFallback className="text-[8px]">
+                            {detail.userName
+                              .charAt(0)
+                              .toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate">
+                      {detail.category}
+                    </span>
+                    <span className="text-gray-500 truncate">
+                      {detail.note}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col text-sm md:text-md">
+                <div className="flex flex-col text-sm md:text-md shrink-0">
                   <span
                     className={`${detail.type === 'income' ? 'text-primary' : 'text-red-500'}`}
                   >
