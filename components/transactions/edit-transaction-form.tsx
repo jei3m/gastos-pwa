@@ -98,10 +98,6 @@ export default function EditTransactionForm({
   const isSharedAccount =
     selectedAccount && selectedAccount.memberCount > 1;
 
-  const availableTypes = isSharedAccount
-    ? transactionTypes.filter((t) => t !== 'Transfer')
-    : transactionTypes;
-
   const form = useForm<
     z.infer<typeof editTransactionSchema>
   >({
@@ -342,24 +338,26 @@ export default function EditTransactionForm({
                           'bg-gray-50 border-dashed border-gray-300'
                       )}
                     >
-                      {availableTypes.map((type, index) => (
-                        <TabsTrigger
-                          value={type.toLowerCase()}
-                          key={index}
-                          disabled={isDisabled}
-                          className={cn(
-                            'text-md',
-                            field.value.toLowerCase() ===
-                              'expense' ||
+                      {transactionTypes.map(
+                        (type, index) => (
+                          <TabsTrigger
+                            value={type.toLowerCase()}
+                            key={index}
+                            disabled={isDisabled}
+                            className={cn(
+                              'text-md',
                               field.value.toLowerCase() ===
-                                'transfer'
-                              ? 'data-[state=active]:bg-red-400'
-                              : 'data-[state=active]:bg-green-300'
-                          )}
-                        >
-                          {type}
-                        </TabsTrigger>
-                      ))}
+                                'expense' ||
+                                field.value.toLowerCase() ===
+                                  'transfer'
+                                ? 'data-[state=active]:bg-red-400'
+                                : 'data-[state=active]:bg-green-300'
+                            )}
+                          >
+                            {type}
+                          </TabsTrigger>
+                        )
+                      )}
                     </TabsList>
                   </Tabs>
                 </FormControl>
@@ -450,40 +448,50 @@ export default function EditTransactionForm({
                       Transfer to
                     </FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        disabled={isDisabled}
-                      >
-                        <SelectTrigger
-                          className={cn(
-                            'w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg',
-                            isReadonly &&
-                              'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100 disabled:cursor-default'
-                          )}
+                      {isReadonly &&
+                      !filteredAccounts.find(
+                        (a) => a.id === field.value
+                      ) ? (
+                        <p className="flex items-center h-9 px-3 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 text-base">
+                          {transaction?.transferToAccountName ||
+                            'N/A'}
+                        </p>
+                      ) : (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={isDisabled}
                         >
-                          <SelectValue placeholder="Select Account..." />
-                        </SelectTrigger>
-                        <SelectContent className="border-2">
-                          {accounts && (
-                            <>
-                              {filteredAccounts.map(
-                                (
-                                  account: Account,
-                                  index: Key
-                                ) => (
-                                  <SelectItem
-                                    key={index}
-                                    value={account.id}
-                                  >
-                                    {account.name}
-                                  </SelectItem>
-                                )
-                              )}
-                            </>
-                          )}
-                        </SelectContent>
-                      </Select>
+                          <SelectTrigger
+                            className={cn(
+                              'w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg',
+                              isReadonly &&
+                                'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100 disabled:cursor-default'
+                            )}
+                          >
+                            <SelectValue placeholder="Select Account..." />
+                          </SelectTrigger>
+                          <SelectContent className="border-2">
+                            {accounts && (
+                              <>
+                                {filteredAccounts.map(
+                                  (
+                                    account: Account,
+                                    index: Key
+                                  ) => (
+                                    <SelectItem
+                                      key={index}
+                                      value={account.id}
+                                    >
+                                      {account.name}
+                                    </SelectItem>
+                                  )
+                                )}
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
