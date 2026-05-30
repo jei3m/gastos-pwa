@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +31,7 @@ import {
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Loader2, Trash2 } from 'lucide-react';
+import { ChevronLeft, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   useMutation,
@@ -42,17 +42,23 @@ import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 import { useAccount } from '@/context/account-context';
 import { Checkbox } from '@/components/ui/checkbox';
+import AccountSharingSection from '@/components/accounts/account-sharing-section';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function EditAccount() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const { selectedAccountID, setSelectedAccountID } =
     useAccount();
 
   const { data: account, isPending: isAccountPending } =
     useQuery(accountByIDQueryOptions(id));
+
+  const isOwner = account?.isOwner ?? false;
 
   const form = useForm<z.infer<typeof createAccountSchema>>(
     {
@@ -65,13 +71,77 @@ export default function EditAccount() {
     }
   );
 
+  const [queuedEmails, setQueuedEmails] = useState<
+    string[]
+  >([]);
+  const [
+    queuedCancelledInvites,
+    setQueuedCancelledInvites,
+  ] = useState<string[]>([]);
+  const [queuedRemovedMembers, setQueuedRemovedMembers] =
+    useState<string[]>([]);
+
+  const handleAddEmail = (email: string) => {
+    if (email && !queuedEmails.includes(email)) {
+      setQueuedEmails([...queuedEmails, email]);
+    }
+  };
+
+  const handleRemoveEmail = (email: string) => {
+    setQueuedEmails(
+      queuedEmails.filter((e) => e !== email)
+    );
+  };
+
+  const handleQueueCancelInvitation = (
+    invitationId: string
+  ) => {
+    if (!queuedCancelledInvites.includes(invitationId)) {
+      setQueuedCancelledInvites([
+        ...queuedCancelledInvites,
+        invitationId,
+      ]);
+    }
+  };
+
+  const handleUnqueueCancelInvitation = (
+    invitationId: string
+  ) => {
+    setQueuedCancelledInvites(
+      queuedCancelledInvites.filter(
+        (id) => id !== invitationId
+      )
+    );
+  };
+
+  const handleQueueRemoveMember = (userId: string) => {
+    if (!queuedRemovedMembers.includes(userId)) {
+      setQueuedRemovedMembers([
+        ...queuedRemovedMembers,
+        userId,
+      ]);
+    }
+  };
+
+  const handleUnqueueRemoveMember = (userId: string) => {
+    setQueuedRemovedMembers(
+      queuedRemovedMembers.filter((id) => id !== userId)
+    );
+  };
+
   const {
     mutate: editAccountMutation,
     isPending: isEditPending,
   } = useMutation({
     mutationFn: (
       values: z.infer<typeof updateAccountSchema>
-    ) => editAccount(id, values),
+    ) =>
+      editAccount(id, {
+        ...values,
+        emails: queuedEmails,
+        cancelInvitationIds: queuedCancelledInvites,
+        removeMemberIds: queuedRemovedMembers,
+      }),
     onMutate: (values) => {
       if (!values.isDropdown && id === selectedAccountID) {
         setSelectedAccountID('');
@@ -126,6 +196,12 @@ export default function EditAccount() {
         isDropdown: account.isDropdown || 0,
       });
     }, 50);
+
+    return () => {
+      setQueuedEmails([]);
+      setQueuedCancelledInvites([]);
+      setQueuedRemovedMembers([]);
+    };
   }, [account, isAccountPending, form]);
 
   const isLoading = useMemo(() => {
@@ -135,143 +211,193 @@ export default function EditAccount() {
   }, [isEditPending, isDeletePending, isAccountPending]);
 
   return (
-    <main className="flex flex-col m-auto space-y-4 p-3">
-      <div className="flex flex-row space-x-2 items-center">
-        <TypographyH3>Edit Account</TypographyH3>
-        <CustomAlertDialog
-          isDisabled={isLoading}
-          trigger={
-            <Trash2 size={24} className="text-red-500" />
-          }
-          title="Are you sure?"
-          description={
+    <main
+      className={cn(
+        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        isMobile ? 'h-screen pb-31' : 'pb-4'
+      )}
+    >
+      <section className="p-3 space-y-4">
+        <div className="flex flex-row space-x-2 items-center">
+          {isOwner ? (
             <>
-              This will permanently delete this account, and
-              all transactions linked to this account.
-              <br /> <br />
-              <span className="font-semibold text-md">
-                This action cannot be undone.
-              </span>
+              <TypographyH3>Edit Account</TypographyH3>
+              <CustomAlertDialog
+                isDisabled={isLoading}
+                trigger={
+                  <Trash2
+                    size={24}
+                    className="text-red-500"
+                  />
+                }
+                title="Are you sure?"
+                description={
+                  <>
+                    This will permanently delete this
+                    account, and all transactions linked to
+                    this account.
+                    <br /> <br />
+                    <span className="font-semibold text-md">
+                      This action cannot be undone.
+                    </span>
+                  </>
+                }
+                confirmMessage="Yes, I'm sure"
+                onConfirm={() => deleteAccountMutation(id)}
+              />
             </>
-          }
-          confirmMessage="Yes, I'm sure"
-          onConfirm={() => deleteAccountMutation(id)}
-        />
-      </div>
-      <Form {...form}>
-        <form
-          className="flex flex-col space-y-4"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
-          <FormField
-            control={form.control}
-            name="name"
-            disabled={isLoading}
-            render={({ field }) => (
-              <FormItem className="-space-y-1">
-                <FormLabel>Account Name</FormLabel>
-                <FormControl>
-                  <Input
-                    required
-                    placeholder="Account Name..."
-                    {...field}
-                    className="h-9
-										rounded-lg border-2
-										border-black bg-white"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem className="-space-y-1">
-                <FormLabel>Account Type</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
-                      <SelectValue placeholder="Select Account Type..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cash">
-                        Cash
-                      </SelectItem>
-                      <SelectItem value="digital">
-                        Digital
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="description"
-            disabled={isLoading}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Description..."
-                    {...field}
-                    className="h-9
-										rounded-lg border-2
-										border-black bg-white"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="isDropdown"
-            disabled={isLoading}
-            render={({ field }) => (
-              <FormItem className="flex items-center">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value === 1}
-                    onCheckedChange={(checked) => {
-                      field.onChange(checked ? 1 : 0);
-                    }}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormLabel>Add to Dropdown</FormLabel>
-              </FormItem>
-            )}
-          />
-          <div className="flex flex-row justify-between">
-            <Button
+          ) : (
+            <div
               onClick={() => router.back()}
-              className="bg-red-500 border-2 hover:none"
-              disabled={isLoading}
-              type="button"
+              className="flex items-center cursor-pointer"
             >
-              Cancel
-            </Button>
-            <Button
-              className="border-2 space-x-2"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading && (
-                <Loader2 className="animate-spin" />
+              <ChevronLeft className="mr-2" size={22} />
+              <TypographyH3>Edit Account</TypographyH3>
+            </div>
+          )}
+        </div>
+        <Form {...form}>
+          <form
+            className="flex flex-col space-y-4"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              disabled={isLoading || !isOwner}
+              render={({ field }) => (
+                <FormItem className="-space-y-1">
+                  <FormLabel>Account Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      required
+                      placeholder="Account Name..."
+                      {...field}
+                      className="h-9
+										rounded-lg border-2
+										border-black bg-white"
+                    />
+                  </FormControl>
+                </FormItem>
               )}
-              Submit
-            </Button>
-          </div>
-        </form>
-      </Form>
+            />
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem className="-space-y-1">
+                  <FormLabel>Account Type</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={isLoading || !isOwner}
+                    >
+                      <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
+                        <SelectValue placeholder="Select Account Type..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cash">
+                          Cash
+                        </SelectItem>
+                        <SelectItem value="digital">
+                          Digital
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              disabled={isLoading || !isOwner}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Description..."
+                      {...field}
+                      className="h-9
+										rounded-lg border-2
+										border-black bg-white"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isDropdown"
+              disabled={isLoading || !isOwner}
+              render={({ field }) => (
+                <FormItem className="flex items-center">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value === 1}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked ? 1 : 0);
+                      }}
+                      disabled={isLoading || !isOwner}
+                    />
+                  </FormControl>
+                  <FormLabel>Add to Dropdown</FormLabel>
+                </FormItem>
+              )}
+            />
+            {/* Sharing Section */}
+            {!isAccountPending && account && (
+              <AccountSharingSection
+                accountID={id}
+                queuedEmails={queuedEmails}
+                onAddEmail={handleAddEmail}
+                onRemoveEmail={handleRemoveEmail}
+                queuedCancelledInvites={
+                  queuedCancelledInvites
+                }
+                onQueueCancelInvitation={
+                  handleQueueCancelInvitation
+                }
+                onUnqueueCancelInvitation={
+                  handleUnqueueCancelInvitation
+                }
+                queuedRemovedMembers={queuedRemovedMembers}
+                onQueueRemoveMember={
+                  handleQueueRemoveMember
+                }
+                onUnqueueRemoveMember={
+                  handleUnqueueRemoveMember
+                }
+              />
+            )}
+            {isOwner && (
+              <div className="flex flex-row justify-between">
+                <Button
+                  onClick={() => router.back()}
+                  className="bg-red-500 border-2 hover:none"
+                  disabled={isLoading}
+                  type="button"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="border-2 space-x-2"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading && (
+                    <Loader2 className="animate-spin" />
+                  )}
+                  Submit
+                </Button>
+              </div>
+            )}
+          </form>
+        </Form>
+      </section>
     </main>
   );
 }

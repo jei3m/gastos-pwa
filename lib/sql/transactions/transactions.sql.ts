@@ -25,14 +25,21 @@ export const getTransactions = () => {
             t.date,
             (t.amount + t.transfer_fee) AS amount,
             c.name,
+            c.icon,
+            c.type AS categoryType,
             t.note,
             t.type,
             t.time,
             t.ref_user_id,
             t.ref_accounts_id,
+            a.ref_user_ids,
+            u.name AS userName,
+            u.image AS userImage,
             ROW_NUMBER() OVER (PARTITION BY t.date ORDER BY t.time ASC) as time_order
         FROM v_transactions_table t
         LEFT JOIN v_categories_table c on t.ref_categories_id = c.id
+        LEFT JOIN v_accounts a ON t.ref_accounts_id = a.id
+        LEFT JOIN v_user_table u ON t.ref_user_id = u.id
         WHERE 
             (:searchTerm IS NULL OR t.note LIKE CONCAT('%', :searchTerm, '%'))
         GROUP BY
@@ -40,11 +47,16 @@ export const getTransactions = () => {
             t.date,
             t.amount,
             c.name,
+            c.icon,
+            c.type,
             t.note,
             t.type,
             t.time,
             t.ref_user_id,
-            t.ref_accounts_id
+            t.ref_accounts_id,
+            a.ref_user_ids,
+            u.name,
+            u.image
         ORDER BY 
             date DESC,
             time DESC
@@ -70,21 +82,24 @@ export const getTransactions = () => {
             JSON_OBJECT(
                 'id', id,
                 'category', name,
+                'icon', icon,
+                'categoryType', categoryType,
                 'note', note,
                 'amount', amount,
                 'type', type,
-                'time', time
+                'time', time,
+                'userName', userName,
+                'userImage', userImage
             )
         ) AS details,
-        ref_user_id AS userID,
         ref_accounts_id AS accountID
     FROM transactions_cte
     WHERE
-        ref_user_id = :userID
-        AND ref_accounts_id = :accountID
+        ref_accounts_id = :accountID
+        AND (:userID MEMBER OF(ref_user_ids)
+             OR ref_user_id = :userID)
     GROUP BY
         date,
-        ref_user_id,
         ref_accounts_id
     ORDER BY date DESC
     LIMIT :limit
@@ -104,9 +119,11 @@ export const getTransactionsCount = () => {
             t.time,
             t.ref_user_id,
             t.ref_accounts_id,
+            a.ref_user_ids,
             ROW_NUMBER() OVER (PARTITION BY t.date ORDER BY t.time ASC) as time_order
         FROM v_transactions_table t
         LEFT JOIN v_categories_table c on t.ref_categories_id = c.id
+        LEFT JOIN v_accounts a ON t.ref_accounts_id = a.id
         WHERE 
             (:searchTerm IS NULL OR t.note LIKE CONCAT('%', :searchTerm, '%'))
         GROUP BY
@@ -118,37 +135,48 @@ export const getTransactionsCount = () => {
             t.type,
             t.time,
             t.ref_user_id,
-            t.ref_accounts_id
+            t.ref_accounts_id,
+            a.ref_user_ids
         ORDER BY 
             date DESC,
             time DESC
     )
     SELECT
-        COUNT(date) AS count
+        COUNT(DISTINCT date) AS count
     FROM
         transactions_cte
     WHERE
-        ref_user_id = :userID
-        AND ref_accounts_id = :accountID;`;
+        ref_accounts_id = :accountID
+        AND (:userID MEMBER OF(ref_user_ids)
+             OR ref_user_id = :userID);`;
 };
 
 export const getTransactionByID = () => {
   return `SELECT
-                id,
-                note,
-                amount,
-                transferFee,
-                isTransfer,
-                type,
-                time,
-                date,
-                refCategoriesID,
-                refTransferToAccountsID
+                v.id,
+                v.note,
+                v.amount,
+                v.transferFee,
+                v.isTransfer,
+                v.type,
+                v.time,
+                v.date,
+                v.refCategoriesID,
+                v.refTransferToAccountsID,
+                v.refUserID AS refUserID,
+                u.name AS userName,
+                u.image AS userImage,
+                ta.name AS transferToAccountName
             FROM
-                v_transaction_details
+                v_transaction_details v
+            JOIN v_transactions_table t ON v.id = t.id
+            LEFT JOIN v_accounts a ON t.ref_accounts_id = a.id
+            LEFT JOIN v_user_table u ON t.ref_user_id = u.id
+            LEFT JOIN v_accounts ta ON v.refTransferToAccountsID = ta.id
             WHERE
-                id = :id
-                AND refUserID = :userID
+                v.id = :id
+                AND (v.refUserID = :userID
+                     OR :userID MEMBER OF(a.ref_user_ids))
             LIMIT 1;`;
 };
 
@@ -160,17 +188,25 @@ export const getTransactionsByCategory = () => {
                 t.date,
                 (t.amount + t.transfer_fee) AS amount,
                 c.name,
+                c.icon,
+                c.type AS categoryType,
                 t.note,
                 t.type,
                 t.time,
                 t.ref_user_id,
                 t.ref_accounts_id,
+                a.ref_user_ids,
+                u.name AS userName,
+                u.image AS userImage,
                 ROW_NUMBER() OVER (PARTITION BY t.date ORDER BY t.time ASC) as time_order
             FROM v_transactions_table t
             LEFT JOIN v_categories_table c on t.ref_categories_id = c.id
+            LEFT JOIN v_accounts a ON t.ref_accounts_id = a.id
+            LEFT JOIN v_user_table u ON t.ref_user_id = u.id
             WHERE t.ref_categories_id = :categoryID
-                AND t.ref_user_id = :userID
                 AND t.ref_accounts_id = :accountID
+                AND (:userID MEMBER OF(ref_user_ids)
+                     OR t.ref_user_id = :userID)
                 AND (:dateStart IS NULL OR t.date >= :dateStart)
                 AND (:dateEnd IS NULL OR t.date <= :dateEnd)
             GROUP BY
@@ -178,11 +214,16 @@ export const getTransactionsByCategory = () => {
                 t.date,
                 t.amount,
                 c.name,
+                c.icon,
+                c.type,
                 t.note,
                 t.type,
                 t.time,
                 t.ref_user_id,
-                t.ref_accounts_id
+                t.ref_accounts_id,
+                a.ref_user_ids,
+                u.name,
+                u.image
             ORDER BY
                 date DESC,
                 time DESC
@@ -208,18 +249,20 @@ export const getTransactionsByCategory = () => {
                 JSON_OBJECT(
                     'id', id,
                     'category', name,
+                    'icon', icon,
+                    'categoryType', categoryType,
                     'note', note,
                     'amount', amount,
                     'type', type,
-                    'time', time
+                    'time', time,
+                    'userName', userName,
+                    'userImage', userImage
                 )
             ) AS details,
-            ref_user_id AS userID,
             ref_accounts_id AS accountID
         FROM transactions_cte
         GROUP BY
             date,
-            ref_user_id,
             ref_accounts_id
         ORDER BY date DESC
         LIMIT :limit
@@ -229,14 +272,19 @@ export const getTransactionsByCategory = () => {
 
 export const getTransactionsByCategoryCount = () => {
   return `
-        SELECT DISTINCT
+        SELECT
             COUNT (date) AS count
-        FROM v_transactions_table
-        WHERE ref_user_id = :userID
-            AND ref_accounts_id = :accountID
-            AND ref_categories_id = :categoryID
-            AND (:dateStart IS NULL OR date >= :dateStart)
-            AND (:dateEnd IS NULL OR date <= :dateEnd);
+        FROM (
+            SELECT DISTINCT date
+            FROM v_transactions_table t
+            LEFT JOIN v_accounts a ON t.ref_accounts_id = a.id
+            WHERE t.ref_accounts_id = :accountID
+                AND t.ref_categories_id = :categoryID
+                AND (:userID MEMBER OF(a.ref_user_ids)
+                     OR t.ref_user_id = :userID)
+                AND (:dateStart IS NULL OR t.date >= :dateStart)
+                AND (:dateEnd IS NULL OR t.date <= :dateEnd)
+        ) AS date_groups;
     `;
 };
 

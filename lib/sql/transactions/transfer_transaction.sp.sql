@@ -20,7 +20,7 @@ main: BEGIN
 
     DECLARE v_affected_rows INT;
     DECLARE v_total_balance, v_amount, v_transfer_fee, v_total_amount DECIMAL(12,2);
-    DECLARE v_income_categories_id, v_expense_categories_id, v_ref_accounts_id, v_ref_transfer_to_accounts_id CHAR(36); -- "Transfer" category for both income and expense
+    DECLARE v_income_categories_id, v_expense_categories_id, v_ref_accounts_id, v_ref_transfer_to_accounts_id, v_account_owner_id CHAR(36);
 	DECLARE v_transfer_to_account_name VARCHAR(10);
     DECLARE v_new_balance DECIMAL(12,2);
 
@@ -44,7 +44,8 @@ main: BEGIN
                 accounts
             WHERE
                 id = p_ref_accounts_id
-                AND ref_user_id = p_ref_user_id
+                AND (ref_user_id = p_ref_user_id
+                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
             LIMIT 1;
 
             -- Validate total_balance
@@ -121,7 +122,8 @@ main: BEGIN
                     total_balance = v_total_balance + (v_total_amount * -1)
                 WHERE
                     id = p_ref_accounts_id
-                    AND ref_user_id = p_ref_user_id
+                    AND (ref_user_id = p_ref_user_id
+                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
                 LIMIT 1;
 
 				-- Get name of receiving account
@@ -129,15 +131,14 @@ main: BEGIN
 				INTO v_transfer_to_account_name
 				FROM accounts
 				WHERE
-					ref_user_id = p_ref_user_id
-					AND id = p_ref_accounts_id
+					id = p_ref_accounts_id
 				LIMIT 1;
 
 				-- Create new transaction at receiving account
 				CALL manage_transactions(
 					'create',
 					UUID(),
-					CONCAT('Transferred from: ', v_transfer_to_account_name),
+					CONCAT('From: ', v_transfer_to_account_name),
 					p_amount,
 					0,
 					'income',
@@ -266,7 +267,8 @@ main: BEGIN
                     total_balance = v_new_balance
                 WHERE
                     id = v_ref_accounts_id
-                    AND ref_user_id = p_ref_user_id
+                    AND (ref_user_id = p_ref_user_id
+                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
                 LIMIT 1;
 
 				IF (p_amount <> v_amount) OR (v_ref_transfer_to_accounts_id <> p_ref_transfer_to_accounts_id) THEN
@@ -275,15 +277,14 @@ main: BEGIN
 					INTO v_transfer_to_account_name
 					FROM accounts
 					WHERE
-						ref_user_id = p_ref_user_id
-						AND id = p_ref_accounts_id
+						id = p_ref_accounts_id
 					LIMIT 1;
 
 					-- Create new transaction at receiving account
 					CALL manage_transactions(
 						'create',
 						UUID(),
-						CONCAT('Transferred from: ', v_transfer_to_account_name),
+						CONCAT('From: ', v_transfer_to_account_name),
 						p_amount,
 						0,
 						'income',

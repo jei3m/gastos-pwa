@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createAccount } from '@/lib/tq-functions/accounts.tq.functions';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ import {
 import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import { Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import AccountSharingSection from '@/components/accounts/account-sharing-section';
 
 export default function CreateAccount() {
   const router = useRouter();
@@ -49,11 +51,31 @@ export default function CreateAccount() {
     }
   );
 
+  const [queuedEmails, setQueuedEmails] = useState<
+    string[]
+  >([]);
+
+  const handleAddEmail = (email: string) => {
+    if (email && !queuedEmails.includes(email)) {
+      setQueuedEmails([...queuedEmails, email]);
+    }
+  };
+
+  const handleRemoveEmail = (email: string) => {
+    setQueuedEmails(
+      queuedEmails.filter((e) => e !== email)
+    );
+  };
+
   const { mutate: createAccountMutation, isPending } =
     useMutation({
       mutationFn: (
         values: z.infer<typeof createAccountSchema>
-      ) => createAccount(values),
+      ) =>
+        createAccount({
+          ...values,
+          emails: queuedEmails,
+        }),
       onSuccess: (data) => {
         queryClient.invalidateQueries({
           queryKey: accountsQueryOptions().queryKey,
@@ -94,8 +116,8 @@ export default function CreateAccount() {
                     placeholder="Account Name..."
                     {...field}
                     className="h-9 
-										rounded-lg border-2 
-										border-black bg-white"
+                    rounded-lg border-2 
+                    border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -143,8 +165,8 @@ export default function CreateAccount() {
                     placeholder="Description..."
                     {...field}
                     className="h-9 
-										rounded-lg border-2 
-										border-black bg-white"
+                    rounded-lg border-2 
+                    border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -169,6 +191,13 @@ export default function CreateAccount() {
                 <FormLabel>Add to Dropdown</FormLabel>
               </FormItem>
             )}
+          />
+          {/* Sharing Section */}
+          <AccountSharingSection
+            isNewAccount
+            queuedEmails={queuedEmails}
+            onAddEmail={handleAddEmail}
+            onRemoveEmail={handleRemoveEmail}
           />
           <div className="flex flex-row justify-between">
             <Button

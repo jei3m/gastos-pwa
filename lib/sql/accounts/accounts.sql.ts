@@ -14,36 +14,41 @@ export const createAccounts = () => {
 };
 
 export const getAccounts = () => {
-  return `SELECT 
-                id,
-                name,
-                type,
-                description,
-                totalBalance,
-                isDropdown
+  return `
+            SELECT 
+                a.id,
+                a.name,
+                a.type,
+                a.description,
+                a.totalBalance,
+                a.isDropdown,
+                JSON_LENGTH(a.ref_user_ids) AS memberCount
             FROM
-                v_accounts
+                v_accounts a
             WHERE
-                ref_user_id = :userID
-                AND (:isDropdown IS NULL OR isDropdown = :isDropdown) 
-            ORDER BY name ASC;`;
+                :userID MEMBER OF(ref_user_ids)
+                AND (:isDropdown IS NULL OR a.isDropdown = :isDropdown) 
+            ORDER BY a.name ASC;
+        `;
 };
 
 export const getAccountByID = () => {
-  return `SELECT 
-                id,
-                id,
-                name,
-                type,
-                description,
-                totalBalance,
-                isDropdown
+  return `
+            SELECT 
+                a.id,
+                a.name,
+                a.type,
+                a.description,
+                a.totalBalance,
+                a.isDropdown,
+                JSON_LENGTH(a.ref_user_ids) AS memberCount
             FROM
-                v_accounts
+                v_accounts a
             WHERE
-                ref_user_id = :userID
-                AND id = :id
-            LIMIT 1;`;
+                a.id = :id
+                AND :userID MEMBER OF(ref_user_ids)
+            LIMIT 1;
+        `;
 };
 
 export const updateAccount = () => {
@@ -68,6 +73,54 @@ export const deleteAccount = () => {
                 :id,
                 :userID,
                 NULL,
+                NULL,
+                NULL,
+                NULL,
+                @response
+            );
+            SELECT @response AS response;`;
+};
+
+export const inviteMember = () => {
+  return `CALL manage_invitations
+            (
+                'invite',
+                :accountID,
+                :userID,
+                NULL,
+                :invitationID,
+                :invitedEmail,
+                :token,
+                NULL,
+                @response
+            );
+            SELECT @response AS response;`;
+};
+
+export const removeMemberAccount = () => {
+  return `CALL manage_invitations
+            (
+                'remove_member',
+                :accountID,
+                :userID,
+                :targetUserID,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                @response
+            );
+            SELECT @response AS response;`;
+};
+
+export const cancelInvitationAccount = () => {
+  return `CALL manage_invitations
+            (
+                'cancel_invitation',
+                :accountID,
+                :userID,
+                NULL,
+                :invitationID,
                 NULL,
                 NULL,
                 NULL,
