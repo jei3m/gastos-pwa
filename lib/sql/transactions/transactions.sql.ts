@@ -103,7 +103,8 @@ export const getTransactions = () => {
         ref_accounts_id
     ORDER BY date DESC
     LIMIT :limit
-    OFFSET :offset;`};
+    OFFSET :offset;`;
+};
 
 export const getTransactionsCount = () => {
   return `
@@ -162,11 +163,16 @@ export const getTransactionByID = () => {
                 v.date,
                 v.refCategoriesID,
                 v.refTransferToAccountsID,
-                v.refUserID AS refUserID
+                v.refUserID AS refUserID,
+                u.name AS userName,
+                u.image AS userImage,
+                ta.name AS transferToAccountName
             FROM
                 v_transaction_details v
             JOIN v_transactions_table t ON v.id = t.id
             LEFT JOIN v_accounts a ON t.ref_accounts_id = a.id
+            LEFT JOIN v_user_table u ON t.ref_user_id = u.id
+            LEFT JOIN v_accounts ta ON v.refTransferToAccountsID = ta.id
             WHERE
                 v.id = :id
                 AND (v.refUserID = :userID
