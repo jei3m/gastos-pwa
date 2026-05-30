@@ -15,13 +15,6 @@ export const createAccounts = () => {
 
 export const getAccounts = () => {
   return `
-            WITH v_account_members_table_cte AS (
-                SELECT
-                    account_id,
-                    COUNT(account_id) AS memberCount
-                FROM v_account_members_table
-                GROUP BY account_id
-            )
             SELECT 
                 a.id,
                 a.name,
@@ -29,16 +22,11 @@ export const getAccounts = () => {
                 a.description,
                 a.totalBalance,
                 a.isDropdown,
-                COALESCE(m.memberCount, 1) AS memberCount
+                JSON_LENGTH(a.ref_user_ids) AS memberCount
             FROM
                 v_accounts a
-            LEFT JOIN v_account_members_table_cte m ON a.id = m.account_id
             WHERE
-                a.id IN (
-                    SELECT account_id
-                    FROM v_account_members_table
-                    WHERE user_id = :userID
-                )
+                :userID MEMBER OF(ref_user_ids)
                 AND (:isDropdown IS NULL OR a.isDropdown = :isDropdown) 
             ORDER BY a.name ASC;
         `;
@@ -46,13 +34,6 @@ export const getAccounts = () => {
 
 export const getAccountByID = () => {
   return `
-            WITH v_account_members_table_cte AS (
-                SELECT
-                    account_id,
-                    COUNT(account_id) AS memberCount
-                FROM v_account_members_table
-                GROUP BY account_id
-            )
             SELECT 
                 a.id,
                 a.name,
@@ -60,17 +41,12 @@ export const getAccountByID = () => {
                 a.description,
                 a.totalBalance,
                 a.isDropdown,
-                COALESCE(m.memberCount, 1) AS memberCount
+                JSON_LENGTH(a.ref_user_ids) AS memberCount
             FROM
                 v_accounts a
-            LEFT JOIN v_account_members_table_cte m ON a.id = m.account_id
             WHERE
                 a.id = :id
-                AND a.id IN (
-                    SELECT account_id
-                    FROM v_account_members_table
-                    WHERE user_id = :userID
-                )
+                AND :userID MEMBER OF(ref_user_ids)
             LIMIT 1;
         `;
 };
