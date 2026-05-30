@@ -106,13 +106,3 @@ export const getInvitationByToken = () => {
           WHERE i.token = :token
           LIMIT 1`;
 };
-
-export const checkAccountAccess = () => {
-  return `
-    SELECT role
-    FROM v_account_members_table
-    WHERE account_id = :accountID
-    AND user_id = :userID
-    LIMIT 1;
-  `;
-};
