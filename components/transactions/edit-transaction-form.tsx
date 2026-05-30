@@ -38,6 +38,7 @@ import {
 import {
   ChevronDownIcon,
   ChevronLeft,
+  Eye,
   Loader2,
   Trash2,
 } from 'lucide-react';
@@ -65,6 +66,7 @@ import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 import { Account } from '@/types/accounts.types';
 import { cn } from '@/lib/utils';
 import { authClient } from '@/lib/auth/auth-client';
+import { Separator } from '../ui/separator';
 
 interface EditTransactionFormProps {
   isModal?: boolean;
@@ -257,9 +259,13 @@ export default function EditTransactionForm({
     return transaction?.refUserID === session?.user.id;
   }, [transaction, session]);
 
-  const isDisabled = useMemo(() => {
-    return isLoading || !isCreator;
+  const isReadonly = useMemo(() => {
+    return !isLoading && !isCreator;
   }, [isLoading, isCreator]);
+
+  const isDisabled = useMemo(() => {
+    return isLoading || isReadonly;
+  }, [isLoading, isReadonly]);
 
   return (
     <main
@@ -270,7 +276,19 @@ export default function EditTransactionForm({
     >
       {!isModal && (
         <>
-          {isCreator ? (
+          {isReadonly ? (
+            <div
+              onClick={() => router.back()}
+              className="flex items-center cursor-pointer"
+            >
+              <ChevronLeft className="mr-2" size={22} />
+              <div className="flex items-center gap-2">
+                <TypographyH3>
+                  Transaction Details
+                </TypographyH3>
+              </div>
+            </div>
+          ) : isCreator ? (
             <div className="flex justify-between items-center">
               <TypographyH3>Edit Transaction</TypographyH3>
               <CustomAlertDialog
@@ -317,21 +335,27 @@ export default function EditTransactionForm({
                     onValueChange={field.onChange}
                     className="-mt-1"
                   >
-                    <TabsList className="bg-white border-2 w-full h-10">
+                    <TabsList
+                      className={cn(
+                        'bg-white border-2 w-full h-10',
+                        isReadonly &&
+                          'bg-gray-50 border-dashed border-gray-300'
+                      )}
+                    >
                       {availableTypes.map((type, index) => (
                         <TabsTrigger
                           value={type.toLowerCase()}
                           key={index}
                           disabled={isDisabled}
-                          className={`text-md
-                            ${
-                              field.value.toLowerCase() ===
-                                'expense' ||
+                          className={cn(
+                            'text-md',
+                            field.value.toLowerCase() ===
+                              'expense' ||
                               field.value.toLowerCase() ===
                                 'transfer'
-                                ? 'data-[state=active]:bg-red-400'
-                                : 'data-[state=active]:bg-green-300'
-                            }`}
+                              ? 'data-[state=active]:bg-red-400'
+                              : 'data-[state=active]:bg-green-300'
+                          )}
                         >
                           {type}
                         </TabsTrigger>
@@ -357,9 +381,8 @@ export default function EditTransactionForm({
                     required
                     placeholder="0.00"
                     {...field}
-                    className="h-9
-                    rounded-lg border-2
-                    border-black bg-white"
+                    readOnly={isReadonly}
+                    className="h-9 rounded-lg border-2 border-black bg-white"
                     type="number"
                     inputMode="decimal"
                     pattern="[0-9\.]*"
@@ -385,7 +408,13 @@ export default function EditTransactionForm({
                       value={field.value}
                       disabled={isDisabled}
                     >
-                      <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
+                      <SelectTrigger
+                        className={cn(
+                          'w-[180px] bg-white border-2 border-black w-full h-9',
+                          isReadonly &&
+                            'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100 disabled:cursor-default'
+                        )}
+                      >
                         <SelectValue placeholder="Select Category..." />
                       </SelectTrigger>
                       <SelectContent className="border-2">
@@ -426,7 +455,13 @@ export default function EditTransactionForm({
                         value={field.value}
                         disabled={isDisabled}
                       >
-                        <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg">
+                        <SelectTrigger
+                          className={cn(
+                            'w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg',
+                            isReadonly &&
+                              'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100 disabled:cursor-default'
+                          )}
+                        >
                           <SelectValue placeholder="Select Account..." />
                         </SelectTrigger>
                         <SelectContent className="border-2">
@@ -468,6 +503,7 @@ export default function EditTransactionForm({
                         required
                         placeholder="0.00"
                         {...field}
+                        readOnly={isReadonly}
                         className="h-9 rounded-lg border-2 border-black bg-white"
                         type="number"
                         inputMode="decimal"
@@ -494,9 +530,8 @@ export default function EditTransactionForm({
                     required
                     placeholder="Transaction note..."
                     {...field}
-                    className="h-9
-                    rounded-lg border-2
-                    border-black bg-white"
+                    readOnly={isReadonly}
+                    className="h-9 rounded-lg border-2 border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -522,7 +557,11 @@ export default function EditTransactionForm({
                           disabled={isDisabled}
                           variant="outline"
                           id="date"
-                          className="justify-between font-normal border-2 bg-white text-[16px] h-9 md:h-10"
+                          className={cn(
+                            'justify-between font-normal border-2 bg-white text-[16px] h-9 md:h-10',
+                            isReadonly &&
+                              'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100'
+                          )}
                         >
                           {field.value
                             ? new Date(
@@ -589,6 +628,7 @@ export default function EditTransactionForm({
                         }
                       }}
                       disabled={isDisabled}
+                      readOnly={isReadonly}
                     />
                   </FormControl>
                   <FormMessage />
@@ -621,6 +661,15 @@ export default function EditTransactionForm({
                 Submit
               </Button>
             </div>
+          )}
+          {isReadonly && (
+            <>
+              <Separator />
+              <p className="text-sm md:text-md text-muted-foreground text-center">
+                This transaction is view-only. Only the
+                creator can make changes.
+              </p>
+            </>
           )}
         </form>
       </Form>
