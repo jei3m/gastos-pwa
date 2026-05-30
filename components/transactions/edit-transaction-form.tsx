@@ -65,6 +65,11 @@ import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 import { Account } from '@/types/accounts.types';
 import { cn } from '@/lib/utils';
 import { authClient } from '@/lib/auth/auth-client';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/avatar';
 import { Separator } from '../ui/separator';
 
 interface EditTransactionFormProps {
@@ -271,39 +276,33 @@ export default function EditTransactionForm({
               className="flex items-center cursor-pointer"
             >
               <ChevronLeft className="mr-2" size={22} />
-              <div className="flex items-center gap-2">
-                <TypographyH3>
-                  Transaction Details
-                </TypographyH3>
-              </div>
-            </div>
-          ) : isCreator ? (
-            <div className="flex justify-between items-center">
-              <TypographyH3>Edit Transaction</TypographyH3>
-              <CustomAlertDialog
-                isDisabled={isDisabled}
-                trigger={
-                  <Trash2
-                    size={24}
-                    className="text-red-500"
-                  />
-                }
-                title="Are you sure?"
-                description="This action cannot be undone. It will be permanently deleted."
-                confirmMessage="Yes, I'm sure"
-                onConfirm={() =>
-                  deleteTransactionMutation(id)
-                }
-              />
+              <TypographyH3>
+                Transaction Details
+              </TypographyH3>
             </div>
           ) : (
-            <div
-              onClick={() => router.back()}
-              className="flex items-center cursor-pointer"
-            >
-              <ChevronLeft className="mr-2" size={22} />
-              <TypographyH3>Edit Transaction</TypographyH3>
-            </div>
+            isCreator && (
+              <div className="flex justify-between items-center">
+                <TypographyH3>
+                  Edit Transaction
+                </TypographyH3>
+                <CustomAlertDialog
+                  isDisabled={isDisabled}
+                  trigger={
+                    <Trash2
+                      size={24}
+                      className="text-red-500"
+                    />
+                  }
+                  title="Are you sure?"
+                  description="This action cannot be undone. It will be permanently deleted."
+                  confirmMessage="Yes, I'm sure"
+                  onConfirm={() =>
+                    deleteTransactionMutation(id)
+                  }
+                />
+              </div>
+            )
           )}
         </>
       )}
@@ -666,6 +665,23 @@ export default function EditTransactionForm({
           {isReadonly && (
             <>
               <Separator />
+              <div className="flex justify-center items-center gap-2 px-1 mb-6">
+                <Avatar className="size-7">
+                  <AvatarImage
+                    src={transaction?.userImage ?? ''}
+                    alt={transaction?.userName ?? ''}
+                  />
+                  <AvatarFallback className="text-xs">
+                    {transaction?.userName
+                      ?.charAt(0)
+                      ?.toUpperCase() ?? '?'}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm md:text-md text-muted-foreground">
+                  Created by{' '}
+                  {transaction?.userName ?? 'Unknown'}
+                </span>
+              </div>
               <p className="text-sm md:text-md text-muted-foreground text-center">
                 This transaction is view-only. Only the
                 creator can make changes.
