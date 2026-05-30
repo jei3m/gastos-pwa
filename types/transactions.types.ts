@@ -27,6 +27,7 @@ export interface TransactionDetails {
   userName: string;
   userImage: string;
   refUserID: string;
+  transferToAccountName?: string;
 }
 
 export interface CreateTransaction {
