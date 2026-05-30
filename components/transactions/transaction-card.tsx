@@ -116,7 +116,12 @@ function TransactionCard({
               href={`${hrefPrefix}/${detail.id}`}
             >
               <div className="space-y-3 md:space-y-4 flex flex-row justify-between text-sm md:text-md py-1">
-                <div className="flex items-center gap-3 min-w-0">
+                <div
+                  className={cn(
+                    'flex items-center min-w-0',
+                    isShared ? 'gap-3' : 'gap-2'
+                  )}
+                >
                   <div className="relative shrink-0">
                     <div
                       className={cn(
