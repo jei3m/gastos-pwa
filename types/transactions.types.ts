@@ -22,6 +22,10 @@ export interface TransactionDetails {
   transferFee?: number;
   isTransfer?: boolean;
   category: string;
+  icon: string;
+  categoryType: string;
+  userName: string;
+  userImage: string;
   refUserID: string;
 }
 
