@@ -23,7 +23,7 @@ async function processInvitations(
   for (const invitedEmail of uniqueEmails) {
     const token = crypto.randomUUID();
     const invitationID = crypto.randomUUID();
-    const [inviteResult] = await db.query<responseRow[]>(
+    const [] = await db.query<responseRow[]>(
       inviteMember(),
       {
         accountID,

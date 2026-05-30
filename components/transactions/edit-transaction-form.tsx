@@ -38,7 +38,6 @@ import {
 import {
   ChevronDownIcon,
   ChevronLeft,
-  Eye,
   Loader2,
   Trash2,
 } from 'lucide-react';
@@ -91,12 +90,6 @@ export default function EditTransactionForm({
     accounts?.filter(
       (account: Account) => account.id !== selectedAccountID
     ) || [];
-
-  const selectedAccount = accounts?.find(
-    (a: Account) => a.id === selectedAccountID
-  );
-  const isSharedAccount =
-    selectedAccount && selectedAccount.memberCount > 1;
 
   const form = useForm<
     z.infer<typeof editTransactionSchema>
