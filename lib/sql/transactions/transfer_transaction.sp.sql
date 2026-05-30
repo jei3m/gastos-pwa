@@ -19,8 +19,20 @@ CREATE PROCEDURE `transfer_transaction`(
 main: BEGIN
 
     DECLARE v_affected_rows INT;
-    DECLARE v_total_balance, v_amount, v_transfer_fee, v_total_amount DECIMAL(12,2);
-    DECLARE v_income_categories_id, v_expense_categories_id, v_ref_accounts_id, v_ref_transfer_to_accounts_id, v_account_owner_id CHAR(36);
+    DECLARE 
+		v_total_balance,
+		v_amount,
+		v_transfer_fee,
+		v_total_amount
+	DECIMAL(12,2);
+    DECLARE 
+		v_income_categories_id,
+		v_expense_categories_id,
+		v_ref_accounts_id,
+		v_ref_transfer_to_accounts_id,
+		v_account_owner_id,
+		v_transfer_account_owner_id
+	CHAR(36);
 	DECLARE v_transfer_to_account_name VARCHAR(10);
     DECLARE v_new_balance DECIMAL(12,2);
 
@@ -58,20 +70,48 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-			-- Get both transfer categories id
-			SELECT 
-				MAX(CASE WHEN type = 'income' THEN id END) AS income_id,
-				MAX(CASE WHEN type = 'expense' THEN id END) AS expense_id
-			INTO 
-				v_income_categories_id, 
-				v_expense_categories_id
-			FROM 
-				categories
+			-- Get sending account user id
+			SELECT
+				ref_user_id
+			INTO
+				v_account_owner_id
+			FROM accounts
+			WHERE id = p_ref_accounts_id
+			LIMIT 1;
+
+			-- Get receiving account user id
+			SELECT
+				ref_user_id
+			INTO
+				v_transfer_account_owner_id
+			FROM accounts
 			WHERE
-				ref_user_id = p_ref_user_id
+				id = p_ref_transfer_to_accounts_id
+			LIMIT 1;
+
+			-- Get expense transfer category for sending account owner
+			SELECT
+				id
+			INTO
+				v_expense_categories_id
+			FROM categories
+			WHERE
+				ref_user_id = v_account_owner_id
 				AND name = 'Transfer'
-				AND type IN ('income', 'expense')
-			GROUP BY name;
+				AND type = 'expense'
+			LIMIT 1;
+
+			-- Get income transfer category for receiving account owner
+			SELECT
+				id
+			INTO
+				v_income_categories_id
+			FROM categories
+			WHERE
+				ref_user_id = v_transfer_account_owner_id
+				AND name = 'Transfer'
+				AND type = 'income'
+			LIMIT 1;
 
 			-- Check if income and expense transfer category exists
 			IF (v_income_categories_id IS NULL OR v_expense_categories_id IS NULL) THEN
@@ -218,20 +258,45 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-			-- Get both transfer categories id
-			SELECT 
-				MAX(CASE WHEN type = 'income' THEN id END) AS income_id,
-				MAX(CASE WHEN type = 'expense' THEN id END) AS expense_id
-			INTO 
-				v_income_categories_id, 
-				v_expense_categories_id
-			FROM 
-				categories
+			-- Get sending account user id
+			SELECT
+				ref_user_id
+			INTO
+				v_account_owner_id
+			FROM accounts
+			WHERE id = v_ref_accounts_id
+			LIMIT 1;
+
+			-- Get receiving account user id
+			SELECT
+				ref_user_id
+			INTO
+				v_transfer_account_owner_id
+			FROM accounts
 			WHERE
-				ref_user_id = p_ref_user_id
+				id = p_ref_transfer_to_accounts_id
+			LIMIT 1;
+
+			-- Get expense transfer category for sending account owner
+			SELECT
+				id
+			INTO
+				v_expense_categories_id
+			FROM categories
+			WHERE
+				ref_user_id = v_account_owner_id
 				AND name = 'Transfer'
-				AND type IN ('income', 'expense')
-			GROUP BY name;
+				AND type = 'expense'
+			LIMIT 1;
+
+			-- Get income transfer category for receiving account owner
+			SELECT id INTO v_income_categories_id
+			FROM categories
+			WHERE
+				ref_user_id = v_transfer_account_owner_id
+				AND name = 'Transfer'
+				AND type = 'income'
+			LIMIT 1;
 
 			-- Check if income and expense transfer category exists
 			IF (v_income_categories_id IS NULL OR v_expense_categories_id IS NULL) THEN
