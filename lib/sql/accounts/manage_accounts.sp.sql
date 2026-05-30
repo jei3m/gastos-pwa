@@ -17,6 +17,7 @@ CREATE PROCEDURE `manage_accounts`(
 main: BEGIN
 
     DECLARE v_affected_rows INT;
+    DECLARE v_member_role ENUM('owner', 'editor');
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION 
     BEGIN
@@ -27,9 +28,7 @@ main: BEGIN
     START TRANSACTION;
 
     CASE p_action_type
-        -- Cases: create, update, delete
         WHEN 'create' THEN
-            -- INSERT statement
             INSERT INTO accounts
             (
                 id,
@@ -52,6 +51,9 @@ main: BEGIN
             SET v_affected_rows = ROW_COUNT();
 
             IF v_affected_rows > 0 THEN
+                INSERT INTO account_members (account_id, user_id, role)
+                VALUES (p_id, p_user_id, 'owner');
+
                 SET p_response = JSON_OBJECT(
                     'responseCode', 200, 
                     'responseMessage', 'Account Successfully Created',
@@ -66,23 +68,19 @@ main: BEGIN
             END IF;
             
 		WHEN 'update' THEN
-            -- Validate account id
-            IF NOT EXISTS
-            (
-                SELECT 1
-                FROM accounts
-                WHERE id = p_id
-                LIMIT 1
-            )
-            THEN
+            SELECT role INTO v_member_role
+            FROM account_members
+            WHERE account_id = p_id AND user_id = p_user_id
+            LIMIT 1;
+
+            IF v_member_role IS NULL OR v_member_role <> 'owner' THEN
                 SET p_response = JSON_OBJECT(
-                    'responseCode', 404,
-                    'responseMessage', 'Account not found with the specified id'
+                    'responseCode', 403,
+                    'responseMessage', 'Only the account owner can update account details'
                 );
                 LEAVE main;
             END IF;
 
-            -- UPDATE Statement
             UPDATE 
                 accounts
             SET
@@ -111,18 +109,15 @@ main: BEGIN
             END IF;
 
         WHEN 'delete' THEN
-            -- Validated account id
-            IF NOT EXISTS
-            (
-                SELECT 1
-                FROM accounts
-                WHERE id = p_id
-                LIMIT 1
-            )
-            THEN
+            SELECT role INTO v_member_role
+            FROM account_members
+            WHERE account_id = p_id AND user_id = p_user_id
+            LIMIT 1;
+
+            IF v_member_role IS NULL OR v_member_role <> 'owner' THEN
                 SET p_response = JSON_OBJECT(
-                    'responseCode', 404,
-                    'responseMessage', 'Account not found with the specified id'
+                    'responseCode', 403,
+                    'responseMessage', 'Only the account owner can delete this account'
                 );
                 LEAVE main;
             END IF;

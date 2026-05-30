@@ -11,7 +11,6 @@ export interface Transaction {
   totalIncome: string;
   totalExpense: string;
   details: TransactionDetails[];
-  userID: string;
 }
 
 export interface TransactionDetails {
@@ -23,6 +22,12 @@ export interface TransactionDetails {
   transferFee?: number;
   isTransfer?: boolean;
   category: string;
+  icon: string;
+  categoryType: string;
+  userName: string;
+  userImage: string;
+  refUserID: string;
+  transferToAccountName?: string;
 }
 
 export interface CreateTransaction {

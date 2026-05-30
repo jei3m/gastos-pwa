@@ -110,7 +110,7 @@ export default function AddTransactionForm({
       !!transactionType && !!selectedAccountID,
       null,
       null,
-      'list'
+      'options'
     )
   );
   const categories = useMemo(() => {

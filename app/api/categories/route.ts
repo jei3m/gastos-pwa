@@ -7,6 +7,7 @@ import {
   createCategory,
   getCategories,
   getCategoriesList,
+  getCategoriesOptions,
 } from '@/lib/sql/categories/categories.sql';
 import { fetchUserID } from '@/lib/auth/auth-session';
 
@@ -63,14 +64,20 @@ export async function GET(request: Request) {
     const dateEnd = url.searchParams.get('dateEnd');
     const type = url.searchParams.get('type');
 
-    if (!accountID && filter !== 'list') {
+    if (
+      !accountID &&
+      filter !== 'list' &&
+      filter !== 'options'
+    ) {
       throw Error('There is no selected account');
     }
 
     const [selectQuery] = await db.query(
       filter === 'list'
         ? getCategoriesList()
-        : getCategories(),
+        : filter === 'options'
+          ? getCategoriesOptions()
+          : getCategories(),
       {
         userID: await fetchUserID(),
         accountID,

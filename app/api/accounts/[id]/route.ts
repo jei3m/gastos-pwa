@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import crypto from 'crypto';
 import { connection, db } from '@/utils/db';
 import { success, fail } from '@/utils/helpers';
 import { responseRow } from '@/types/response.types';
@@ -7,7 +8,64 @@ import {
   getAccountByID,
   deleteAccount,
   updateAccount,
+  inviteMember,
+  removeMemberAccount,
+  cancelInvitationAccount,
 } from '@/lib/sql/accounts/accounts.sql';
+import {
+  getMembers,
+  getPendingInvitations,
+} from '@/lib/sql/members/members.sql';
+import { RowDataPacket } from 'mysql2';
+
+async function processInvitations(
+  accountID: string,
+  emails: string[]
+) {
+  if (!emails || emails.length === 0) return;
+  const userID = await fetchUserID();
+  const uniqueEmails = [...new Set(emails)];
+  for (const invitedEmail of uniqueEmails) {
+    const token = crypto.randomUUID();
+    const invitationID = crypto.randomUUID();
+    await db.query<responseRow[]>(inviteMember(), {
+      accountID,
+      userID,
+      invitationID,
+      invitedEmail,
+      token,
+    });
+  }
+}
+
+async function processCancelledInvitations(
+  accountID: string,
+  invitationIds: string[]
+) {
+  if (!invitationIds || invitationIds.length === 0) return;
+  const userID = await fetchUserID();
+  for (const invitationID of invitationIds) {
+    await db.query<responseRow[]>(
+      cancelInvitationAccount(),
+      { accountID, userID, invitationID }
+    );
+  }
+}
+
+async function processRemovedMembers(
+  accountID: string,
+  memberIds: string[]
+) {
+  if (!memberIds || memberIds.length === 0) return;
+  const userID = await fetchUserID();
+  for (const targetUserID of memberIds) {
+    await db.query<responseRow[]>(removeMemberAccount(), {
+      accountID,
+      userID,
+      targetUserID,
+    });
+  }
+}
 
 // Get Specific Account
 export async function GET(
@@ -16,17 +74,53 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const userID = await fetchUserID();
 
     if (!id || id === 'null') {
       throw Error('There is no selected account');
     }
 
-    const [rows] = await db.query(getAccountByID(), {
-      userID: await fetchUserID(),
-      id,
-    });
+    const [rows] = await db.query<RowDataPacket[]>(
+      getAccountByID(),
+      {
+        userID,
+        id,
+      }
+    );
 
-    return success({ data: rows || [] });
+    const isOwner = rows[0]?.isOwner === 1;
+
+    const [members] = await db.query<RowDataPacket[]>(
+      getMembers(),
+      { accountID: id }
+    );
+
+    let invitations: RowDataPacket[] = [];
+    if (isOwner) {
+      [invitations] = await db.query<RowDataPacket[]>(
+        getPendingInvitations(),
+        { accountID: id }
+      );
+
+      const baseUrl =
+        process.env.BETTER_AUTH_URL ||
+        'http://localhost:3000';
+      invitations = invitations.map(
+        (inv: RowDataPacket) => ({
+          ...inv,
+          inviteLink: `${baseUrl}/pages/invitations/accept?token=${inv.token}`,
+        })
+      );
+    }
+
+    return success({
+      data: {
+        ...(rows[0] || {}),
+        members,
+        invitations,
+        isOwner,
+      },
+    });
   } catch (error) {
     return fail(
       500,
@@ -45,8 +139,15 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { name, type, description, isDropdown } =
-      await req.json();
+    const {
+      name,
+      type,
+      description,
+      isDropdown,
+      emails,
+      cancelInvitationIds,
+      removeMemberIds,
+    } = await req.json();
     const { id } = await params;
 
     const [resultUpdate] = await db.query<responseRow[]>(
@@ -72,6 +173,16 @@ export async function PUT(
         parsedData.responseMessage
       );
     }
+
+    const allEmails: string[] = [];
+    if (Array.isArray(emails)) allEmails.push(...emails);
+
+    await processInvitations(id, allEmails);
+    await processCancelledInvitations(
+      id,
+      cancelInvitationIds
+    );
+    await processRemovedMembers(id, removeMemberIds);
 
     return success({
       data: parsedData,

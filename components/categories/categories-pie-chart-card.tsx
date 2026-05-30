@@ -101,7 +101,7 @@ export function CategoryPieChart({
         <CardTitle className="text-lg md:text-xl">
           {chartTitle}
         </CardTitle>
-        <CardDescription className="text-sm md:text-md">
+        <CardDescription className="text-sm md:text-md -mt-2">
           {dateRangeText}
         </CardDescription>
       </CardHeader>
