@@ -12,8 +12,12 @@ import {
 import { useAccount } from '@/context/account-context';
 import PulseLoader from '@/components/custom/pulse-loader';
 import TransactionCard from '@/components/transactions/transaction-card';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useQuery,
+} from '@tanstack/react-query';
 import { transactionsByCategoryInfiniteQueryOptions } from '@/lib/tq-options/transactions.tq.options';
+import { accountByIDQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
 import {
   useParams,
@@ -53,12 +57,15 @@ export default function Transactions() {
     isMobile
   );
 
+  const { data: account, isPending: isAccountLoading } =
+    useQuery(accountByIDQueryOptions(selectedAccountID));
+
   const {
     data: transactionsData,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-    isPending,
+    isPending: isTransactionsLoading,
   } = useInfiniteQuery(
     transactionsByCategoryInfiniteQueryOptions(
       selectedAccountID,
@@ -67,6 +74,10 @@ export default function Transactions() {
       dateEnd
     )
   );
+
+  const isPending = useMemo(() => {
+    return isAccountLoading || isTransactionsLoading;
+  }, [isAccountLoading, isTransactionsLoading]);
 
   const category = useMemo(() => {
     return (
@@ -255,6 +266,11 @@ export default function Transactions() {
                     (transaction, index) => (
                       <TransactionCard
                         transaction={transaction}
+                        isShared={
+                          account?.memberCount
+                            ? account.memberCount > 1
+                            : false
+                        }
                         key={index}
                       />
                     )
