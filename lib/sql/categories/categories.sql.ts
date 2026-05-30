@@ -15,28 +15,22 @@ export const createCategory = () => {
 
 export const getCategories = () => {
   return `WITH
+            account_info_cte AS (
+                SELECT 
+                    ref_user_id AS owner_id,
+                    ref_user_ids
+                FROM v_accounts
+                WHERE id = :accountID
+            ),
             resolved_user_cte AS (
                 SELECT
                     CASE
-                        WHEN :accountID IS NOT NULL AND EXISTS (
-                            SELECT 1
-                            FROM v_account_members_table
-                            WHERE account_id = :accountID AND user_id = :userID AND role != 'owner'
-                            LIMIT 1
-                        )
-                        THEN (
-                            SELECT user_id
-                            FROM v_account_members_table
-                            WHERE account_id = :accountID AND role = 'owner'
-                            LIMIT 1
-                        )
+                        WHEN :accountID IS NOT NULL
+                             AND :userID MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
+                             AND :userID != (SELECT owner_id FROM account_info_cte)
+                        THEN (SELECT owner_id FROM account_info_cte)
                         ELSE :userID
                     END AS resolved_user_id
-            ),
-            account_members_cte AS (
-                SELECT user_id
-                FROM v_account_members_table
-                WHERE account_id = :accountID
             ),
             sum_income AS (
                 SELECT
@@ -44,7 +38,7 @@ export const getCategories = () => {
                 FROM
                     v_transactions_table
                 WHERE
-                    ref_user_id IN (SELECT user_id FROM account_members_cte)
+                    ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
                     AND ref_accounts_id = :accountID
                     AND type = 'income'
                     AND (:dateStart IS NULL OR date BETWEEN :dateStart AND :dateEnd)
@@ -55,7 +49,7 @@ export const getCategories = () => {
                 FROM
                     v_transactions_table
                 WHERE
-                    ref_user_id IN (SELECT user_id FROM account_members_cte)
+                    ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
                     AND ref_accounts_id = :accountID
                     AND type = 'expense'
                     AND (:dateStart IS NULL OR date BETWEEN :dateStart AND :dateEnd)
@@ -70,7 +64,7 @@ export const getCategories = () => {
                 JOIN v_categories_table c
                     ON t.ref_categories_id = c.id
                 WHERE
-                    t.ref_user_id IN (SELECT user_id FROM account_members_cte)
+                    t.ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
                     AND t.ref_accounts_id = :accountID
                     AND (:dateStart IS NULL OR t.date BETWEEN :dateStart AND :dateEnd)
                 GROUP BY
@@ -91,7 +85,7 @@ export const getCategories = () => {
                             ON c.id = cd.ref_categories_id
                             AND c.ref_user_id = cd.ref_user_id
                         WHERE
-                            c.ref_user_id IN (SELECT user_id FROM account_members_cte)
+                            c.ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
                             AND (:type IS NULL OR c.type = :type)
                         LIMIT 1
                     ) THEN (
@@ -114,7 +108,7 @@ export const getCategories = () => {
                             ON c.id = cd.ref_categories_id
                             AND c.ref_user_id = cd.ref_user_id
                         WHERE
-                            c.ref_user_id IN (SELECT user_id FROM account_members_cte)
+                            c.ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
                             AND (:type IS NULL OR c.type = :type)
                     )
                     ELSE
@@ -129,21 +123,18 @@ export const getCategories = () => {
 
 export const getCategoriesOptions = () => {
   return `WITH
+            account_info_cte AS (
+                SELECT ref_user_id AS owner_id, ref_user_ids
+                FROM v_accounts
+                WHERE id = :accountID
+            ),
             resolved_user_cte AS (
                 SELECT
                     CASE
-                        WHEN :accountID IS NOT NULL AND EXISTS (
-                            SELECT 1
-                            FROM v_account_members_table
-                            WHERE account_id = :accountID AND user_id = :userID AND role != 'owner'
-                            LIMIT 1
-                        )
-                        THEN (
-                            SELECT user_id
-                            FROM v_account_members_table
-                            WHERE account_id = :accountID AND role = 'owner'
-                            LIMIT 1
-                        )
+                        WHEN :accountID IS NOT NULL
+                             AND :userID MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
+                             AND :userID != (SELECT owner_id FROM account_info_cte)
+                        THEN (SELECT owner_id FROM account_info_cte)
                         ELSE :userID
                     END AS resolved_user_id
             )
@@ -183,7 +174,23 @@ export const getCategoriesList = () => {
 };
 
 export const getCategoryByID = () => {
-  return `SELECT
+  return `WITH
+            account_info_cte AS (
+                SELECT ref_user_id AS owner_id, ref_user_ids
+                FROM v_accounts
+                WHERE id = :accountID
+            ),
+            resolved_user_cte AS (
+                SELECT
+                    CASE
+                        WHEN :accountID IS NOT NULL
+                             AND :userID MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
+                             AND :userID != (SELECT owner_id FROM account_info_cte)
+                        THEN (SELECT owner_id FROM account_info_cte)
+                        ELSE :userID
+                    END AS resolved_user_id
+            )
+            SELECT
                 c.id,
                 c.name,
                 c.type,
@@ -208,7 +215,7 @@ export const getCategoryByID = () => {
             FROM 
                 v_categories c
             WHERE
-                c.refUserID = :userID
+                c.refUserID = (SELECT resolved_user_id FROM resolved_user_cte)
                 AND c.id = :id
             LIMIT 1;`;
 };
