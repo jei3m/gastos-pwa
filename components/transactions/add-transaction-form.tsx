@@ -81,10 +81,6 @@ export default function AddTransactionForm({
   const isSharedAccount =
     selectedAccount && selectedAccount.memberCount > 1;
 
-  const availableTypes = isSharedAccount
-    ? transactionTypes.filter((t) => t !== 'Transfer')
-    : transactionTypes;
-
   const form = useForm<
     z.infer<typeof createTransactionSchema>
   >({
@@ -224,7 +220,7 @@ export default function AddTransactionForm({
                     className="-mt-1"
                   >
                     <TabsList className="bg-white border-2 w-full h-10">
-                      {availableTypes.map((type, index) => (
+                      {transactionTypes .map((type, index) => (
                         <TabsTrigger
                           value={type.toLowerCase()}
                           key={index}
