@@ -217,7 +217,7 @@ export default function EditAccount() {
         isMobile ? 'h-screen pb-31' : 'pb-4'
       )}
     >
-      <section className="p-3">
+      <section className="p-3 space-y-4">
         <div className="flex flex-row space-x-2 items-center">
           {isOwner ? (
             <>
