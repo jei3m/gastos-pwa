@@ -22,6 +22,7 @@ export const getAccounts = () => {
                 a.description,
                 a.totalBalance,
                 a.isDropdown,
+                a.ref_user_id = :userID AS isOwner,
                 JSON_LENGTH(a.ref_user_ids) AS memberCount
             FROM
                 v_accounts a
@@ -41,6 +42,7 @@ export const getAccountByID = () => {
                 a.description,
                 a.totalBalance,
                 a.isDropdown,
+                a.ref_user_id = :userID AS isOwner,
                 JSON_LENGTH(a.ref_user_ids) AS memberCount
             FROM
                 v_accounts a

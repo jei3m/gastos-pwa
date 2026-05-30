@@ -6,6 +6,7 @@ export interface Account {
   totalBalance: string;
   isDropdown: number;
   memberCount: number;
+  isOwner: number;
 }
 
 export interface AccountMember {

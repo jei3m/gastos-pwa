@@ -15,7 +15,6 @@ import {
 import {
   getMembers,
   getPendingInvitations,
-  checkAccountAccess,
 } from '@/lib/sql/members/members.sql';
 import { RowDataPacket } from 'mysql2';
 
@@ -89,13 +88,7 @@ export async function GET(
       }
     );
 
-    const [accessRows] = await db.query<RowDataPacket[]>(
-      checkAccountAccess(),
-      { accountID: id, userID }
-    );
-    const isOwner =
-      accessRows.length > 0 &&
-      accessRows[0].role === 'owner';
+    const isOwner = rows[0]?.isOwner === 1;
 
     const [members] = await db.query<RowDataPacket[]>(
       getMembers(),
