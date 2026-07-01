@@ -83,7 +83,7 @@ export default function AccountSelector() {
                     >
                       {account.name}
                       {account.memberCount > 1 && (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground mt-0.5">
                           (Shared)
                         </span>
                       )}
