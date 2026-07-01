@@ -12,6 +12,7 @@ CREATE PROCEDURE `manage_invitations`(
     IN p_invited_email VARCHAR(255),
     IN p_token VARCHAR(36),
     IN p_invitation_action VARCHAR(10),
+    IN p_is_internal BOOLEAN,
 
     OUT p_response JSON
 )
@@ -28,11 +29,15 @@ main: BEGIN
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-        ROLLBACK;
+        IF NOT p_is_internal THEN
+            ROLLBACK;
+        END IF;
         RESIGNAL;
     END;
 
-    START TRANSACTION;
+    IF NOT p_is_internal THEN
+        START TRANSACTION;
+    END IF;
 
     CASE p_action_type
         WHEN 'invite' THEN
@@ -305,7 +310,9 @@ main: BEGIN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Unsupported action type';
     END CASE;
 
-    COMMIT;
+    IF NOT p_is_internal THEN
+        COMMIT;
+    END IF;
 END $$
 DELIMITER ;
 -- END Stored Procedure Script

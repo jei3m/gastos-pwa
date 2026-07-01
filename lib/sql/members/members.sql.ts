@@ -1,51 +1,3 @@
-export const inviteMember = () => {
-  return `CALL manage_invitations
-            (
-                'invite',
-                :accountID,
-                :userID,
-                NULL,
-                :invitationID,
-                :invitedEmail,
-                :token,
-                NULL,
-                @response
-            );
-            SELECT @response AS response;`;
-};
-
-export const removeMember = () => {
-  return `CALL manage_invitations
-            (
-                'remove_member',
-                :accountID,
-                :userID,
-                :targetUserID,
-                NULL,
-                NULL,
-                NULL,
-                NULL,
-                @response
-            );
-            SELECT @response AS response;`;
-};
-
-export const cancelInvitation = () => {
-  return `CALL manage_invitations
-            (
-                'cancel_invitation',
-                :accountID,
-                :userID,
-                NULL,
-                :invitationID,
-                NULL,
-                NULL,
-                NULL,
-                @response
-            );
-            SELECT @response AS response;`;
-};
-
 export const respondToInvitation = () => {
   return `CALL manage_invitations
             (
@@ -57,6 +9,7 @@ export const respondToInvitation = () => {
                 NULL,
                 :token,
                 :invitationAction,
+                TRUE,
                 @response
             );
             SELECT @response AS response;`;

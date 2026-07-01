@@ -73,11 +73,11 @@ export default function AcceptInvitation() {
     },
   });
 
-  if (!token) {
-    return (
-      <main className="flex items-center justify-center min-h-screen p-4">
+  return (
+    <main className="flex items-center justify-center min-h-screen p-4 -mt-12 md:-mt-14">
+      {!token ? (
         <Card className="border-2 max-w-md w-full">
-          <CardContent className="pt-6 text-center">
+          <CardContent className="pt-2 text-center">
             <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <p className="text-lg font-medium">
               Invalid invitation link
@@ -87,29 +87,17 @@ export default function AcceptInvitation() {
             </p>
           </CardContent>
         </Card>
-      </main>
-    );
-  }
-
-  if (isPending) {
-    return (
-      <main className="flex items-center justify-center min-h-screen p-4">
+      ) : isPending ? (
         <Card className="border-2 max-w-md w-full">
-          <CardContent className="pt-6 space-y-4">
+          <CardContent className="pt-2 space-y-4">
             <Skeleton className="h-8 w-3/4 mx-auto bg-gray-300" />
             <Skeleton className="h-4 w-1/2 mx-auto bg-gray-300" />
             <Skeleton className="h-10 w-full bg-gray-300" />
           </CardContent>
         </Card>
-      </main>
-    );
-  }
-
-  if (error || !invitation) {
-    return (
-      <main className="flex items-center justify-center min-h-screen p-4">
+      ) : error || !invitation ? (
         <Card className="border-2 max-w-md w-full">
-          <CardContent className="pt-6 text-center">
+          <CardContent className="pt-2 text-center">
             <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <p className="text-lg font-medium">
               Invitation Error
@@ -121,82 +109,77 @@ export default function AcceptInvitation() {
             </p>
           </CardContent>
         </Card>
-      </main>
-    );
-  }
-
-  return (
-    <main className="flex items-center justify-center min-h-screen p-4">
-      <Card className="border-2 max-w-md w-full">
-        <CardHeader className="text-center">
-          <Mail className="h-12 w-12 text-primary mx-auto mb-2" />
-          <CardTitle className="text-xl">
-            Account Invitation
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {actionDone ? (
-            <div className="text-center space-y-4">
-              <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
-              <p className="text-lg font-medium">
-                {invitation.accountID
-                  ? 'Welcome to the account!'
-                  : 'Invitation declined'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Redirecting you to the app...
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">
-                      {invitation.inviterName}
+      ) : (
+        <Card className="border-2 max-w-md w-full">
+          <CardHeader className="text-center">
+            <Mail className="h-12 w-12 text-primary mx-auto mb-2" />
+            <CardTitle className="text-xl">
+              Account Invitation
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {actionDone ? (
+              <div className="text-center space-y-4">
+                <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
+                <p className="text-lg font-medium">
+                  {invitation.accountID
+                    ? 'Welcome to the account!'
+                    : 'Invitation declined'}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Redirecting you to the app...
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">
+                        {invitation.inviterName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {invitation.inviterEmail}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground">
+                      has invited you to join
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {invitation.inviterEmail}
+                    <p className="text-lg font-semibold mt-1">
+                      {invitation.accountName}
                     </p>
                   </div>
+                  <div className="text-center text-xs text-muted-foreground">
+                    Invited: {invitation.invitedEmail}
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">
-                    has invited you to join
-                  </p>
-                  <p className="text-lg font-semibold mt-1">
-                    {invitation.accountName}
-                  </p>
+                <div className="flex gap-3">
+                  <Button
+                    className="bg-red-500 flex-1 border-2"
+                    onClick={() => mutate('decline')}
+                    disabled={isResponding}
+                  >
+                    Decline
+                  </Button>
+                  <Button
+                    className="flex-1 space-x-2"
+                    onClick={() => mutate('accept')}
+                    disabled={isResponding}
+                  >
+                    {isResponding && (
+                      <Loader2 className="animate-spin" />
+                    )}
+                    <span>Accept</span>
+                  </Button>
                 </div>
-                <div className="text-center text-xs text-muted-foreground">
-                  Invited: {invitation.invitedEmail}
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1 border-2"
-                  onClick={() => mutate('decline')}
-                  disabled={isResponding}
-                >
-                  Decline
-                </Button>
-                <Button
-                  className="flex-1 space-x-2"
-                  onClick={() => mutate('accept')}
-                  disabled={isResponding}
-                >
-                  {isResponding && (
-                    <Loader2 className="animate-spin" />
-                  )}
-                  <span>Accept</span>
-                </Button>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </main>
   );
 }
