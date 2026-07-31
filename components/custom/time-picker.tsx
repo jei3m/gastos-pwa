@@ -117,7 +117,7 @@ export function TimePicker({
           variant="outline"
           type="button"
           className={cn(
-            'bg-white border-2 w-full justify-between text-left font-normal h-9 md:h-10',
+            'w-full justify-between text-left font-normal h-9 md:h-10',
             !value && 'text-muted-foreground',
             readOnly &&
               'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100 disabled:cursor-default'
