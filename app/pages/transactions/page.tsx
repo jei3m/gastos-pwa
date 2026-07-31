@@ -166,7 +166,7 @@ export default function Transactions() {
               onChange={(e) =>
                 setSearchFilter(e.target.value)
               }
-              className="pl-8 bg-white border-black border-2"
+              className="pl-8"
             />
           </div>
         </div>

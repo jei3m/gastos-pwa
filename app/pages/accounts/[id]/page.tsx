@@ -273,9 +273,6 @@ export default function EditAccount() {
                       required
                       placeholder="Account Name..."
                       {...field}
-                      className="h-9
-										rounded-lg border-2
-										border-black bg-white"
                     />
                   </FormControl>
                 </FormItem>
@@ -293,7 +290,7 @@ export default function EditAccount() {
                       value={field.value}
                       disabled={isLoading || !isOwner}
                     >
-                      <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
+                      <SelectTrigger className="w-full h-9">
                         <SelectValue placeholder="Select Account Type..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -321,9 +318,6 @@ export default function EditAccount() {
                     <Textarea
                       placeholder="Description..."
                       {...field}
-                      className="h-9
-										rounded-lg border-2
-										border-black bg-white"
                     />
                   </FormControl>
                 </FormItem>
@@ -377,14 +371,14 @@ export default function EditAccount() {
               <div className="flex flex-row justify-between">
                 <Button
                   onClick={() => router.back()}
-                  className="bg-red-500 border-2 hover:none"
+                  className="bg-red-500"
                   disabled={isLoading}
                   type="button"
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="border-2 space-x-2"
+                  className="space-x-2"
                   type="submit"
                   disabled={isLoading}
                 >

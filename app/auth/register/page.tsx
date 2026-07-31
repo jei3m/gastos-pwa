@@ -73,7 +73,7 @@ export default function Register() {
               type="text"
               autoComplete="name"
               required
-              className="mt-1 h-12 rounded-lg border-2 border-black bg-white"
+              className="mt-1 h-12"
             />
           </div>
 
@@ -90,7 +90,7 @@ export default function Register() {
               type="email"
               autoComplete="email"
               required
-              className="mt-1 h-12 rounded-lg border-2 border-black bg-white"
+              className="mt-1 h-12"
             />
           </div>
 
@@ -107,7 +107,7 @@ export default function Register() {
               type="password"
               autoComplete="new-password"
               required
-              className="mt-1 h-12 rounded-lg border-2 border-black bg-white"
+              className="mt-1 h-12"
             />
           </div>
 
@@ -120,7 +120,7 @@ export default function Register() {
           <Button
             type="submit"
             disabled={loading}
-            className="mt-1 h-12 w-full rounded-lg border-2 font-semibold"
+            className="mt-1 h-12 w-full rounded-lg font-semibold"
           >
             {loading ? 'Signing up…' : 'SIGN UP'}
           </Button>

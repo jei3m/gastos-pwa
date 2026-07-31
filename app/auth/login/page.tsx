@@ -78,7 +78,7 @@ export default function Login() {
               onClick={handleGoogleSignIn}
               disabled={googleLoading}
               variant="outline"
-              className="w-full h-12 rounded-xl border-2 bg-white items-center"
+              className="w-full h-12 rounded-xl items-center"
             >
               {googleLoading ? (
                 <div className="flex items-center justify-center gap-3">
