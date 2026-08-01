@@ -28,7 +28,7 @@ import CategoriesSection from '@/components/settings/categories-section';
 import { authClient } from '@/lib/auth/auth-client';
 import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
 import DataSection from '@/components/settings/data-section';
-import DangerZoneSection from '@/components/settings/danger-zone-section';
+// import DangerZoneSection from '@/components/settings/danger-zone-section';
 
 export default function Settings() {
   const [activeTab, setActiveTab] =
@@ -224,7 +224,7 @@ export default function Settings() {
       <DataSection isSessionPending={isPending} />
 
       {/* Danger Zone Section */}
-      <DangerZoneSection />
+      {/* <DangerZoneSection /> */}
     </main>
   );
 }
