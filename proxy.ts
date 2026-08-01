@@ -45,6 +45,7 @@ export const config = {
     '/pages/transactions/:path*',
     '/pages/categories/:path*',
     '/pages/accounts/:path*',
+    '/pages/settings/:path*',
     '/api/((?!auth).*)',
   ],
 };
