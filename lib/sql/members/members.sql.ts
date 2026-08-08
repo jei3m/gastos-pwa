@@ -19,11 +19,11 @@ export const getMembers = () => {
   return `SELECT
             am.user_id AS userID,
             u.email,
-            u.name,
-            u.image,
+            COALESCE(u.name, 'Deleted User') AS name,
+            COALESCE(u.image, '/images/profile-picture.png') AS image,
             am.role
           FROM v_account_members_table am
-          JOIN user u ON am.user_id = u.id
+          LEFT JOIN user u ON am.user_id = u.id
           WHERE am.account_id = :accountID
           ORDER BY am.role = 'owner' DESC, u.name ASC`;
 };

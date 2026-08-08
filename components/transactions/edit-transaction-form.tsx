@@ -84,7 +84,11 @@ export default function EditTransactionForm({
   const [datePickerOpen, setDatePickerOpen] =
     useState<boolean>(false);
   const router = useRouter();
-  const { selectedAccountID, accounts } = useAccount();
+  const {
+    selectedAccountID,
+    accounts,
+    selectedAccountDetails,
+  } = useAccount();
   const queryClient = useQueryClient();
   const params = useParams();
   const id =
@@ -249,13 +253,17 @@ export default function EditTransactionForm({
 
   const { data: session } = authClient.useSession();
 
+  const isAccountOwner = useMemo(() => {
+    return selectedAccountDetails?.isOwner ? true : false;
+  }, [selectedAccountDetails]);
+
   const isCreator = useMemo(() => {
     return transaction?.refUserID === session?.user.id;
   }, [transaction, session]);
 
   const isReadonly = useMemo(() => {
-    return !isLoading && !isCreator;
-  }, [isLoading, isCreator]);
+    return !isLoading && !isCreator && !isAccountOwner;
+  }, [isLoading, isCreator, isAccountOwner]);
 
   const isDisabled = useMemo(() => {
     return isLoading || isReadonly;
@@ -281,7 +289,7 @@ export default function EditTransactionForm({
               </TypographyH3>
             </div>
           ) : (
-            isCreator && (
+            !isReadonly && (
               <div className="flex justify-between items-center">
                 <TypographyH3>
                   Edit Transaction
@@ -372,7 +380,6 @@ export default function EditTransactionForm({
                     placeholder="0.00"
                     {...field}
                     readOnly={isReadonly}
-                    className="h-9 rounded-lg border-2 border-black bg-white"
                     type="number"
                     inputMode="decimal"
                     pattern="[0-9\.]*"
@@ -400,14 +407,14 @@ export default function EditTransactionForm({
                     >
                       <SelectTrigger
                         className={cn(
-                          'w-[180px] bg-white border-2 border-black w-full h-9',
+                          'w-full h-9',
                           isReadonly &&
                             'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100 disabled:cursor-default'
                         )}
                       >
                         <SelectValue placeholder="Select Category..." />
                       </SelectTrigger>
-                      <SelectContent className="border-2">
+                      <SelectContent>
                         {categories && (
                           <>
                             {categories.map(
@@ -456,14 +463,14 @@ export default function EditTransactionForm({
                         >
                           <SelectTrigger
                             className={cn(
-                              'w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg',
+                              'w-full h-9',
                               isReadonly &&
                                 'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100 disabled:cursor-default'
                             )}
                           >
                             <SelectValue placeholder="Select Account..." />
                           </SelectTrigger>
-                          <SelectContent className="border-2">
+                          <SelectContent>
                             {accounts && (
                               <>
                                 {filteredAccounts.map(
@@ -504,7 +511,6 @@ export default function EditTransactionForm({
                         placeholder="0.00"
                         {...field}
                         readOnly={isReadonly}
-                        className="h-9 rounded-lg border-2 border-black bg-white"
                         type="number"
                         inputMode="decimal"
                         pattern="[0-9\.]*"
@@ -531,7 +537,6 @@ export default function EditTransactionForm({
                     placeholder="Transaction note..."
                     {...field}
                     readOnly={isReadonly}
-                    className="h-9 rounded-lg border-2 border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -558,7 +563,7 @@ export default function EditTransactionForm({
                           variant="outline"
                           id="date"
                           className={cn(
-                            'justify-between font-normal border-2 bg-white text-[16px] h-9 md:h-10',
+                            'justify-between font-normal text-[16px] h-9 md:h-10',
                             isReadonly &&
                               'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100'
                           )}
@@ -636,7 +641,7 @@ export default function EditTransactionForm({
               )}
             />
           </div>
-          {isCreator && (
+          {!isReadonly && (
             <div className="flex flex-row justify-between">
               <Button
                 onClick={() => {
@@ -644,14 +649,14 @@ export default function EditTransactionForm({
                     ? onClose()
                     : router.back();
                 }}
-                className="bg-red-500 border-2 hover:none"
+                className="bg-red-500"
                 disabled={isDisabled}
                 type="button"
               >
                 Cancel
               </Button>
               <Button
-                className="border-2 space-x-2"
+                className="space-x-2"
                 type="submit"
                 disabled={isDisabled}
               >
@@ -684,7 +689,7 @@ export default function EditTransactionForm({
               </div>
               <p className="text-sm md:text-md text-muted-foreground text-center">
                 This transaction is view-only. Only the
-                creator can make changes.
+                creator or account owner can make changes.
               </p>
             </>
           )}

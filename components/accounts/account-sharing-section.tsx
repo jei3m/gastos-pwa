@@ -158,12 +158,12 @@ export default function AccountSharingSection({
                     onChange={(e) =>
                       setInviteInput(e.target.value)
                     }
-                    className="border-2 bg-white border-black h-9"
+                    className="h-9"
                   />
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-2 shrink-0 bg-primary text-white md:h-10"
+                    className="shrink-0 bg-primary text-white md:h-10"
                     disabled={!inviteInput.trim()}
                     onClick={() => {
                       onAddEmail?.(inviteInput.trim());
@@ -460,12 +460,12 @@ export default function AccountSharingSection({
                       onChange={(e) =>
                         setInviteInput(e.target.value)
                       }
-                      className="border-2 bg-white border-black h-9"
+                      className="h-9"
                     />
                     <Button
                       type="button"
                       variant="outline"
-                      className="border-2 shrink-0 bg-primary text-white md:h-10"
+                      className="shrink-0 bg-primary text-white md:h-10"
                       disabled={!inviteInput.trim()}
                       onClick={() => {
                         onAddEmail?.(inviteInput.trim());

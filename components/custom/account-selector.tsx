@@ -57,7 +57,6 @@ export default function AccountSelector() {
           `
           w-[180px]
           bg-primary
-          border-2 border-black
           min-w-[120px]
           text-sm`,
           isMobile ? 'w-auto' : 'w-full'
@@ -66,7 +65,7 @@ export default function AccountSelector() {
         <SelectValue placeholder="Accounts" />
       </SelectTrigger>
 
-      <SelectContent className="border-2 border-black">
+      <SelectContent className="border-black">
         <SelectGroup>
           {isAccountsLoading ? (
             <div className="flex flex-col justify-center">

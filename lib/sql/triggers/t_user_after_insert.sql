@@ -5,7 +5,10 @@ DELIMITER $$
 CREATE TRIGGER `user_AFTER_INSERT` 
 AFTER INSERT ON `user` 
 FOR EACH ROW 
-BEGIN
+main: BEGIN
+
+    DECLARE v_accounts_id CHAR(36) DEFAULT UUID();
+
     IF NEW.`id` IS NOT NULL THEN
         -- Insert First Account
         INSERT INTO accounts
@@ -18,11 +21,26 @@ BEGIN
         )
         VALUES
         (
-            UUID(),
+            v_accounts_id,
             NEW.`id`,
             'Account',
             'Cash',
             'First cash account'
+        );
+
+        INSERT INTO account_members
+        (
+            account_id,
+            user_id,
+            role,
+            joined_at
+        )
+        VALUES
+        (
+            v_accounts_id,
+            NEW.`id`,
+            'Owner',
+            NOW()
         );
 
         -- Insert Default Categories

@@ -53,7 +53,6 @@ export default function CustomAlertDialog({
           <AlertDialogCancel asChild>
             <Button
               variant="outline"
-              className="border-2"
               disabled={isDisabled}
             >
               Cancel
@@ -61,7 +60,7 @@ export default function CustomAlertDialog({
           </AlertDialogCancel>
           <Button
             variant="destructive"
-            className="border-2 space-x-2"
+            className="space-x-2"
             type={type || 'button'}
             onClick={onConfirm}
             disabled={isDisabled}

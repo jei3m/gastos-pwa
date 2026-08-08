@@ -115,9 +115,6 @@ export default function CreateAccount() {
                     required
                     placeholder="Account Name..."
                     {...field}
-                    className="h-9 
-                    rounded-lg border-2 
-                    border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -136,7 +133,7 @@ export default function CreateAccount() {
                     onValueChange={field.onChange}
                     disabled={isPending}
                   >
-                    <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9">
+                    <SelectTrigger className="w-full h-9">
                       <SelectValue placeholder="Select Account Type..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -164,9 +161,6 @@ export default function CreateAccount() {
                   <Textarea
                     placeholder="Description..."
                     {...field}
-                    className="h-9 
-                    rounded-lg border-2 
-                    border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -205,13 +199,13 @@ export default function CreateAccount() {
                 form.reset();
                 router.back();
               }}
-              className="bg-red-500 border-2 hover:none"
+              className="bg-red-500"
               disabled={isPending}
             >
               Cancel
             </Button>
             <Button
-              className="border-2 space-x-2"
+              className="space-x-2"
               type="submit"
               disabled={isPending}
             >

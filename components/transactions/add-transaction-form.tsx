@@ -253,7 +253,6 @@ export default function AddTransactionForm({
                     required
                     placeholder="0.00"
                     {...field}
-                    className="rounded-lg border-2 border-black bg-white"
                     type="number"
                     inputMode="decimal"
                     pattern="[0-9\.]*"
@@ -276,10 +275,10 @@ export default function AddTransactionForm({
                       value={field.value}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full">
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Category..." />
                       </SelectTrigger>
-                      <SelectContent className="border-2">
+                      <SelectContent>
                         {categories && (
                           <>
                             {categories.map(
@@ -320,10 +319,10 @@ export default function AddTransactionForm({
                         value={field.value}
                         disabled={isLoading}
                       >
-                        <SelectTrigger className="w-[180px] bg-white border-2 border-black w-full h-9 rounded-lg">
+                        <SelectTrigger className="w-full h-9">
                           <SelectValue placeholder="Select Account..." />
                         </SelectTrigger>
-                        <SelectContent className="border-2">
+                        <SelectContent>
                           {accounts && (
                             <>
                               {filteredAccounts.map(
@@ -362,7 +361,6 @@ export default function AddTransactionForm({
                         required
                         placeholder="0.00"
                         {...field}
-                        className="rounded-lg border-2 border-black bg-white"
                         type="number"
                         inputMode="decimal"
                         pattern="[0-9\.]*"
@@ -386,8 +384,6 @@ export default function AddTransactionForm({
                     required
                     placeholder="Transaction note..."
                     {...field}
-                    className="rounded-lg border-2
-                    border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -411,7 +407,7 @@ export default function AddTransactionForm({
                           disabled={isLoading}
                           variant="outline"
                           id="date"
-                          className="justify-between font-normal border-2 bg-white text-[16px] h-9 md:h-10"
+                          className="justify-between font-normal text-[16px] h-9 md:h-10"
                         >
                           {transactionDate
                             ? new Date(
@@ -493,7 +489,7 @@ export default function AddTransactionForm({
                   router.back();
                 }
               }}
-              className="bg-red-500 border-2 hover:none"
+              className="bg-red-500"
               disabled={isLoading}
               type="button"
             >
@@ -504,7 +500,6 @@ export default function AddTransactionForm({
                 isDisabled={isLoading}
                 trigger={
                   <Button
-                    className="border-2"
                     type="button"
                     disabled={isLoading}
                   >
@@ -539,7 +534,7 @@ export default function AddTransactionForm({
               />
             ) : (
               <Button
-                className="border-2 space-x-2"
+                className="space-x-2"
                 type="submit"
                 disabled={isLoading}
               >

@@ -166,7 +166,7 @@ export default function Transactions() {
               onChange={(e) =>
                 setSearchFilter(e.target.value)
               }
-              className="pl-8 bg-white border-black border-2"
+              className="pl-8"
             />
           </div>
         </div>
@@ -184,9 +184,7 @@ export default function Transactions() {
                       <TransactionCard
                         transaction={transaction}
                         isShared={
-                          account?.memberCount
-                            ? account.memberCount > 1
-                            : false
+                          account?.isShared ? true : false
                         }
                         key={index}
                       />

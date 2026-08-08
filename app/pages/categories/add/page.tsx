@@ -153,9 +153,6 @@ export default function CreateCategory() {
                     required
                     placeholder="Category Name..."
                     {...field}
-                    className="h-9
-											rounded-lg border-2
-											border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -172,9 +169,6 @@ export default function CreateCategory() {
                   <Textarea
                     placeholder="Description..."
                     {...field}
-                    className="h-9
-										rounded-lg border-2
-										border-black bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -187,14 +181,14 @@ export default function CreateCategory() {
                 form.reset();
                 router.back();
               }}
-              className="bg-red-500 border-2 hover:none"
+              className="bg-red-500"
               disabled={isPending}
               type="button"
             >
               Cancel
             </Button>
             <Button
-              className="border-2 space-x-2"
+              className="space-x-2"
               type="submit"
               disabled={isPending}
             >

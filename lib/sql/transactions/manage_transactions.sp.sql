@@ -122,7 +122,7 @@ main: BEGIN
                 transactions
             WHERE
                 id = p_id
-                AND ref_user_id = p_ref_user_id
+                AND ref_accounts_id = p_ref_accounts_id
             LIMIT 1;
 
             -- Validate transaction id
@@ -174,7 +174,7 @@ main: BEGIN
 				ref_categories_id = p_ref_categories_id
 			WHERE
 				id = p_id
-				AND ref_user_id = p_ref_user_id
+				AND ref_accounts_id = p_ref_accounts_id
 			LIMIT 1;
 
 			SET v_affected_rows = ROW_COUNT();
@@ -200,7 +200,7 @@ main: BEGIN
                     'responseCode', 500,
                     'responseMessage', 'Failed to Update Transaction'
                 );
-                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Failed to Update Transaction';
+                LEAVE main;
             END IF;
 
 		WHEN 'delete' THEN
@@ -217,7 +217,15 @@ main: BEGIN
                 transactions
             WHERE
                 id = p_id
-                AND ref_user_id = p_ref_user_id
+                AND (
+                    ref_user_id = p_ref_user_id
+                    OR ref_accounts_id IN (
+                        SELECT account_id 
+                        FROM account_members 
+                        WHERE user_id = p_ref_user_id 
+                            AND role = 'owner'
+                    )
+                )
             LIMIT 1;
 
             -- Validate transaction id
@@ -238,8 +246,14 @@ main: BEGIN
                 accounts
             WHERE
                 id = v_ref_accounts_id
-                AND (ref_user_id = p_ref_user_id
-                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                AND (
+                    ref_user_id = p_ref_user_id
+                    OR id IN (
+                        SELECT account_id
+                        FROM account_members
+                        WHERE user_id = p_ref_user_id
+                    )
+                )
             LIMIT 1;
 
             -- Calculate new balance before deleting
@@ -259,7 +273,7 @@ main: BEGIN
                 transactions
             WHERE
                 id = p_id
-                AND ref_user_id = p_ref_user_id
+                AND ref_accounts_id = v_ref_accounts_id
             LIMIT 1;
 
             SET v_affected_rows = ROW_COUNT();
@@ -272,8 +286,14 @@ main: BEGIN
                     total_balance = v_new_balance
                 WHERE
                     id = v_ref_accounts_id
-                    AND (ref_user_id = p_ref_user_id
-                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                    AND (
+                        ref_user_id = p_ref_user_id
+                        OR id IN (
+                            SELECT account_id
+                            FROM account_members
+                            WHERE user_id = p_ref_user_id
+                        )
+                    )
                 LIMIT 1;
 
                 SET p_response = JSON_OBJECT(
@@ -285,7 +305,7 @@ main: BEGIN
                     'responseCode', 500,
                     'responseMessage', 'Failed to Delete Transaction'
                 );
-                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Failed to Delete Transaction';
+                LEAVE main;
             END IF;
 
 		ELSE
