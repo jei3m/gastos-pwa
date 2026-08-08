@@ -9,7 +9,10 @@ import {
   QueryObserverResult,
   useQuery,
 } from '@tanstack/react-query';
-import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
+import {
+  accountByIDQueryOptions,
+  accountsQueryOptions,
+} from '@/lib/tq-options/accounts.tq.options';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
 type AccountContextType = {
@@ -18,6 +21,7 @@ type AccountContextType = {
   refetchAccountsData: () => Promise<QueryObserverResult>;
   isAccountsLoading: boolean;
   accounts: Account[];
+  selectedAccountDetails: Account;
 };
 
 const AccountContext = createContext<
@@ -38,6 +42,10 @@ export function AccountProvider({
     refetch,
   } = useQuery(accountsQueryOptions());
 
+  const { data: selectedAccountDetails } = useQuery(
+    accountByIDQueryOptions(selectedAccountID!)
+  );
+
   const refetchAccountsData = () => {
     return refetch();
   };
@@ -50,6 +58,7 @@ export function AccountProvider({
         refetchAccountsData,
         isAccountsLoading,
         accounts,
+        selectedAccountDetails,
       }}
     >
       {children}
