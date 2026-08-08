@@ -33,8 +33,8 @@ export const getTransactions = () => {
             t.ref_user_id,
             t.ref_accounts_id,
             a.ref_user_ids,
-            u.name AS userName,
-            u.image AS userImage,
+            COALESCE(u.name, 'Deleted User') AS userName,
+            COALESCE(u.image, '/images/profile-picture.png') AS userImage,
             ROW_NUMBER() OVER (PARTITION BY t.date ORDER BY t.time ASC) as time_order
         FROM v_transactions_table t
         LEFT JOIN v_categories_table c on t.ref_categories_id = c.id
@@ -164,8 +164,8 @@ export const getTransactionByID = () => {
                 v.refCategoriesID,
                 v.refTransferToAccountsID,
                 v.refUserID AS refUserID,
-                u.name AS userName,
-                u.image AS userImage,
+                COALESCE(u.name, 'Deleted User') AS userName,
+                COALESCE(u.image, '/images/profile-picture.png') AS userImage,
                 ta.name AS transferToAccountName
             FROM
                 v_transaction_details v
