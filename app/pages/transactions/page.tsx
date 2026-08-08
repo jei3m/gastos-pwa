@@ -184,9 +184,7 @@ export default function Transactions() {
                       <TransactionCard
                         transaction={transaction}
                         isShared={
-                          account?.memberCount
-                            ? account.memberCount > 1
-                            : false
+                          account?.isShared ? true : false
                         }
                         key={index}
                       />
