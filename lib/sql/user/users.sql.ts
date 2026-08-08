@@ -136,3 +136,11 @@ export const getExportData = () => {
             ) AS export;
     `;
 };
+
+export const deleteUser = () => {
+  return `CALL delete_user(
+        :userID,
+        @response
+    );
+    SELECT @response AS response;`;
+};
