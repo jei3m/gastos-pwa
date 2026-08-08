@@ -84,7 +84,11 @@ export default function EditTransactionForm({
   const [datePickerOpen, setDatePickerOpen] =
     useState<boolean>(false);
   const router = useRouter();
-  const { selectedAccountID, accounts } = useAccount();
+  const {
+    selectedAccountID,
+    accounts,
+    selectedAccountDetails,
+  } = useAccount();
   const queryClient = useQueryClient();
   const params = useParams();
   const id =
@@ -249,12 +253,16 @@ export default function EditTransactionForm({
 
   const { data: session } = authClient.useSession();
 
+  const isAccountOwner = useMemo(() => {
+    return selectedAccountDetails?.isOwner ? true : false;
+  }, [selectedAccountDetails]);
+
   const isCreator = useMemo(() => {
     return transaction?.refUserID === session?.user.id;
   }, [transaction, session]);
 
   const isReadonly = useMemo(() => {
-    return !isLoading && !isCreator;
+    return !isLoading && !isCreator && !isAccountOwner;
   }, [isLoading, isCreator]);
 
   const isDisabled = useMemo(() => {
@@ -281,7 +289,7 @@ export default function EditTransactionForm({
               </TypographyH3>
             </div>
           ) : (
-            isCreator && (
+            !isReadonly && (
               <div className="flex justify-between items-center">
                 <TypographyH3>
                   Edit Transaction
@@ -633,7 +641,7 @@ export default function EditTransactionForm({
               )}
             />
           </div>
-          {isCreator && (
+          {!isReadonly && (
             <div className="flex flex-row justify-between">
               <Button
                 onClick={() => {
@@ -681,7 +689,7 @@ export default function EditTransactionForm({
               </div>
               <p className="text-sm md:text-md text-muted-foreground text-center">
                 This transaction is view-only. Only the
-                creator can make changes.
+                creator or account owner can make changes.
               </p>
             </>
           )}
