@@ -62,7 +62,7 @@ export default function CategoriesSection({
   };
 
   return (
-    <section className="space-y-4 mb-2">
+    <section className="space-y-4">
       <Tabs
         value={activeTab}
         onValueChange={handleTabChange}
