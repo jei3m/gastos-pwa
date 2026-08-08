@@ -263,7 +263,7 @@ export default function EditTransactionForm({
 
   const isReadonly = useMemo(() => {
     return !isLoading && !isCreator && !isAccountOwner;
-  }, [isLoading, isCreator]);
+  }, [isLoading, isCreator, isAccountOwner]);
 
   const isDisabled = useMemo(() => {
     return isLoading || isReadonly;
