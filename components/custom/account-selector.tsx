@@ -81,8 +81,8 @@ export default function AccountSelector() {
                       value={account.id}
                     >
                       {account.name}
-                      {account.memberCount > 1 && (
-                        <span className="text-xs text-muted-foreground mt-0.5">
+                      {Boolean(account.isShared) && (
+                        <span className="text-xs text-muted-foreground mt-0.5 -ml-1">
                           (Shared)
                         </span>
                       )}
