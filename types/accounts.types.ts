@@ -5,7 +5,6 @@ export interface Account {
   description: string;
   totalBalance: string;
   isDropdown: number;
-  memberCount: number;
   isOwner: number;
   isShared: 0 | 1;
 }

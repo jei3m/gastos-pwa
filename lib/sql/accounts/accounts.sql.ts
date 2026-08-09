@@ -26,14 +26,13 @@ export const getAccounts = () => {
                 a.totalBalance,
                 a.isDropdown,
                 a.ref_user_id = :userID AS isOwner,
-                JSON_LENGTH(a.ref_user_ids) AS memberCount,
                 EXISTS (
                     SELECT 1
                     FROM v_transactions_table t
                     WHERE t.ref_accounts_id = a.id
                     AND t.ref_user_id <> a.ref_user_id
                     LIMIT 1
-                ) AS isShared
+                ) OR JSON_LENGTH(a.ref_user_ids) > 1 AS isShared
             FROM v_accounts a
             WHERE
                 :userID MEMBER OF(ref_user_ids)
@@ -52,14 +51,13 @@ export const getAccountByID = () => {
                 a.totalBalance,
                 a.isDropdown,
                 a.ref_user_id = :userID AS isOwner,
-                JSON_LENGTH(a.ref_user_ids) AS memberCount,
                 EXISTS (
                     SELECT 1
                     FROM v_transactions_table t
                     WHERE t.ref_accounts_id = a.id
                     AND t.ref_user_id <> a.ref_user_id
                     LIMIT 1
-                ) AS isShared
+                ) OR JSON_LENGTH(a.ref_user_ids) > 1 AS isShared
             FROM
                 v_accounts a
             WHERE
