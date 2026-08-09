@@ -17,6 +17,9 @@ Gastos is a comprehensive budget tracking application designed to help users man
 - **Google oAuth**: Quick and easy registration using your Google account
 - **Date Range Filtering**: Analyze finances within specific time periods
 - **Rate Limiting**: Protected API routes to ensure fair usage and stability
+- **Data Export**: Download your account data as a JSON backup for safekeeping
+- **Session Management**: View active sessions with device details and sign out remotely
+- **Account Deletion**: Permanently delete your account and all associated data
 
 ## Technologies Used
 
@@ -42,3 +45,4 @@ Gastos is a comprehensive budget tracking application designed to help users man
 4. **Track Transactions**: Add transactions in the Transactions section by specifying amount, category, date, and note
 5. **View Analytics**: Check the Categories section to see spending breakdowns
 6. **Monitor Balances**: View account balances and net worth on the Accounts page
+7. **Manage Your Account**: Export data, manage sessions, or delete your account in the Settings section
