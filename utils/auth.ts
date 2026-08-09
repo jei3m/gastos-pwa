@@ -10,7 +10,6 @@ export const auth = betterAuth({
       enabled: true,
       beforeDelete: async (user) => {
         try {
-          console.log(user);
           await db.query(deleteUser(), { userID: user.id });
         } catch (error) {
           if (error instanceof Error)
@@ -34,7 +33,7 @@ export const auth = betterAuth({
   plugins: [nextCookies()],
   baseURL: process.env.BETTER_AUTH_URL,
   basePath: 'api/auth',
-  trustedOrigins: ['*'],
+  trustedOrigins: [process.env.BETTER_AUTH_URL!],
   socialProviders: {
     google: {
       prompt: 'select_account',
