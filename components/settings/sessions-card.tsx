@@ -55,14 +55,19 @@ const getDeviceInfo = (
   }
   const parser = new UAParser(userAgent);
   const { browser, os, device } = parser.getResult();
+
   const deviceName =
     device.model && device.vendor
       ? `${device.vendor} ${device.model}`
       : device.model;
-  const parts = [deviceName, browser.name, os.name].filter(
-    (part): part is string => !!part
-  );
+
+  const parts = [
+    deviceName,
+    browser.name,
+    device.type === 'mobile' ? '' : os.name,
+  ].filter((part): part is string => !!part);
   const label = parts.join(' · ') || 'Unknown device';
+
   const type =
     device.type === 'mobile'
       ? 'mobile'
