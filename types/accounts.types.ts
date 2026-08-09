@@ -7,6 +7,7 @@ export interface Account {
   isDropdown: number;
   memberCount: number;
   isOwner: number;
+  isShared: 0 | 1;
 }
 
 export interface AccountMember {
