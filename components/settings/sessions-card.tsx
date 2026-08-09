@@ -94,11 +94,6 @@ export default function SessionsCard({
     if (!sessions) return [];
     return sessions
       .slice()
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() -
-          new Date(a.createdAt).getTime()
-      )
       .map((session: SessionData) => {
         const isCurrent = session.token === currentToken;
         return {
@@ -106,6 +101,14 @@ export default function SessionsCard({
           isCurrent,
           device: getDeviceInfo(session.userAgent),
         };
+      })
+      .sort((a, b) => {
+        if (a.isCurrent !== b.isCurrent)
+          return a.isCurrent ? -1 : 1;
+        return (
+          new Date(b.createdAt).getTime() -
+          new Date(a.createdAt).getTime()
+        );
       });
   }, [sessions, currentToken]);
 
