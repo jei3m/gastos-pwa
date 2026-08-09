@@ -51,10 +51,7 @@ export default function CustomAlertDialog({
         {body && <div className="text-sm">{body}</div>}
         <AlertDialogFooter className="flex flex-row justify-between">
           <AlertDialogCancel asChild>
-            <Button
-              variant="outline"
-              disabled={isDisabled}
-            >
+            <Button variant="outline" disabled={isDisabled}>
               Cancel
             </Button>
           </AlertDialogCancel>
