@@ -270,19 +270,28 @@ export default function SessionsCard({
         </CardContent>
         {!isLoading && sessionRows.length > 1 && (
           <CardContent className="mt-4">
-            <Button
-              variant="ghost"
-              className="w-full text-red-500"
-              onClick={() => revokeOthersMutation.mutate()}
-              disabled={revokeOthersMutation.isPending}
-            >
-              {revokeOthersMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ShieldCheck className="h-4 w-4" />
-              )}
-              Sign out all other sessions
-            </Button>
+            <CustomAlertDialog
+              isDisabled={revokeOthersMutation.isPending}
+              trigger={
+                <Button
+                  variant="ghost"
+                  className="w-full text-red-500"
+                >
+                  {revokeOthersMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ShieldCheck className="h-4 w-4" />
+                  )}
+                  Log out all other sessions
+                </Button>
+              }
+              title="Log out of all other devices?"
+              description="This will end the session on every other device and sign them out, except for this current device."
+              confirmMessage="Log out"
+              onConfirm={() =>
+                revokeOthersMutation.mutate()
+              }
+            />
           </CardContent>
         )}
       </div>
