@@ -27,8 +27,10 @@ import AccountsSection from '@/components/settings/accounts-section';
 import CategoriesSection from '@/components/settings/categories-section';
 import { authClient } from '@/lib/auth/auth-client';
 import { accountsQueryOptions } from '@/lib/tq-options/accounts.tq.options';
-import DataPrivacySection from '@/components/settings/data-privacy-section';
+import ExportDataCard from '@/components/settings/export-data-card';
 import DangerZoneSection from '@/components/settings/danger-zone-section';
+import { TypographyH4 } from '@/components/custom/typography';
+import SessionsCard from '@/components/settings/sessions-card';
 
 export default function Settings() {
   const [activeTab, setActiveTab] =
@@ -221,7 +223,13 @@ export default function Settings() {
       />
 
       {/* Data & Privacy Section */}
-      <DataPrivacySection isSessionPending={isPending} />
+      <section className="space-y-4">
+        <TypographyH4 className="font-semibold">
+          Data &amp; Privacy
+        </TypographyH4>
+        <ExportDataCard isSessionPending={isPending} />
+        <SessionsCard isSessionPending={isPending} />
+      </section>
 
       {/* Danger Zone Section */}
       <DangerZoneSection />
