@@ -315,7 +315,7 @@ export default function Accounts() {
                           {selectedAccountID ===
                             account.id && (
                             <span className="inline-flex items-center flex-shrink-0 mt-1">
-                              <span className="h-3 w-3 rounded-full bg-green-500 ring-4 ring-green-200" />
+                              <span className="h-3 w-3 rounded-full bg-green-500 ring-4 ring-green-200 animate-pulse" />
                             </span>
                           )}
                         </div>
