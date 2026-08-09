@@ -88,17 +88,23 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-html {
-  @apply overflow-x-hidden;
-}
-
 body {
-  @apply !min-w-full;
+  @apply overflow-x-hidden !min-w-full;
 }
 
 @media (max-width: 767px) {
   body {
     overflow-y: hidden;
+  }
+}
+
+@media (max-width: 468px) {
+  html {
+    @apply overflow-x-hidden;
+  }
+
+  body {
+    @apply !min-w-full;
   }
 }
 

@@ -11,15 +11,15 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchUserDataExport } from '@/lib/tq-functions/user.tq.functions';
 import { cn } from '@/lib/utils';
-import { TypographyH4 } from '../custom/typography';
+import { Download } from 'lucide-react';
 
-interface DataSectionProps {
+interface ExportDataCardProps {
   isSessionPending: boolean;
 }
 
-export default function DataPrivacySection({
+export default function ExportDataCard({
   isSessionPending,
-}: DataSectionProps) {
+}: ExportDataCardProps) {
   const [isExporting, setIsExporting] =
     useState<boolean>(false);
 
@@ -58,40 +58,40 @@ export default function DataPrivacySection({
   };
 
   return (
-    <section className="space-y-4">
-      <TypographyH4 className="font-semibold">
-        Data &amp; Privacy
-      </TypographyH4>
-      <Card className={cn('border-2')}>
-        <div className="flex items-center justify-between px-4">
-          <div className="flex-1">
-            <CardHeader className="p-0 -mb-1">
-              <CardTitle className="text-md font-medium text-foreground">
-                Export Data
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="text-sm text-muted-foreground">
-                Download all of your accounts, categories,
-                and transactions as a JSON file.
-              </div>
-            </CardContent>
-          </div>
-
-          <div className="ml-4 flex-shrink-0">
-            {isSessionPending ? (
-              <Skeleton className="h-9 w-32 bg-gray-300" />
-            ) : (
-              <Button
-                onClick={handleExport}
-                disabled={isExporting}
-              >
-                Export
-              </Button>
-            )}
-          </div>
+    <Card className={cn('border-2')}>
+      <div className="flex items-center justify-between px-4">
+        <div className="flex-1">
+          <CardHeader className="p-0 -mb-1">
+            <CardTitle className="text-md font-medium text-foreground">
+              Export Data
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="text-sm text-muted-foreground">
+              Download all of your accounts, categories, and
+              transactions as a JSON file.
+            </div>
+          </CardContent>
         </div>
-      </Card>
-    </section>
+
+        <div className="ml-4 flex-shrink-0">
+          {isSessionPending ? (
+            <Skeleton className="h-9 w-32 bg-gray-300" />
+          ) : (
+            <Button
+              onClick={handleExport}
+              disabled={isExporting}
+              variant="ghost"
+              className="text-green-500 px-1 sm:px-4"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                Export
+              </span>
+            </Button>
+          )}
+        </div>
+      </div>
+    </Card>
   );
 }

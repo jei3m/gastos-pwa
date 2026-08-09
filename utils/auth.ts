@@ -24,11 +24,9 @@ export const auth = betterAuth({
   },
   session: {
     cookieCache: {
-      enabled: true,
-      maxAge: 10 * 60, // 10mins
-      strategy: 'compact',
+      enabled: false,
     },
-    refreshCache: true,
+    expiresIn: 60 * 60 * 24 * 30, // 30 days
   },
   plugins: [nextCookies()],
   baseURL: process.env.BETTER_AUTH_URL,

@@ -13,6 +13,7 @@ import { authClient } from '@/lib/auth/auth-client';
 import { cn } from '@/lib/utils';
 import { TypographyH4 } from '../custom/typography';
 import { Button } from '../ui/button';
+import { TrashIcon } from 'lucide-react';
 
 export default function DangerZoneSection() {
   const router = useRouter();
@@ -75,8 +76,14 @@ export default function DangerZoneSection() {
               isDisabled={isDeleting}
               trigger={
                 <div className="w-fit">
-                  <Button variant={'destructive'}>
-                    Delete
+                  <Button
+                    variant="ghost"
+                    className="text-red-500 px-1 sm:px-4"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                    <span className="hidden sm:inline">
+                      Delete
+                    </span>
                   </Button>
                 </div>
               }
