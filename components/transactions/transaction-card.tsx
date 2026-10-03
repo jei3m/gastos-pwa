@@ -44,7 +44,7 @@ function TransactionCard({
     ? pathname
     : '/pages/transactions';
   return (
-    <Card className="border-2">
+    <Card>
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span className="text-md md:text-xl">
@@ -146,7 +146,7 @@ function TransactionCard({
                     </div>
                     {isShared && detail.userName && (
                       <div className="absolute -bottom-1.5 -right-1.5">
-                        <Avatar className="size-6 border-2 border-background">
+                        <Avatar className="size-6">
                           <AvatarImage
                             src={detail.userImage ?? ''}
                             alt={detail.userName}
