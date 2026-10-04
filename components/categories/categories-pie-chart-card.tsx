@@ -9,12 +9,11 @@ import {
 } from '@/components/ui/card';
 import {
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   type ChartConfig,
 } from '@/components/ui/chart';
 import { Category } from '@/types/categories.types';
-import { Inbox } from 'lucide-react';
+import { CalendarDays, Inbox } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface CategoryPieChartProps {
   categories: Category[];
@@ -29,7 +28,7 @@ export function CategoryPieChart({
   dateStart,
   dateEnd,
 }: CategoryPieChartProps) {
-  const { chartData, chartConfig } = useMemo(() => {
+  const { chartData, chartConfig, total } = useMemo(() => {
     // Filter categories by the selected type (income or expense)
     const filteredCategories = categories.filter(
       (cat) =>
@@ -56,15 +55,22 @@ export function CategoryPieChart({
         ? expenseColors
         : incomeColors;
 
-    const data = filteredCategories.map((cat, index) => {
-      const color =
-        colorPalette[index % colorPalette.length];
-      return {
-        name: cat.name,
-        value: cat.totalAmount,
-        fill: color,
-      };
-    });
+    const data = filteredCategories
+      .map((cat, index) => {
+        const color =
+          colorPalette[index % colorPalette.length];
+        return {
+          name: cat.name,
+          value: cat.totalAmount,
+          fill: color,
+        };
+      })
+      .sort((a, b) => Number(b.value) - Number(a.value));
+
+    const total = data.reduce(
+      (sum, item) => sum + Number(item.value),
+      0
+    );
 
     const config: ChartConfig = {
       value: {
@@ -80,53 +86,105 @@ export function CategoryPieChart({
       };
     });
 
-    return { chartData: data, chartConfig: config };
+    return { chartData: data, chartConfig: config, total };
   }, [categories, categoryType]);
 
   const dateRangeText =
     dateStart && dateEnd
-      ? `${dateStart} – ${dateEnd}`
+      ? `${format(dateStart, 'MMM dd, yyyy')} to ${format(dateEnd, 'MMM dd, yyyy')}`
       : dateStart
-        ? `From ${dateStart}`
+        ? `From ${format(dateStart, 'MMM dd, yyyy')}`
         : dateEnd
-          ? `Until ${dateEnd}`
+          ? `Until ${format(dateEnd, 'MMM dd, yyyy')}`
           : 'All time';
 
   const chartTitle =
-    categoryType === 'expense' ? 'Expense' : 'Income';
+    categoryType.toLowerCase() === 'expense'
+      ? 'Expense Breakdown'
+      : 'Income Breakdown';
+  const isExpense =
+    categoryType.toLowerCase() === 'expense';
 
   return (
-    <Card className="flex flex-col border-2 mt-0">
-      <CardHeader className="items-center pb-2">
-        <CardTitle className="text-lg md:text-xl">
-          {chartTitle}
-        </CardTitle>
-        <CardDescription className="text-sm md:text-md -mt-2">
-          {dateRangeText}
-        </CardDescription>
+    <Card className="flex flex-col border-2 border-black">
+      <CardHeader>
+        <div className="flex flex-col gap-0">
+          <CardTitle className="text-lg md:text-xl">
+            {chartTitle}
+          </CardTitle>
+          <CardDescription className="flex items-center gap-1.5 text-sm">
+            <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+            {dateRangeText}
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col items-center gap-2">
+      <CardContent className="-mb-1 flex-1 flex flex-col items-center">
         {chartData.length > 0 ? (
-          <ChartContainer
-            config={chartConfig}
-            className="h-60 w-full -mt-2"
-          >
-            <PieChart className="flex flex-col md:flex-row">
-              <Pie
-                data={chartData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={80}
-                isAnimationActive={false}
+          <>
+            <div className="relative h-60 w-full -mt-8">
+              <ChartContainer
+                config={chartConfig}
+                className="h-full w-full p-0"
+              >
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={80}
+                    stroke="none"
+                    strokeWidth={0}
+                    isAnimationActive={false}
+                  />
+                </PieChart>
+              </ChartContainer>
+              <div
+                aria-hidden
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[160px] w-[160px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-black"
               />
-              <ChartLegend
-                content={
-                  <ChartLegendContent nameKey="name" />
-                }
-                className="flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
-              />
-            </PieChart>
-          </ChartContainer>
+            </div>
+            <ul className="-mt-6 w-full space-y-3 px-1 py-2">
+              {chartData.map((item) => {
+                const percent =
+                  total > 0
+                    ? Math.round(
+                        (Number(item.value) / total) * 100
+                      )
+                    : 0;
+                return (
+                  <li
+                    key={item.name}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="flex items-center gap-2 font-medium">
+                      <span
+                        className="h-3 w-3 shrink-0 rounded-full"
+                        style={{
+                          backgroundColor: item.fill,
+                        }}
+                      />
+                      {item.name}
+                    </span>
+                    <span className="flex items-center gap-3 tabular-nums text-muted-foreground">
+                      <span>
+                        PHP{' '}
+                        {Number(item.value).toLocaleString(
+                          'en-PH',
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
+                      </span>
+                      <span className="w-10 text-right font-semibold">
+                        {percent}%
+                      </span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
         ) : (
           <div className="-my-10 flex flex-col items-center justify-center gap-4 py-12 text-muted-foreground">
             <div className="rounded-full bg-muted p-4">
