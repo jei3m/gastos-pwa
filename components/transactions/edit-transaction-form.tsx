@@ -269,10 +269,14 @@ export default function EditTransactionForm({
     return isLoading || isReadonly;
   }, [isLoading, isReadonly]);
 
+  const isTransactionTypeDisabled = useMemo(() => {
+    return transaction || isDisabled;
+  }, [transaction, isDisabled]);
+
   return (
     <main
       className={cn(
-        'flex flex-col space-y-4',
+        'flex flex-col space-y-2 md:space-y-4',
         !isModal && 'p-3'
       )}
     >
@@ -317,7 +321,7 @@ export default function EditTransactionForm({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col space-y-4"
+          className="flex flex-col space-y-6"
         >
           <FormField
             control={form.control}
@@ -343,16 +347,18 @@ export default function EditTransactionForm({
                           <TabsTrigger
                             value={type.toLowerCase()}
                             key={index}
-                            disabled={isDisabled}
-                            className={cn(
-                              'text-md',
+                            disabled={
+                              isTransactionTypeDisabled
+                            }
+                            className={`text-md
+                            ${
                               field.value.toLowerCase() ===
                                 'expense' ||
-                                field.value.toLowerCase() ===
-                                  'transfer'
+                              field.value.toLowerCase() ===
+                                'transfer'
                                 ? 'data-[state=active]:bg-red-400'
                                 : 'data-[state=active]:bg-green-300'
-                            )}
+                            }`}
                           >
                             {type}
                           </TabsTrigger>
@@ -371,9 +377,7 @@ export default function EditTransactionForm({
             disabled={isDisabled}
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
-                  Amount
-                </FormLabel>
+                <FormLabel>Amount</FormLabel>
                 <FormControl>
                   <Input
                     required
@@ -396,9 +400,7 @@ export default function EditTransactionForm({
               disabled={isDisabled}
               render={({ field }) => (
                 <FormItem className="-space-y-1">
-                  <FormLabel className="text-md font-medium">
-                    Category
-                  </FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
@@ -407,7 +409,7 @@ export default function EditTransactionForm({
                     >
                       <SelectTrigger
                         className={cn(
-                          'w-full h-9',
+                          'w-full',
                           isReadonly &&
                             'bg-gray-50 border-dashed border-gray-300 disabled:opacity-100 disabled:cursor-default'
                         )}
@@ -437,13 +439,13 @@ export default function EditTransactionForm({
               )}
             />
           ) : (
-            <div className="flex gap-2 items-center w-full">
+            <div className="flex gap-2 items-start w-full">
               <FormField
                 control={form.control}
                 name="refTransferToAccountsID"
                 render={({ field }) => (
-                  <FormItem className="flex-2">
-                    <FormLabel className="-mb-1 text-md font-medium">
+                  <FormItem className="-space-y-1 flex-2">
+                    <FormLabel className="text-md font-medium">
                       Transfer to
                     </FormLabel>
                     <FormControl>
@@ -501,8 +503,8 @@ export default function EditTransactionForm({
                 name="transferFee"
                 disabled={isDisabled}
                 render={({ field }) => (
-                  <FormItem className="flex-2">
-                    <FormLabel className="-mb-1 text-md font-medium">
+                  <FormItem className="-space-y-1 flex-2">
+                    <FormLabel className="text-md font-medium">
                       Transfer Fee
                     </FormLabel>
                     <FormControl>
@@ -528,9 +530,7 @@ export default function EditTransactionForm({
             disabled={isDisabled}
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel className="text-md font-medium">
-                  Note
-                </FormLabel>
+                <FormLabel>Note</FormLabel>
                 <FormControl>
                   <Input
                     required
@@ -543,15 +543,13 @@ export default function EditTransactionForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-x-2">
+          <div className="flex flex-row space-x-2">
             <FormField
               control={form.control}
               name="date"
               render={({ field }) => (
                 <FormItem className="-space-y-1 w-full">
-                  <FormLabel className="text-md font-medium">
-                    Date
-                  </FormLabel>
+                  <FormLabel>Date</FormLabel>
                   <FormControl>
                     <Popover
                       open={datePickerOpen}
@@ -619,9 +617,7 @@ export default function EditTransactionForm({
               name="time"
               render={({ field }) => (
                 <FormItem className="-space-y-1 w-full">
-                  <FormLabel className="text-md font-medium">
-                    Time
-                  </FormLabel>
+                  <FormLabel>Time</FormLabel>
                   <FormControl>
                     <TimePicker
                       value={timeStringToDate(field.value)}
