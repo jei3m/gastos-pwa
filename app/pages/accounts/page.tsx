@@ -39,10 +39,6 @@ export default function Accounts() {
 
   const [hideNetWorthTotal, setHideNetWorthTotal] =
     useLocalStorage('hideNetWorthTotal', false);
-  const [hideNetWorthDigital, setHideNetWorthDigital] =
-    useLocalStorage('hideNetWorthDigital', false);
-  const [hideNetWorthCash, setHideNetWorthCash] =
-    useLocalStorage('hideNetWorthCash', false);
 
   const { data: accounts, isPending: isAccountsLoading } =
     useQuery(accountsQueryOptions());

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import { Poppins } from 'next/font/google'; // Already imported
-// @ts-expect-error Global CSS is handled by Next.js at build time.
 import './globals.css';
 import { AccountProvider } from '@/context/account-context';
 import { TanstackProvider } from '@/context/tanstack-context';

@@ -102,8 +102,6 @@ export function CategoryPieChart({
     categoryType.toLowerCase() === 'expense'
       ? 'Expense Breakdown'
       : 'Income Breakdown';
-  const isExpense =
-    categoryType.toLowerCase() === 'expense';
 
   return (
     <Card className="flex flex-col border-2 border-black">
