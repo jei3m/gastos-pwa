@@ -101,14 +101,14 @@ function TransactionCard({
         </div>
       </div>
       <Card className="p-[10px]">
-        <CardContent className="-p-1 -mb-3 items-center">
+        <CardContent className="flex flex-col gap-3 md:gap-4 -p-1">
           {transaction.details.map(
             (detail: TransactionDetails, index: number) => (
               <Link
                 key={index}
                 href={`${hrefPrefix}/${detail.id}`}
               >
-                <div className="space-y-3 md:space-y-4 flex flex-row justify-between text-sm md:text-md py-1">
+                <div className="flex flex-row justify-between text-sm md:text-md">
                   <div
                     className={cn(
                       'flex items-center min-w-0',
