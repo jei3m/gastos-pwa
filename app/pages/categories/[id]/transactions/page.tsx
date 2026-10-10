@@ -155,7 +155,7 @@ export default function Transactions() {
     <main
       ref={scrollRef}
       className={cn(
-        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        'flex flex-col space-y-4 md:space-y-6 overflow-y-auto',
         isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
@@ -240,7 +240,7 @@ export default function Transactions() {
       {/* Transactions Section */}
       <section
         className={cn(
-          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
+          'flex flex-col space-y-4 md:space-y-6 px-3 mb-2',
           isScrolled && isMobile && 'mt-[104px]'
         )}
       >
@@ -261,7 +261,7 @@ export default function Transactions() {
           <>
             {transactions && transactions.length > 0 ? (
               <>
-                <div className="grid gap-2 md:gap-4">
+                <div className="grid gap-4 md:gap-6">
                   {transactions.map(
                     (transaction, index) => (
                       <TransactionCard

@@ -1,7 +1,7 @@
 export interface CategoryData {
   type: string;
-  totalIncome: string;
-  totalExpense: string;
+  totalIncome: number;
+  totalExpense: number;
   details: Category[];
   refUserID: string;
   refAccountsID: string;
