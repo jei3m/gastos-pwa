@@ -30,6 +30,7 @@ export const db = mysql.createPool({
   multipleStatements: true,
   maxIdle: 10,
   idleTimeout: 60000,
+  decimalNumbers: true,
 });
 
 export const connection = await db.getConnection();
