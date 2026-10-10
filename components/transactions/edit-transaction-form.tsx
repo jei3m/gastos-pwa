@@ -217,8 +217,8 @@ export default function EditTransactionForm({
         ? 'transfer'
         : transaction.type,
       note: transaction.note,
-      amount: transaction.amount,
-      transferFee: transaction.transferFee,
+      amount: transaction.amount.toFixed(2),
+      transferFee: transaction.transferFee.toFixed(2),
       time: transaction.time,
       date: transaction.date,
       refCategoriesID: transaction.refCategoriesID,
