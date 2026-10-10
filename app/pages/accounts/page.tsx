@@ -70,26 +70,7 @@ export default function Accounts() {
       0
     );
 
-    return netWorth.toFixed(2);
-  };
-
-  const calculateNetWorthByType = (type: string) => {
-    if (!accounts) return '0.00';
-
-    const digitalAccounts = accounts.filter(
-      (account: Account) => account.type === type
-    );
-
-    // Sum up all account balances
-    const netWorth = digitalAccounts.reduce(
-      (total: number, account: Account) => {
-        const balance = parseFloat(account.totalBalance);
-        return total + (isNaN(balance) ? 0 : balance);
-      },
-      0
-    );
-
-    return netWorth.toFixed(2);
+    return netWorth.toLocaleString();
   };
 
   const handleSelectAccount = (
@@ -156,94 +137,11 @@ export default function Accounts() {
                 PHP{' '}
                 {hideNetWorthTotal
                   ? '********'
-                  : formatAmount(calculateNetWorth())}
+                  : calculateNetWorth()}
               </h1>
             )}
           </CardContent>
         </Card>
-
-        {!isMobile && (
-          <>
-            {/* Total Digital Net Worth Card */}
-            <Card className="border-2 my-auto flex-3">
-              <CardContent>
-                <div className="flex flex-row items-center -mb-0.5">
-                  <h3 className="text-gray-600 font-normal text-lg">
-                    Digital Net Worth
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      setHideNetWorthDigital(
-                        !hideNetWorthDigital
-                      )
-                    }
-                    className="h-8 w-8 text-gray-600"
-                  >
-                    {hideNetWorthDigital ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {isAccountsLoading ? (
-                  <h1 className="text-2xl font-extrabold flex">
-                    <Skeleton className="h-10 w-[50%] bg-gray-300" />
-                  </h1>
-                ) : (
-                  <h1 className="text-2xl font-extrabold">
-                    PHP{' '}
-                    {hideNetWorthDigital
-                      ? '********'
-                      : formatAmount(
-                          calculateNetWorthByType('Digital')
-                        )}
-                  </h1>
-                )}
-              </CardContent>
-            </Card>
-            {/* Total Cash Net Worth Card */}
-            <Card className="border-2 my-auto flex-3">
-              <CardContent>
-                <div className="flex flex-row items-center -mb-0.5">
-                  <h3 className="text-gray-600 font-normal text-lg">
-                    Cash Net Worth
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      setHideNetWorthCash(!hideNetWorthCash)
-                    }
-                    className="h-8 w-8 text-gray-600"
-                  >
-                    {hideNetWorthCash ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {isAccountsLoading ? (
-                  <h1 className="text-2xl font-extrabold flex">
-                    <Skeleton className="h-10 w-[50%] bg-gray-300" />
-                  </h1>
-                ) : (
-                  <h1 className="text-2xl font-extrabold">
-                    PHP{' '}
-                    {hideNetWorthCash
-                      ? '********'
-                      : formatAmount(
-                          calculateNetWorthByType('Cash')
-                        )}
-                  </h1>
-                )}
-              </CardContent>
-            </Card>
-          </>
-        )}
 
         {isMobile && isScrolled && (
           <div className="w-full border-t-2 border-black" />
