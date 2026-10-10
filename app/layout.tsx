@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Poppins } from 'next/font/google'; // Already imported
+// @ts-expect-error Global CSS is handled by Next.js at build time.
 import './globals.css';
 import { AccountProvider } from '@/context/account-context';
 import { TanstackProvider } from '@/context/tanstack-context';
@@ -74,7 +75,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${poppins.variable} font-sans antialiased m-auto max-w-[600px]`}
+        className={`${poppins.variable} font-sans antialiased`}
       >
         <TanstackProvider>
           <AccountProvider>{children}</AccountProvider>

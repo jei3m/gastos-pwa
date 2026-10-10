@@ -1,27 +1,26 @@
 import Navbar from '@/components/custom/navbar';
+import StickySidebar from '@/components/custom/sticky-sidebar';
 import { Dock } from '@/components/custom/dock';
 import { Toaster } from '@/components/ui/sonner';
 import { Suspense } from 'react';
 import Loader from '@/components/custom/loader';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/ui/app-sidebar';
 
 export default function TransactionsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <Suspense fallback={<Loader />}>
-      <SidebarProvider>
-        <AppSidebar />
-        <div className="w-full">
-          <Navbar />
-          <div className="max-w-[800px] m-auto">
+      <div className="w-full">
+        <Navbar />
+        <div className="grid grid-cols-1 justify-center gap-0 md:gap-3 md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[260px_minmax(0,650px)]">
+          <StickySidebar />
+          <main className="mx-auto w-full max-w-none md:max-w-[650px]">
             {children}
-          </div>
-          <Toaster />
-          <Dock showLabels={true} />
+          </main>
         </div>
-      </SidebarProvider>
+        <Toaster />
+        <Dock showLabels={true} />
+      </div>
     </Suspense>
   );
 }
