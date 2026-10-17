@@ -74,7 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${poppins.variable} font-sans antialiased m-auto max-w-[600px]`}
+        className={`${poppins.variable} font-sans antialiased`}
       >
         <TanstackProvider>
           <AccountProvider>{children}</AccountProvider>

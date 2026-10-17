@@ -45,7 +45,7 @@ export interface EditTransaction {
   note: string;
   time: string;
   type: '' | 'income' | 'expense';
-  amount: string;
+  amount: number;
   category: string;
   date: string;
   refCategoriesID: string;

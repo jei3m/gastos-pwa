@@ -217,12 +217,17 @@ export default function SessionsCard({
                           {session.device.label}
                         </span>
                         {session.isCurrent && (
-                          <Badge
-                            variant="outline"
-                            className="text-xs text-red-600 border-red-200 bg-red-50"
-                          >
-                            Current Device
-                          </Badge>
+                          <>
+                            <Badge
+                              variant="outline"
+                              className="hidden md:block text-xs text-green-600 border-green-200 bg-green-50"
+                            >
+                              Current Device
+                            </Badge>
+                            <span className="block md:hidden inline-flex items-center flex-shrink-0">
+                              <span className="h-2 w-2 rounded-full bg-green-500 ring-4 ring-green-200 animate-pulse" />
+                            </span>
+                          </>
                         )}
                       </div>
                       <div className="mt-1 text-xs text-muted-foreground">

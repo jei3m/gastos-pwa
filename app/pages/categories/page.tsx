@@ -96,7 +96,7 @@ export default function Categories() {
   return (
     <main
       className={cn(
-        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        'flex flex-col space-y-4 md:space-y-6 overflow-y-auto',
         isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
@@ -105,7 +105,7 @@ export default function Categories() {
         onDateRangeChange={handleDateRangeChange}
         content={
           <>
-            <div className="flex flex-col md:flex-row gap-2 md:justify-between md:items-center">
+            <div className="flex flex-col gap-2">
               <div className="flex flex-col">
                 <h3 className="text-gray-600 font-normal text-lg md:text-xl">
                   Balance
@@ -118,7 +118,7 @@ export default function Categories() {
                   )}
                 </h1>
               </div>
-              <div className="w-full md:w-[64%] flex space-x-2">
+              <div className="w-full flex space-x-2">
                 <div
                   className="
 								bg-primary 
@@ -133,11 +133,11 @@ export default function Categories() {
                     <div className="text-md md:text-lg">
                       Income
                     </div>
-                    <div className="text-xl font-bold">
+                    <div className="text-xl md:text-2xl font-bold">
                       {isPending ? (
                         <Skeleton className="h-[30px] w-[100px] bg-green-300" />
                       ) : (
-                        `${formatAmount(totalIncome)}`
+                        `${totalIncome.toLocaleString()}`
                       )}
                     </div>
                   </div>
@@ -156,11 +156,11 @@ export default function Categories() {
                     <div className="text-md md:text-lg">
                       Expense
                     </div>
-                    <div className="text-xl font-bold">
+                    <div className="text-xl md:text-2xl font-bold">
                       {isPending ? (
                         <Skeleton className="h-[30px] w-[100px] bg-red-300" />
                       ) : (
-                        `${formatAmount(totalExpense)}`
+                        `${totalExpense.toLocaleString()}`
                       )}
                     </div>
                   </div>
@@ -170,10 +170,11 @@ export default function Categories() {
           </>
         }
       />
-      {/* Categories Section */}
+
+      {/* Breakdown Section */}
       <section
         className={cn(
-          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2'
+          'flex flex-col space-y-4 md:space-y-6 px-3'
         )}
       >
         <Tabs
@@ -208,36 +209,46 @@ export default function Categories() {
         ) : isPending ? (
           <PulseLoader />
         ) : (
-          <>
-            <CategoryPieChart
-              categories={categories}
-              categoryType={categoryType}
-              dateStart={dateStart}
-              dateEnd={dateEnd}
-            />
-            <TypographyH4>Categories</TypographyH4>
-            {categories && categories.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-2 md:gap-4">
-                {categories.map((category: Category) => (
-                  <CategoryCard
-                    key={category.id}
-                    category={category}
-                    hideAmount={false}
-                    isEdit={false}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
-                <div>
-                  <Inbox size={80} strokeWidth={1.5} />
-                </div>
-                <p className="text-sm text-center">
-                  No {categoryType} activity for this period
-                </p>
-              </div>
-            )}
-          </>
+          <CategoryPieChart
+            categories={categories}
+            categoryType={categoryType}
+            dateStart={dateStart}
+            dateEnd={dateEnd}
+          />
+        )}
+      </section>
+
+      {/* Categories Section */}
+      <section
+        className={cn(
+          'flex flex-col space-y-4 md:space-y-6 px-3 mb-2'
+        )}
+      >
+        <TypographyH4>Categories</TypographyH4>
+        {!selectedAccountID ? (
+          <NoSelectedAccountDiv data="categories" />
+        ) : isPending ? (
+          <PulseLoader />
+        ) : categories && categories.length > 0 ? (
+          <div className="grid grid-cols-2 gap-2 md:gap-4">
+            {categories.map((category: Category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                hideAmount={false}
+                isEdit={false}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
+            <div>
+              <Inbox size={80} strokeWidth={1.5} />
+            </div>
+            <p className="text-sm text-center">
+              No {categoryType} activity for this period
+            </p>
+          </div>
         )}
       </section>
     </main>

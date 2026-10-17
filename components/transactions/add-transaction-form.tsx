@@ -190,7 +190,7 @@ export default function AddTransactionForm({
   return (
     <main
       className={cn(
-        'flex flex-col space-y-4',
+        'flex flex-col space-y-2 md:space-y-4',
         !isModal && 'p-3'
       )}
     >
@@ -200,7 +200,7 @@ export default function AddTransactionForm({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col space-y-4"
+          className="flex flex-col space-y-6"
         >
           <FormField
             control={form.control}

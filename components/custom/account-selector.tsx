@@ -65,7 +65,7 @@ export default function AccountSelector() {
         <SelectValue placeholder="Accounts" />
       </SelectTrigger>
 
-      <SelectContent className="border-black">
+      <SelectContent>
         <SelectGroup>
           {isAccountsLoading ? (
             <div className="flex flex-col justify-center">

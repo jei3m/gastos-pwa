@@ -1,11 +1,6 @@
 import { createElement } from 'react';
 import { Category } from '@/types/categories.types';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from '../ui/card';
+import { Card, CardContent } from '../ui/card';
 import { getIconById } from '@/lib/icons';
 import { TypographyH5 } from '../custom/typography';
 import { formatAmount } from '@/utils/format-amount';
@@ -43,26 +38,33 @@ export default function CategoryCard({
   };
 
   const isExpense = (type: string) => {
-    return type === 'Expense';
+    return type.toLowerCase() === 'expense';
   };
 
   return (
     <Link href={getHref()} scroll={false}>
-      <Card className="border-2 p-[10px]">
+      <Card className="p-[10px]">
         <CardContent className="flex flex-row justify-between items-center -p-1">
-          <div className="flex flex-row space-x-2 items-center">
+          <div className="flex flex-row space-x-2 md:space-x-3 items-center">
             <div
               className={cn(
-                'p-1.5 rounded-lg border-2 ',
+                'p-2 rounded-lg',
                 isExpense(category.type)
-                  ? 'bg-red-500'
-                  : 'bg-primary'
+                  ? 'bg-red-500/15'
+                  : 'bg-primary/15'
               )}
             >
               {createElement(
                 getIconById(category.icon)?.icon ||
                   SquareDashed,
-                { size: 30 }
+                {
+                  size: 26,
+                  className: cn(
+                    isExpense(category.type)
+                      ? 'text-red-500'
+                      : 'text-primary'
+                  ),
+                }
               )}
             </div>
             <div>
@@ -74,26 +76,22 @@ export default function CategoryCard({
                   {category.description || ''}
                 </div>
               )}
+              {!hideAmount && (
+                <div
+                  className={cn(
+                    'text-sm md:text-lg font-semibold',
+                    isExpense(category.type)
+                      ? 'text-red-500'
+                      : 'text-primary'
+                  )}
+                >
+                  PHP {isExpense(category.type) ? '-' : '+'}
+                  {formatAmount(category.totalAmount) ??
+                    0.0}
+                </div>
+              )}
             </div>
           </div>
-          {!hideAmount && (
-            <div className="text-right">
-              <CardDescription className="text-sm">
-                Total Amount:
-              </CardDescription>
-              <CardTitle
-                className={cn(
-                  'text-md md:text-lg',
-                  isExpense(category.type)
-                    ? 'text-red-500'
-                    : 'text-primary'
-                )}
-              >
-                PHP {isExpense(category.type) ? '-' : '+'}
-                {formatAmount(category.totalAmount) ?? 0.0}
-              </CardTitle>
-            </div>
-          )}
         </CardContent>
       </Card>
     </Link>
