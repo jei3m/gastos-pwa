@@ -1,0 +1,278 @@
+import { useRef, useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import PulseLoader from '@/components/custom/pulse-loader';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+} from '@/components/ui/card';
+import { formatAmount } from '@/lib/format-amount';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TypographyH4 } from '@/components/custom/typography';
+import { Separator } from '@/components/ui/separator';
+import { accountsQueryOptions } from '@/features/accounts/accounts.tq.options';
+import { useQuery } from '@tanstack/react-query';
+import type { Account } from '@/features/accounts/accounts.interface';
+import { cn } from '@/lib/utils';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
+import { accountTypes } from '@/lib/data';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { CircleCheck, Eye, EyeOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useScrollState } from '@/hooks/use-scroll-state';
+import { useAccount } from '@/context/account-context';
+import { toast } from '@/lib/toast';
+import { Badge } from '@/components/ui/badge';
+
+export default function Accounts() {
+  const [accountType, setAccountType] = useState('All');
+  const isMobile = useIsMobile();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isScrolled = useScrollState(scrollRef);
+  const { setSelectedAccountID, selectedAccountID } =
+    useAccount();
+
+  const [hideNetWorthTotal, setHideNetWorthTotal] =
+    useLocalStorage('hideNetWorthTotal', false);
+
+  const { data: accounts, isPending: isAccountsLoading } =
+    useQuery(accountsQueryOptions());
+
+  const filteredAccounts =
+    accounts?.filter((account: Account) =>
+      accountType === 'All'
+        ? true
+        : account.type === accountType
+    ) ?? [];
+
+  const calculateNetWorth = () => {
+    if (!accounts) return '0.00';
+
+    const accountsToCalculate = isMobile
+      ? filteredAccounts
+      : accounts;
+
+    const netWorth = accountsToCalculate.reduce(
+      (total: number, account: Account) => {
+        const balance = parseFloat(account.totalBalance);
+        return total + (isNaN(balance) ? 0 : balance);
+      },
+      0
+    );
+
+    return netWorth.toLocaleString();
+  };
+
+  const handleSelectAccount = (
+    id: string,
+    name: string
+  ) => {
+    if (selectedAccountID === id) return;
+    setSelectedAccountID(id);
+    toast.success(`Selected ${name} as Active Account`);
+  };
+
+  return (
+    <main
+      ref={scrollRef}
+      className={cn(
+        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        isMobile ? 'h-screen pb-29' : 'pb-4'
+      )}
+    >
+      {/* Net Worth Section */}
+      <section
+        className={cn(
+          'transition-all ease-in-out',
+          isScrolled && isMobile
+            ? 'fixed w-full top-0 z-10'
+            : 'pt-2 md:pt-4 px-3 flex md:flex-col md:flex-row gap-2 md:gap-4'
+        )}
+      >
+        {/* Total Net Worth Card */}
+        <Card
+          className={cn(
+            isScrolled && isMobile
+              ? '-mt-2 border-0 rounded-none'
+              : 'border-2 my-auto',
+            isMobile ? 'w-full' : 'flex-3'
+          )}
+        >
+          <CardContent>
+            <div className="flex flex-row items-center -mb-0.5">
+              <h3 className="text-gray-600 font-normal text-lg">
+                {isMobile ? 'Total Balance' : 'Net Worth'}
+              </h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() =>
+                  setHideNetWorthTotal(!hideNetWorthTotal)
+                }
+                className="h-8 w-8 text-gray-600"
+              >
+                {hideNetWorthTotal ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {isAccountsLoading ? (
+              <h1 className="text-2xl font-extrabold flex">
+                <Skeleton className="h-10 w-[50%] bg-gray-300" />
+              </h1>
+            ) : (
+              <h1 className="text-2xl font-extrabold">
+                PHP{' '}
+                {hideNetWorthTotal
+                  ? '********'
+                  : calculateNetWorth()}
+              </h1>
+            )}
+          </CardContent>
+        </Card>
+
+        {isMobile && isScrolled && (
+          <div className="w-full border-t-2 border-black" />
+        )}
+      </section>
+
+      {/* Accounts Section */}
+      <section
+        className={cn(
+          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
+          isScrolled && isMobile && 'mt-[76px]'
+        )}
+      >
+        <Tabs
+          value={accountType}
+          onValueChange={setAccountType}
+        >
+          <div className="flex flex-row justify-between items-center w-full">
+            <TypographyH4>Accounts</TypographyH4>
+            <TabsList className="border-black border-2 p-1">
+              {accountTypes.map((type, index) => (
+                <TabsTrigger
+                  className="text-sm md:text-md"
+                  value={type}
+                  key={index}
+                >
+                  {type}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+        </Tabs>
+        {isAccountsLoading || !accounts ? (
+          <PulseLoader />
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-2 md:gap-4">
+              {filteredAccounts.map((account: Account) => (
+                <Card
+                  className="border-2 h-full"
+                  key={account.id}
+                  onClick={() =>
+                    handleSelectAccount(
+                      account.id,
+                      account.name
+                    )
+                  }
+                >
+                  <CardHeader>
+                    {/* Mobile layout */}
+                    <div className="block md:hidden">
+                      {isAccountsLoading ? (
+                        <div className="flex flex-row items-start justify-between">
+                          <div className="w-full">
+                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300 mb-1" />
+                            <Skeleton className="h-3 md:h-4 w-[100px] bg-gray-300" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-row items-start justify-between -mb-2">
+                          <div className="w-full">
+                            <div className="-mb-1 text-md md:text-xl font-bold">
+                              {account?.name}
+                            </div>
+                            <div className="text-sm md:text-md text-gray-600">
+                              {account?.type}
+                            </div>
+                          </div>
+                          {selectedAccountID ===
+                            account.id && (
+                            <span className="inline-flex items-center flex-shrink-0 mt-1">
+                              <span className="h-3 w-3 rounded-full bg-green-500 ring-4 ring-green-200 animate-pulse" />
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Desktop layout */}
+                    <div className="hidden md:block">
+                      {isAccountsLoading ? (
+                        <div className="flex flex-row items-center justify-between">
+                          <div className="text-lg md:text-xl font-bold">
+                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
+                          </div>
+                          <div className="text-md text-gray-600 font-normal">
+                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-row items-center justify-between">
+                          <div className="text-lg md:text-xl font-bold">
+                            {account?.name}
+                            {selectedAccountID ===
+                              account.id && (
+                              <Badge
+                                variant="outline"
+                                className="ml-2 text-green-600 border-green-200 bg-green-50"
+                              >
+                                <CircleCheck className="h-3 w-3 mr-1" />
+                                Active
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-md text-gray-600 font-normal">
+                            {account?.type}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <Separator />
+                  <CardContent className="-mb-2 md:mb-0 space-y-2">
+                    <div className="flex flex-col">
+                      <h3 className="text-gray-600 font-normal text-sm md:text-lg hidden md:block">
+                        Balance
+                      </h3>
+                      {isAccountsLoading ? (
+                        <h1 className="text-2xl md:text-3xl font-extrabold flex">
+                          <Skeleton className="h-10 w-[50%] bg-gray-300" />
+                        </h1>
+                      ) : (
+                        <h1 className="text-lg md:text-2xl font-extrabold mt-0">
+                          PHP{' '}
+                          {formatAmount(
+                            account?.totalBalance
+                          )}
+                        </h1>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+    </main>
+  );
+}
