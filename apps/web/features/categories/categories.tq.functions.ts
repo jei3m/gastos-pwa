@@ -10,7 +10,7 @@ export const fetchCategories = async (
   accountID: string | null,
   dateStart?: string | null,
   dateEnd?: string | null,
-  filter?: string
+  filter?: 'list' | 'options'
 ) => {
   const query = toSearchParams({
     type,

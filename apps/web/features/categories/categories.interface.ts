@@ -15,8 +15,8 @@ export interface Category {
   icon: string;
   description: string;
   totalAmount: number;
-  refUserID: string;
-  refAccountsID: string;
+  refUserID?: string;
+  refAccountsID?: string;
 }
 
 export interface CreateCategory {

@@ -10,7 +10,7 @@ export function categoryQueryOptions(
   isEnabled: boolean,
   dateStart?: string | null,
   dateEnd?: string | null,
-  filter?: string
+  filter?: 'list' | 'options'
 ) {
   return queryOptions({
     queryKey: [
