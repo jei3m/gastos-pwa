@@ -12,7 +12,7 @@ export default function DataPrivacySection({
   isSessionPending,
 }: IDataPrivacySection) {
   return (
-    <section className="space-y-4">
+    <section className="space-y-2 md:space-y-4">
       <TypographyH4 className="font-semibold">
         Data &amp; Privacy
       </TypographyH4>

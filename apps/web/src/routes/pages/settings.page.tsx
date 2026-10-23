@@ -61,7 +61,7 @@ export default function SettingsPage() {
         isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
-      <section className={cn('space-y-4')}>
+      <section className={cn('space-y-2 md:space-y-4')}>
         <Card className={cn('border-2 mt-2 md:mt-4')}>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex justify-between">

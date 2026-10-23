@@ -43,7 +43,7 @@ export default function DangerZoneSection() {
   };
 
   return (
-    <section className="space-y-4 mb-4">
+    <section className="space-y-2 md:space-y-4 mb-4">
       <TypographyH4 className="font-semibold">
         Danger Zone
       </TypographyH4>

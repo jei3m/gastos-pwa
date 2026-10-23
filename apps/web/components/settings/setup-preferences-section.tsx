@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react';
 
 export default function SetupPreferencesSection() {
   return (
-    <section className="space-y-4">
+    <section className="space-y-2 md:space-y-4">
       <TypographyH4 className="font-semibold">
         Setup &amp; Preferences
       </TypographyH4>

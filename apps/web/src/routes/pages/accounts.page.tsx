@@ -80,7 +80,7 @@ export default function AccountsPage() {
     <main
       ref={scrollRef}
       className={cn(
-        'flex flex-col space-y-2 md:space-y-4 overflow-y-auto',
+        'flex flex-col space-y-4 md:space-y-6 overflow-y-auto',
         isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
