@@ -11,7 +11,7 @@ export default function PagesLayout() {
     <Suspense fallback={<Loader />}>
       <div className="w-full">
         <Navbar />
-        <div className="grid grid-cols-1 justify-center gap-0 md:grid-cols-[240px_minmax(0,1fr)] md:gap-3 lg:grid-cols-[260px_minmax(0,650px)]">
+        <div className="grid grid-cols-1 justify-center gap-0 px-0 md:px-4 md:grid-cols-[240px_minmax(0,1fr)] md:gap-3 lg:grid-cols-[260px_minmax(0,650px)]">
           <StickySidebar />
           <main className="mx-auto w-full max-w-none md:max-w-[650px]">
             <Outlet />
