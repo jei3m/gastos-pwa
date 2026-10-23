@@ -3,7 +3,24 @@ const API_URL = import.meta.env.VITE_API_URL ?? '';
 export type ApiResult<T> = {
   success: boolean;
   message?: string;
+  code: number;
 } & T;
+
+export class ApiError extends Error {
+  status: number;
+  code?: number;
+
+  constructor(
+    message: string,
+    status: number,
+    code: number
+  ) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.code = code;
+  }
+}
 
 export async function apiFetch<T extends object>(
   path: string,
@@ -25,7 +42,11 @@ export async function apiFetch<T extends object>(
     const data = (await res.json()) as ApiResult<T>;
 
     if (!data.success) {
-      throw new Error(data.message ?? 'Request failed');
+      throw new ApiError(
+        data.message ?? 'Request failed',
+        res.status,
+        data.code
+      );
     }
 
     return data;

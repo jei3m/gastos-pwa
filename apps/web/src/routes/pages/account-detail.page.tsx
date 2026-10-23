@@ -32,6 +32,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { ChevronLeft, Loader, Trash2 } from 'lucide-react';
 import { toast } from '@/lib/toast';
+import { ApiError } from '@/lib/api';
 import {
   useMutation,
   useQuery,
@@ -158,6 +159,14 @@ export default function AccountDetailPage() {
       void navigate('/settings/accounts');
     },
     onError: (error) => {
+      if (
+        error instanceof ApiError &&
+        error.status >= 400 &&
+        error.status <= 499
+      ) {
+        toast.warning(error.message);
+        return;
+      }
       toast.error(error.message);
     },
   });
