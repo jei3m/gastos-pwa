@@ -41,13 +41,13 @@ export default function CategoryCard({
   };
 
   return (
-    <Link to={getHref()}>
-      <Card className="p-[10px]">
+    <Link to={getHref()} className="block min-w-0">
+      <Card className="p-[10px] min-w-0 overflow-hidden">
         <CardContent className="flex flex-row justify-between items-center -p-1">
-          <div className="flex flex-row space-x-2 md:space-x-3 items-center">
+          <div className="flex flex-row space-x-2 md:space-x-3 items-center flex-1 min-w-0">
             <div
               className={cn(
-                'p-2 rounded-lg',
+                'p-2 rounded-lg shrink-0',
                 isExpense(category.type)
                   ? 'bg-red-500/15'
                   : 'bg-primary/15'
@@ -66,12 +66,12 @@ export default function CategoryCard({
                 }
               )}
             </div>
-            <div>
-              <TypographyH5 className="font-semibold">
+            <div className="flex-1 min-w-0">
+              <TypographyH5 className="font-semibold truncate">
                 {category.name}
               </TypographyH5>
               {showDescription && (
-                <div className="truncate w-[280px]">
+                <div className="truncate w-full">
                   {category.description || ''}
                 </div>
               )}
