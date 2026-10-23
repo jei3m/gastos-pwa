@@ -1,10 +1,10 @@
 {
   "name": "@gastos/api",
   "version": "1.0.0",
-  "main": "api/index.ts",
+  "main": "index.ts",
   "scripts": {
-    "dev": "bun --watch api/index.ts",
-    "start": "bun api/index.ts",
+    "dev": "bun --watch index.ts",
+    "start": "bun index.ts",
     "db:migrate": "bun db/migrate.ts",
     "db:routines": "bun db/migrate.ts --routines-only",
     "typecheck": "bun x tsc --noEmit"
