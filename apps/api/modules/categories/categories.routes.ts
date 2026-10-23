@@ -6,7 +6,7 @@ import {
   getCategoryByID,
   getCategoryTransactions,
   updateCategory,
-} from '../controllers/categories.controller.ts';
+} from './categories.controller.ts';
 
 const categoriesRouter = Router();
 

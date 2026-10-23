@@ -5,7 +5,7 @@ import {
   getAccountByID,
   getAccounts,
   updateAccount,
-} from '../controllers/accounts.controller.ts';
+} from './accounts.controller.ts';
 
 const accountRouter = Router();
 

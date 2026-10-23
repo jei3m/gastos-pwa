@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   getInvitation,
   respondToInvitation,
-} from '../controllers/invitations.controller.ts';
+} from './invitations.controller.ts';
 
 const invitationsRouter = Router();
 

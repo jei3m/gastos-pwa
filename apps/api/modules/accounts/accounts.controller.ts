@@ -1,19 +1,17 @@
-import { db } from '../lib/db.ts';
+import { db } from '../../lib/db.ts';
 import {
   createAccountQuery,
   deleteAccountQuery,
   getAccountByIDQuery,
   getAccountsQuery,
-  updateAccountQuery,
-} from '../lib/sql/accounts.sql.ts';
-import type { responseRow } from '../lib/types.ts';
-import type { Request, Response } from 'express';
-import { fail, success } from '../utils/response.ts';
-import type { RowDataPacket } from 'mysql2';
-import {
   getMembersQuery,
   getPendingInvitationsQuery,
-} from '../lib/sql/members.sql.ts';
+  updateAccountQuery,
+} from './accounts.sql.ts';
+import type { responseRow } from '../../lib/types.ts';
+import type { Request, Response } from 'express';
+import { fail, success } from '../../utils/response.ts';
+import type { RowDataPacket } from 'mysql2';
 
 // Create New Account
 export const createAccount = async (

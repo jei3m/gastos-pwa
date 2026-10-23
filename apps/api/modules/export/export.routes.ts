@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { exportData } from '../controllers/export.controller.ts';
+import { exportData } from './export.controller.ts';
 
 const exportRouter = Router();
 

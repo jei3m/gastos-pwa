@@ -1,7 +1,7 @@
 import type { RowDataPacket } from 'mysql2';
-import { db } from '../lib/db.ts';
-import { success, fail } from '../utils/response.ts';
-import { getExportDataQuery } from '../lib/sql/users.sql.ts';
+import { db } from '../../lib/db.ts';
+import { success, fail } from '../../utils/response.ts';
+import { getExportDataQuery } from './export.sql.ts';
 import type { Request, Response } from 'express';
 
 // Export User Data

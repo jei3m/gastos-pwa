@@ -1,11 +1,11 @@
 import type { RowDataPacket } from 'mysql2';
-import { db } from '../lib/db.ts';
-import { success, fail } from '../utils/response.ts';
-import type { responseRow } from '../lib/types.ts';
+import { db } from '../../lib/db.ts';
+import { success, fail } from '../../utils/response.ts';
+import type { responseRow } from '../../lib/types.ts';
 import {
   getInvitationByTokenQuery,
   respondToInvitationQuery,
-} from '../lib/sql/members.sql.ts';
+} from './invitations.sql.ts';
 import type { Request, Response } from 'express';
 
 // Fetch invitation details

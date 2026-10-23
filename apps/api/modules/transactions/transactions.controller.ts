@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import type { RowDataPacket } from 'mysql2';
-import { db } from '../lib/db.ts';
-import { success, fail } from '../utils/response.ts';
-import type { responseRow } from '../lib/types.ts';
+import { db } from '../../lib/db.ts';
+import { success, fail } from '../../utils/response.ts';
+import type { responseRow } from '../../lib/types.ts';
 import {
   createTransactionQuery,
   getTransactionsQuery,
@@ -11,7 +11,7 @@ import {
   updateTransactionQuery,
   deleteTransactionQuery,
   transferTransactionQuery,
-} from '../lib/sql/transactions.sql.ts';
+} from './transactions.sql.ts';
 import type { Request, Response } from 'express';
 
 // Create New Transaction

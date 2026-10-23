@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { betterAuth } from 'better-auth';
 import { db } from './db.ts';
 import { redis } from './redis.ts';
-import { deleteUserQuery } from './sql/users.sql.ts';
+import { deleteUserQuery } from '../modules/users/users.sql.ts';
 
 export const auth = betterAuth({
   database: db,

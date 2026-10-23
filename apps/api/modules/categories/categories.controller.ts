@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import type { RowDataPacket } from 'mysql2';
-import { db } from '../lib/db.ts';
-import { success, fail } from '../utils/response.ts';
-import type { responseRow } from '../lib/types.ts';
+import { db } from '../../lib/db.ts';
+import { success, fail } from '../../utils/response.ts';
+import type { responseRow } from '../../lib/types.ts';
 import {
   createCategoryQuery,
   getCategoriesQuery,
@@ -11,11 +11,11 @@ import {
   getCategoryByIDQuery,
   updateCategoryQuery,
   deleteCategoryQuery,
-} from '../lib/sql/categories.sql.ts';
+} from './categories.sql.ts';
 import {
   getTransactionsByCategoryQuery,
   getTransactionsByCategoryCountQuery,
-} from '../lib/sql/transactions.sql.ts';
+} from '../transactions/transactions.sql.ts';
 import type { Request, Response } from 'express';
 
 // Create Category

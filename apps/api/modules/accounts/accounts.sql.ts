@@ -102,3 +102,31 @@ export const deleteAccountQuery = () => {
             );
             SELECT @response AS response;`;
 };
+
+export const getMembersQuery = () => {
+  return `SELECT
+            am.user_id AS userID,
+            u.email,
+            COALESCE(u.name, 'Deleted User') AS name,
+            COALESCE(u.image, '/images/profile-picture.png') AS image,
+            am.role
+          FROM v_account_members_table am
+          LEFT JOIN user u ON am.user_id = u.id
+          WHERE am.account_id = :accountID
+          ORDER BY am.role = 'owner' DESC, u.name ASC`;
+};
+
+export const getPendingInvitationsQuery = () => {
+  return `SELECT
+            i.id,
+            i.account_id AS accountID,
+            i.invited_email AS invitedEmail,
+            i.invited_by AS invitedBy,
+            i.status,
+            i.token,
+            i.expires_at AS expiresAt,
+            i.created_at AS createdAt
+          FROM v_invitations_table i
+          WHERE i.account_id = :accountID AND i.status = 'pending'
+          ORDER BY i.created_at DESC`;
+};

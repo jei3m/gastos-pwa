@@ -6,7 +6,7 @@ import {
   getTransactions,
   getTransactionsCount,
   updateTransaction,
-} from '../controllers/transactions.controller.ts';
+} from './transactions.controller.ts';
 
 const transactionsRouter = Router();
 
