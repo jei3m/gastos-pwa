@@ -5,7 +5,6 @@ import { success, fail } from '../../utils/response.ts';
 import type { responseRow } from '../../lib/types.ts';
 import {
   createCategoryQuery,
-  getCategoriesQuery,
   getCategoriesListQuery,
   getCategoriesOptionsQuery,
   getCategoryByIDQuery,
@@ -71,7 +70,7 @@ export const getCategories = async (
   res: Response
 ) => {
   try {
-    const filter = req.query.filter as string | undefined;
+    const filter = req.query.filter as 'list' | 'options';
     const accountID = req.query.accountID as
       | string
       | undefined;
@@ -92,9 +91,7 @@ export const getCategories = async (
     const [selectQuery] = await db.query(
       filter === 'list'
         ? getCategoriesListQuery()
-        : filter === 'options'
-          ? getCategoriesOptionsQuery()
-          : getCategoriesQuery(),
+        : getCategoriesOptionsQuery(),
       {
         userID: req.userID,
         accountID,
