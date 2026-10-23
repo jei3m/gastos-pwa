@@ -1,107 +1,92 @@
 export const getInsightsQuery = () => {
   return `WITH
-            account_info_cte AS (
-                SELECT
-                    ref_user_id AS owner_id,
-                    ref_user_ids
-                FROM v_accounts
-                WHERE id = :accountID
-            ),
-            resolved_user_cte AS (
-                SELECT
+    authorized AS (
+        SELECT 1 AS authorized
+        FROM account_members
+        WHERE account_id = :accountID
+            AND user_id = :userID
+    ),
+    totals AS (
+        SELECT
+            COALESCE(
+                SUM(
                     CASE
-                        WHEN :accountID IS NOT NULL
-                             AND :userID MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
-                             AND :userID != (SELECT owner_id FROM account_info_cte)
-                        THEN (SELECT owner_id FROM account_info_cte)
-                        ELSE :userID
-                    END AS resolved_user_id
-            ),
-            sum_income AS (
-                SELECT
-                    SUM(amount + transfer_fee) AS total_income
-                FROM
-                    v_transactions_table
-                WHERE
-                    ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
-                    AND ref_accounts_id = :accountID
-                    AND type = 'income'
-                    AND (:dateStart IS NULL OR date BETWEEN :dateStart AND :dateEnd)
-            ),
-            sum_expense AS (
-                SELECT
-                    SUM(amount + transfer_fee) AS total_expense
-                FROM
-                    v_transactions_table
-                WHERE
-                    ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
-                    AND ref_accounts_id = :accountID
-                    AND type = 'expense'
-                    AND (:dateStart IS NULL OR date BETWEEN :dateStart AND :dateEnd)
-            ),
-            category_details AS (
-                SELECT
-                    t.ref_categories_id,
-                    c.ref_user_id,
-                    SUM(t.amount + t.transfer_fee) AS amount
-                FROM
-                    v_transactions_table t
-                JOIN v_categories_table c
-                    ON t.ref_categories_id = c.id
-                WHERE
-                    t.ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
-                    AND t.ref_accounts_id = :accountID
-                    AND (:dateStart IS NULL OR t.date BETWEEN :dateStart AND :dateEnd)
-                GROUP BY
-                    t.ref_categories_id,
-                    c.ref_user_id
-                ORDER BY
-                    amount DESC
+                        WHEN type = 'income' THEN amount + transfer_fee
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_income,
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN type = 'expense' THEN amount + transfer_fee
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_expense
+        FROM transactions
+        WHERE ref_accounts_id = :accountID
+            AND (
+                :dateStart IS NULL
+                OR date BETWEEN :dateStart AND :dateEnd
             )
-            SELECT
-                :type,
-                COALESCE(si.total_income, 0) AS totalIncome,
-                COALESCE(se.total_expense, 0) AS totalExpense,
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM v_categories_table c
-                        JOIN category_details cd
-                            ON c.id = cd.ref_categories_id
-                            AND c.ref_user_id = cd.ref_user_id
-                        WHERE
-                            c.ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
-                            AND (:type IS NULL OR c.type = :type)
-                        LIMIT 1
-                    ) THEN (
-                        SELECT
-                            JSON_ARRAYAGG(
-                                JSON_OBJECT(
-                                    'id', c.id,
-                                    'icon', c.icon,
-                                    'name', c.name,
-                                    'type', c.type,
-                                    'description', c.description,
-                                    'totalAmount', COALESCE(cd.amount, 0),
-                                    'refUserID', c.ref_user_id,
-                                    'refAccountsID', :accountID
-                                )
-                            )
-                        FROM
-                            v_categories_table c
-                        JOIN category_details cd
-                            ON c.id = cd.ref_categories_id
-                            AND c.ref_user_id = cd.ref_user_id
-                        WHERE
-                            c.ref_user_id MEMBER OF((SELECT ref_user_ids FROM account_info_cte))
-                            AND (:type IS NULL OR c.type = :type)
+    ),
+    category_details AS (
+        SELECT
+            c.id,
+            c.icon,
+            c.name,
+            c.type,
+            c.description,
+            SUM(
+                t.amount + t.transfer_fee
+            ) AS amount
+        FROM transactions t
+        JOIN categories c
+            ON t.ref_categories_id = c.id
+        JOIN account_members cm
+            ON cm.account_id = :accountID
+            AND cm.user_id = c.ref_user_id
+        WHERE t.ref_accounts_id = :accountID
+            AND (
+                :dateStart IS NULL
+                OR t.date BETWEEN :dateStart AND :dateEnd
+            )
+        GROUP BY
+            c.id,
+            c.icon,
+            c.name,
+            c.type,
+            c.description
+        ORDER BY amount DESC
+    )
+    SELECT
+        :type AS type,
+        t.total_income AS totalIncome,
+        t.total_expense AS totalExpense,
+        COALESCE(
+            (
+                SELECT
+                    JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'id', cd.id,
+                            'icon', cd.icon,
+                            'name', cd.name,
+                            'type', cd.type,
+                            'description', cd.description,
+                            'totalAmount', cd.amount
+                        )
                     )
-                    ELSE
-                        JSON_ARRAY()
-                END as details,
-                (SELECT resolved_user_id FROM resolved_user_cte) AS refUserID,
-                :accountID AS refAccountsID
-            FROM sum_income si
-            JOIN sum_expense se
-            LIMIT 1;`;
+                FROM category_details cd
+                WHERE (
+                    :type IS NULL
+                    OR cd.type = :type
+                )
+            ),
+            JSON_ARRAY()
+        ) AS categories
+    FROM totals t
+    CROSS JOIN authorized a;`;
 };

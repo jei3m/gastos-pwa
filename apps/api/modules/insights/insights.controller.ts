@@ -11,11 +11,15 @@ export const getInsights = async (
     // Declare needed filters
     const userID = req.userID;
     const accountID = req.query.accountID;
-    const dateStart = req.query.dateStart as
-      | string
-      | undefined;
-    const dateEnd = req.query.dateEnd as string | undefined;
-    const type = req.query.type as string | undefined;
+    const dateStart =
+      (req.query.dateStart as string) || null;
+    const dateEnd = (req.query.dateEnd as string) || null;
+    const type =
+      req.query.type === 'income'
+        ? 'Income'
+        : req.query.type === 'expense'
+          ? 'Expense'
+          : null;
 
     if (!accountID) {
       throw Error('There is no selected account');
