@@ -39,8 +39,8 @@ export default function CustomAlertDialog({
         disabled={isDisabled}
         render={trigger as ReactElement}
       />
-      <AlertDialogContent className="border-2 bg-primary [&>button]:hidden">
-        <AlertDialogHeader className="text-left">
+      <AlertDialogContent className="border-2 [&>button]:hidden">
+        <AlertDialogHeader className="place-items-start text-left">
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-gray-800">
             {description}
@@ -49,7 +49,7 @@ export default function CustomAlertDialog({
         {body && <div className="text-sm">{body}</div>}
         <AlertDialogFooter className="flex flex-row justify-between">
           <AlertDialogCancel
-            variant="outline"
+            variant="ghost"
             disabled={isDisabled}
           >
             Cancel
