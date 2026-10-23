@@ -46,14 +46,15 @@ and `apps/web` keeps `dev`/`build`/`preview`/`lint`/`typecheck` (`@gastos/web`).
 
 - In `api/index.ts`, Better Auth is mounted at `/api/auth` **before**
   `express.json()` (it needs the raw body). Keep that order.
-- Routes in `routes/*.routes.ts`, mounted under `/api/*` with `requireAuth` +
-  `rateLimit`. `requireAuth` sets `req.userID` (global Express namespace
-  augmentation in `middleware/auth.middleware.ts`).
-- Use `success()`/`fail()` from `middleware/response.ts`; JSON shape is
+- Modules live in `modules/<name>/` with `<name>.routes.ts`,
+  `<name>.controller.ts`, and `<name>.sql.ts`. Routes are mounted under `/api/*`
+  with `requireAuth` + `rateLimit`. `requireAuth` sets `req.userID` (global
+  Express namespace augmentation in `middleware/auth.middleware.ts`).
+- Use `success()`/`fail()` from `utils/response.ts`; JSON shape is
   `{ success, data }` or `{ success:false, message }`.
-- No ORM: query builders in `lib/sql/*.sql.ts` return named-parameter (`:param`)
-  strings run via `db.query(sql, params)` (mysql2 pool with `namedPlaceholders`
-  - `multipleStatements`).
+- No ORM: query builders in `modules/<name>/<name>.sql.ts` return named-parameter
+  (`:param`) strings run via `db.query(sql, params)` (mysql2 pool with
+  `namedPlaceholders` + `multipleStatements`).
 - Writes go through MySQL stored procedures (`CALL manage_*`) and parse the JSON
   `@response` output (`result[1][0].response`); `v_*` views serve reads.
   Schema/procs/views/triggers live in `db/` and are applied by the migration
