@@ -6,7 +6,7 @@ import { authClient } from '@/lib/auth/auth-client';
 import { toast } from '@/lib/toast';
 import { useAccount } from '@/context/account-context';
 
-export default function Login() {
+export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
@@ -14,7 +14,7 @@ export default function Login() {
 
   useEffect(() => {
     if (session) {
-      void navigate('/pages/transactions', {
+      void navigate('/transactions', {
         replace: true,
       });
     }
@@ -24,7 +24,7 @@ export default function Login() {
     setGoogleLoading(true);
     const { error } = await authClient.signIn.social({
       provider: 'google',
-      callbackURL: `${window.location.origin}/pages/transactions`,
+      callbackURL: `${window.location.origin}/transactions`,
     });
 
     if (error?.status === 429) {

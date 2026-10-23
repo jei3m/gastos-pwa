@@ -27,7 +27,7 @@ import {
 import { accountsQueryOptions } from '@/features/accounts/accounts.tq.options';
 import { toast } from '@/lib/toast';
 
-export default function AcceptInvitation() {
+export default function AcceptInvitationPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -58,7 +58,7 @@ export default function AcceptInvitation() {
           'You are now a member of this account!'
         );
         setTimeout(() => {
-          void navigate('/pages/transactions');
+          void navigate('/transactions');
         }, 1500);
       } else {
         toast.success('Invitation declined');

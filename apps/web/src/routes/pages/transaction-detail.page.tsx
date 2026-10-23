@@ -1,7 +1,7 @@
 import EditTransactionForm from '@/components/transactions/edit-transaction-form';
 import { Suspense } from 'react';
 
-function EditTransactionPage() {
+function TransactionDetailPage() {
   return (
     <Suspense fallback={<></>}>
       <EditTransactionForm />
@@ -9,4 +9,4 @@ function EditTransactionPage() {
   );
 }
 
-export default EditTransactionPage;
+export default TransactionDetailPage;

@@ -23,29 +23,25 @@ A modern React + TypeScript single-page application boilerplate built with Vite,
 | Components  | shadcn (Base UI)       |
 | Routing     | React Router v7        |
 | Data fetch  | TanStack Query v5      |
-| Lint/Format | ESLint 10 + Prettier 3 |
+| Lint/Format | oxlint + oxfmt (Vite+) |
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20+ (or Bun)
-- A package manager: `npm`, `pnpm`, or `bun`
+- Bun
+- Vite+ (`vp`) installed globally
 
 ### Install
 
 ```bash
-npm install
-# or
-bun install
-# or
-pnpm install
+vp install
 ```
 
 ### Run the dev server
 
 ```bash
-npm run dev
+vp run dev:web
 ```
 
 Then open the printed local URL (default `http://localhost:5173`).
@@ -53,31 +49,31 @@ Then open the printed local URL (default `http://localhost:5173`).
 ### Build for production
 
 ```bash
-npm run build
+vp run build
 ```
 
-This formats the code, type-checks with `tsc`, and produces a production bundle in `dist/`.
+This type-checks with `tsc` and produces a production bundle in `dist/`.
 
 ### Preview the production build
 
 ```bash
-npm run preview
+vp preview
 ```
 
-### Lint
+### Check
 
 ```bash
-npm run lint
+vp check
 ```
 
 ## Scripts
 
-| Script    | Description                                  |
-| --------- | -------------------------------------------- |
-| `dev`     | Start the Vite dev server                    |
-| `build`   | Format, type-check, and build for production |
-| `preview` | Preview the production build locally         |
-| `lint`    | Run ESLint                                   |
+| Script    | Description                          |
+| --------- | ------------------------------------ |
+| `dev`     | Start the Vite dev server            |
+| `build`   | Type-check and build for production  |
+| `preview` | Preview the production build locally |
+| `lint`    | Run oxlint                           |
 
 ## Project Structure
 
@@ -98,37 +94,44 @@ npm run lint
 └── src/
     ├── index.css        # Tailwind + theme tokens
     ├── main.tsx         # App entry point
-    ├── router.tsx       # Route definitions
-    └── routes/          # Page-level route components
+    ├── router.tsx       # Route definitions (createBrowserRouter)
+    └── routes/
+        ├── auth/        # login.page.tsx, register.page.tsx
+        ├── guards/      # protected-route.tsx
+        ├── layouts/     # auth-layout.tsx, pages-layout.tsx
+        └── pages/       # <resource>.page.tsx route entry points
 ```
 
 ## Routing
 
-Routes are defined declaratively in `src/router.tsx` using `react-router-dom`'s
-`<BrowserRouter>` / `<Routes>` API. The root path `/` redirects to `/users`.
+Routes are defined in `src/router.tsx` with `createBrowserRouter` from
+`react-router`. The root path `/` redirects to `/transactions` when a session
+exists, otherwise to `/auth/login`. Page entry points live in
+`src/routes/**/<name>.page.tsx` and are loaded lazily.
 
 ```tsx
-<BrowserRouter>
-  <Routes>
-    <Route
-      path="/"
-      element={<Navigate to="/users" replace />}
-    />
-    <Route
-      path="/users"
-      element={
-        <>
-          <Navbar />
-          <UsersPage />
-        </>
-      }
-    />
-  </Routes>
-</BrowserRouter>
+const router = createBrowserRouter([
+  {
+    errorElement: <RouteError />,
+    children: [
+      { path: '/', element: <RootRedirect /> },
+      {
+        path: '/auth',
+        element: <AuthLayout />,
+        children: [
+          { path: 'login', element: <LoginPage /> },
+          { path: 'register', element: <RegisterPage /> },
+        ],
+      },
+    ],
+  },
+]);
 ```
 
-Add new routes by creating a component in `src/routes/` and a corresponding
-`<Route>` entry in `src/router.tsx`.
+URLs are top-level (`/transactions`, `/accounts/:id`); `/pages/*` is kept only
+as a legacy redirect. Add a new page by creating
+`src/routes/pages/<name>.page.tsx` exporting `<Name>Page` and registering it in
+`src/router.tsx`.
 
 ## Styling
 
@@ -158,11 +161,13 @@ import { cn } from '@/lib/utils';
 ## TanStack Query
 
 The app is wrapped in a `TanstackProvider` (`context/tanstack-context.tsx`).
-Define query options per feature (e.g. `features/users/users.tq.options.ts`)
+Define query options per feature (e.g. `features/accounts/accounts.tq.options.ts`)
 and consume them with `useQuery`:
 
 ```tsx
-const { data, isPending } = useQuery(usersQueryOptions());
+const { data, isPending } = useQuery(
+  accountsQueryOptions()
+);
 ```
 
 React Query Devtools are mounted in `src/main.tsx` (closed by default).
@@ -172,4 +177,4 @@ React Query Devtools are mounted in `src/main.tsx` (closed by default).
 - **React Compiler** is enabled via `@vitejs/plugin-react` + Babel. It
   automatically memoizes components, so you generally don't need manual
   `useMemo` / `React.memo`.
-- The project uses strict TypeScript; run `npm run build` to catch type errors.
+- The project uses strict TypeScript; run `vp run build` to catch type errors.

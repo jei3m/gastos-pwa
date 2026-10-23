@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TypographyH3 } from '@/components/custom/typography';
@@ -14,13 +14,19 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
-import { createCategory } from '@/features/categories/categories.tq.functions';
-import { createCategorySchema } from '@/lib/schema/categories.schema';
+import {
+  editCategory,
+  deleteCategory,
+} from '@/features/categories/categories.tq.functions';
+import { editCategorySchema } from '@/lib/schema/categories.schema';
 import { toast } from '@/lib/toast';
+import { Loader, Trash2 } from 'lucide-react';
 import {
   useMutation,
+  useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { categoryByIDQueryOptions } from '@/features/categories/categories.tq.options';
 import {
   Tabs,
   TabsList,
@@ -29,19 +35,19 @@ import {
 import { categoryTypes } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
 import IconPicker from '@/components/custom/icon-picker';
-import { Loader } from 'lucide-react';
+import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 
-export default function CreateCategory() {
+export default function CategoryDetailPage() {
   const navigate = useNavigate();
+  const params = useParams();
   const queryClient = useQueryClient();
+  const id = params.id as string;
 
-  const form = useForm<
-    z.infer<typeof createCategorySchema>
-  >({
-    resolver: zodResolver(createCategorySchema),
+  const form = useForm<z.infer<typeof editCategorySchema>>({
+    resolver: zodResolver(editCategorySchema),
     defaultValues: {
       name: '',
-      type: 'expense',
+      type: '',
       icon: '',
       description: '',
     },
@@ -52,32 +58,73 @@ export default function CreateCategory() {
     name: 'type',
   });
 
-  const { mutate: createCategoryMutation, isPending } =
-    useMutation({
-      mutationFn: (
-        values: z.infer<typeof createCategorySchema>
-      ) => createCategory(values),
-      onSuccess: (data) => {
-        void queryClient.invalidateQueries({
-          queryKey: ['categories'],
-        });
-        toast.success(
-          (data as { responseMessage: string })
-            .responseMessage
-        );
-        form.reset();
-        void navigate('/pages/settings');
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    });
+  const {
+    mutate: editCategoryMutation,
+    isPending: isEditCategoryPending,
+  } = useMutation({
+    mutationFn: (
+      values: z.infer<typeof editCategorySchema>
+    ) => editCategory(id, values),
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({
+        queryKey: categoryByIDQueryOptions(id).queryKey,
+      });
+      toast.success(
+        (data as { responseMessage: string })
+          .responseMessage
+      );
+      form.reset();
+      void navigate('/settings');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const {
+    mutate: deleteCategoryMutation,
+    isPending: isDeleteCategoryPending,
+  } = useMutation({
+    mutationFn: (id: string) => deleteCategory(id),
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({
+        queryKey: categoryByIDQueryOptions(id).queryKey,
+      });
+      toast.success(
+        (data as { responseMessage: string })
+          .responseMessage
+      );
+      void navigate('/settings');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   async function onSubmit(
-    values: z.infer<typeof createCategorySchema>
+    values: z.infer<typeof editCategorySchema>
   ) {
-    createCategoryMutation(values);
+    editCategoryMutation(values);
   }
+
+  const {
+    data,
+    isPending: isCategoryPending,
+    error: categoryError,
+  } = useQuery(categoryByIDQueryOptions(id));
+
+  useEffect(() => {
+    if (categoryError) {
+      toast.error(categoryError.message);
+    }
+    if (!data || isCategoryPending) return;
+    form.reset({
+      name: data.name,
+      icon: data.icon,
+      type: data.type || 'expense',
+      description: data.description || '',
+    });
+  }, [categoryError, data, isCategoryPending, form]);
 
   useEffect(() => {
     if (form?.formState?.errors?.type?.message) {
@@ -86,9 +133,40 @@ export default function CreateCategory() {
     }
   }, [form?.formState?.errors?.type?.message]);
 
+  const isLoading = useMemo(() => {
+    return (
+      isEditCategoryPending ||
+      isDeleteCategoryPending ||
+      isCategoryPending
+    );
+  }, [
+    isCategoryPending,
+    isDeleteCategoryPending,
+    isEditCategoryPending,
+  ]);
+
   return (
     <main className="flex flex-col space-y-4 p-3">
-      <TypographyH3>Create New Category</TypographyH3>
+      <div className="flex justify-between items-center">
+        <TypographyH3>Edit Category</TypographyH3>
+        <CustomAlertDialog
+          isDisabled={isLoading}
+          trigger={
+            <Trash2 size={20} className="text-red-500" />
+          }
+          title="Are you sure?"
+          description={
+            <>
+              This will permanently delete this category.{' '}
+              <br /> <br />
+              If there are existing transactions associated
+              with this category, please delete them first.
+            </>
+          }
+          confirmMessage="Yes, I'm sure"
+          onConfirm={() => deleteCategoryMutation(id)}
+        />
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -132,7 +210,9 @@ export default function CreateCategory() {
             name="icon"
             render={({ field }) => (
               <FormItem className="m-auto mb-4 flex flex-col justify-center items-center">
-                <FormLabel>Category Icon</FormLabel>
+                <FormLabel className="text-md font-medium">
+                  Category Icon
+                </FormLabel>
                 <FormControl>
                   <IconPicker
                     value={field.value}
@@ -149,7 +229,9 @@ export default function CreateCategory() {
             name="name"
             render={({ field }) => (
               <FormItem className="-space-y-1">
-                <FormLabel>Category Name</FormLabel>
+                <FormLabel className="text-md font-medium">
+                  Category Name
+                </FormLabel>
                 <FormControl>
                   <Input
                     required
@@ -166,7 +248,9 @@ export default function CreateCategory() {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel className="text-md font-medium">
+                  Description
+                </FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Description..."
@@ -179,12 +263,9 @@ export default function CreateCategory() {
           />
           <div className="flex flex-row justify-between">
             <Button
-              onClick={() => {
-                form.reset();
-                void navigate(-1);
-              }}
+              onClick={() => navigate(-1)}
               className="bg-red-500"
-              disabled={isPending}
+              disabled={isLoading}
               type="button"
             >
               Cancel
@@ -192,9 +273,9 @@ export default function CreateCategory() {
             <Button
               className="space-x-2"
               type="submit"
-              disabled={isPending}
+              disabled={isLoading}
             >
-              {isPending && (
+              {isLoading && (
                 <Loader className="animate-spin" />
               )}
               Submit

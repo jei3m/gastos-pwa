@@ -32,21 +32,21 @@ export const menuItems: DockItem[] = [
   {
     label: 'transactions',
     icon: ArrowLeftRight,
-    route: '/pages/transactions',
+    route: '/transactions',
   },
   {
     label: 'accounts',
     icon: Landmark,
-    route: '/pages/accounts',
+    route: '/accounts',
   },
   {
     label: 'categories',
     icon: Tags,
-    route: '/pages/categories',
+    route: '/categories',
   },
   {
     label: 'settings',
     icon: Settings,
-    route: '/pages/settings',
+    route: '/settings',
   },
 ];

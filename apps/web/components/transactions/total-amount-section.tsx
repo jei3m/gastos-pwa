@@ -117,7 +117,7 @@ export default function TotalAmountSection({
               <>
                 {selectedAccountID ? (
                   <Link
-                    to={`/pages/transactions/add?type=income`}
+                    to={`/transactions/add?type=income`}
                     className="w-full"
                   >
                     <Button className="w-full flex flex-row -space-x-1">
@@ -137,7 +137,7 @@ export default function TotalAmountSection({
 
                 {selectedAccountID ? (
                   <Link
-                    to={`/pages/transactions/add?type=expense`}
+                    to={`/transactions/add?type=expense`}
                     className="w-full"
                   >
                     <Button

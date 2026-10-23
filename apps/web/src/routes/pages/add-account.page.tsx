@@ -34,7 +34,7 @@ import { Loader } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import AccountSharingSection from '@/components/accounts/account-sharing-section';
 
-export default function CreateAccount() {
+export default function AddAccountPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -84,7 +84,7 @@ export default function CreateAccount() {
           (data as { responseMessage: string })
             .responseMessage
         );
-        void navigate('/pages/settings');
+        void navigate('/settings');
       },
       onError: (error) => {
         toast.error(error.message);

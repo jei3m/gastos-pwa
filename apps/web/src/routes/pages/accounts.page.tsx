@@ -28,7 +28,7 @@ import { useAccount } from '@/context/account-context';
 import { toast } from '@/lib/toast';
 import { Badge } from '@/components/ui/badge';
 
-export default function Accounts() {
+export default function AccountsPage() {
   const [accountType, setAccountType] = useState('All');
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);

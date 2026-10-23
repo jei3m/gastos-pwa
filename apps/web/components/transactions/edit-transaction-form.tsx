@@ -105,7 +105,7 @@ export default function EditTransactionForm({
   const queryClient = useQueryClient();
   const params = useParams();
   const id =
-    (params['transaction-id'] as string) ||
+    (params.transactionID as string) ||
     (params.id as string);
 
   const filteredAccounts =
@@ -154,7 +154,7 @@ export default function EditTransactionForm({
       if (isModal && onClose) {
         onClose();
       } else {
-        void navigate('/pages/transactions');
+        void navigate('/transactions');
       }
     },
     onError: (error) => {
@@ -179,7 +179,7 @@ export default function EditTransactionForm({
       if (isModal && onClose) {
         onClose();
       } else {
-        void navigate('/pages/transactions');
+        void navigate('/transactions');
       }
     },
     onError: (error) => {

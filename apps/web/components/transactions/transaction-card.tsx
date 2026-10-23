@@ -31,11 +31,11 @@ function TransactionCard({
 }: TransactionCardProps) {
   const { pathname } = useLocation();
   const isCategoryRoute = pathname.match(
-    /^\/pages\/categories\/[^/]+\/transactions$/
+    /^\/categories\/[^/]+\/transactions$/
   );
   const hrefPrefix = isCategoryRoute
     ? pathname
-    : '/pages/transactions';
+    : '/transactions';
   return (
     <section className="flex flex-col gap-1">
       <div className="flex justify-between items-center px-2 font-semibold">

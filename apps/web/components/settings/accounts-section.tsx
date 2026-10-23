@@ -83,7 +83,7 @@ export default function AccountsSection({
                           {pageAccounts.map(
                             (account: Account) => (
                               <Link
-                                to={`/pages/accounts/${account.id}`}
+                                to={`/accounts/${account.id}`}
                                 key={account.id}
                               >
                                 <Card className="border-2 h-full">
@@ -188,10 +188,7 @@ export default function AccountsSection({
               </p>
             </div>
           )}
-          <Link
-            className="w-full"
-            to={'/pages/accounts/add'}
-          >
+          <Link className="w-full" to={'/accounts/add'}>
             <Button className="w-full">
               <Plus size={40} className="-mr-1" /> Add New
               Account

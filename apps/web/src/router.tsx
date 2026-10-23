@@ -1,104 +1,149 @@
+import { lazy, Suspense } from 'react';
 import {
-  BrowserRouter,
+  createBrowserRouter,
   Navigate,
-  Route,
-  Routes,
-} from 'react-router-dom';
-import ProtectedRoute from '@/components/custom/protected-route';
-import AuthLayout from './routes/auth-layout';
-import PagesLayout from './routes/pages-layout';
-import RootRedirect from './routes/root';
-import Login from './routes/auth/login';
-import Register from './routes/auth/register';
-import AcceptInvitation from './routes/pages/invitations-accept';
-import TransactionsPage from './routes/pages/transactions';
-import TransactionsAddPage from './routes/pages/transactions-add';
-import TransactionDetailPage from './routes/pages/transaction-detail';
-import AccountsPage from './routes/pages/accounts';
-import AccountsAddPage from './routes/pages/accounts-add';
-import AccountDetailPage from './routes/pages/account-detail';
-import CategoriesPage from './routes/pages/categories';
-import CategoriesAddPage from './routes/pages/categories-add';
-import CategoryDetailPage from './routes/pages/category-detail';
-import CategoryTransactionsPage from './routes/pages/category-transactions';
-import CategoryTransactionDetailPage from './routes/pages/category-transaction-detail';
-import SettingsPage from './routes/pages/settings';
+  RouterProvider,
+} from 'react-router';
+import Loader from '@/components/custom/loader';
+import LegacyPagesRedirect from './routes/legacy-pages-redirect';
+import AuthLayout from './routes/layouts/auth-layout';
+import PagesLayout from './routes/layouts/pages-layout';
+import ProtectedRoute from './routes/guards/protected-route';
+import RootRedirect from './routes/root-redirect';
+import RouteError from './routes/route-error';
+
+const LoginPage = lazy(
+  () => import('./routes/auth/login.page')
+);
+const RegisterPage = lazy(
+  () => import('./routes/auth/register.page')
+);
+const AcceptInvitationPage = lazy(
+  () => import('./routes/pages/accept-invitation.page')
+);
+const TransactionsPage = lazy(
+  () => import('./routes/pages/transactions.page')
+);
+const AddTransactionPage = lazy(
+  () => import('./routes/pages/add-transaction.page')
+);
+const TransactionDetailPage = lazy(
+  () => import('./routes/pages/transaction-detail.page')
+);
+const AccountsPage = lazy(
+  () => import('./routes/pages/accounts.page')
+);
+const AddAccountPage = lazy(
+  () => import('./routes/pages/add-account.page')
+);
+const AccountDetailPage = lazy(
+  () => import('./routes/pages/account-detail.page')
+);
+const CategoriesPage = lazy(
+  () => import('./routes/pages/categories.page')
+);
+const AddCategoryPage = lazy(
+  () => import('./routes/pages/add-category.page')
+);
+const CategoryDetailPage = lazy(
+  () => import('./routes/pages/category-detail.page')
+);
+const CategoryTransactionsPage = lazy(
+  () => import('./routes/pages/category-transactions.page')
+);
+const SettingsPage = lazy(
+  () => import('./routes/pages/settings.page')
+);
+
+const router = createBrowserRouter([
+  {
+    errorElement: <RouteError />,
+    children: [
+      { path: '/', element: <RootRedirect /> },
+      {
+        path: '/auth',
+        element: <AuthLayout />,
+        children: [
+          { path: 'login', element: <LoginPage /> },
+          { path: 'register', element: <RegisterPage /> },
+        ],
+      },
+      {
+        element: <PagesLayout />,
+        children: [
+          {
+            path: 'invitations/accept',
+            element: <AcceptInvitationPage />,
+          },
+          {
+            element: <ProtectedRoute />,
+            children: [
+              {
+                path: 'transactions',
+                element: <TransactionsPage />,
+              },
+              {
+                path: 'transactions/add',
+                element: <AddTransactionPage />,
+              },
+              {
+                path: 'transactions/:id',
+                element: <TransactionDetailPage />,
+              },
+              {
+                path: 'accounts',
+                element: <AccountsPage />,
+              },
+              {
+                path: 'accounts/add',
+                element: <AddAccountPage />,
+              },
+              {
+                path: 'accounts/:id',
+                element: <AccountDetailPage />,
+              },
+              {
+                path: 'categories',
+                element: <CategoriesPage />,
+              },
+              {
+                path: 'categories/add',
+                element: <AddCategoryPage />,
+              },
+              {
+                path: 'categories/:id',
+                element: <CategoryDetailPage />,
+              },
+              {
+                path: 'categories/:id/transactions',
+                element: <CategoryTransactionsPage />,
+              },
+              {
+                path: 'categories/:id/transactions/:transactionID',
+                element: <TransactionDetailPage />,
+              },
+              {
+                path: 'settings',
+                element: <SettingsPage />,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        path: '/pages/*',
+        element: <LegacyPagesRedirect />,
+      },
+      { path: '*', element: <Navigate to="/" replace /> },
+    ],
+  },
+]);
 
 function Router() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<RootRedirect />} />
-
-        <Route path="/auth" element={<AuthLayout />}>
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-        </Route>
-
-        <Route path="/pages" element={<PagesLayout />}>
-          <Route
-            path="invitations/accept"
-            element={<AcceptInvitation />}
-          />
-
-          <Route element={<ProtectedRoute />}>
-            <Route
-              path="transactions"
-              element={<TransactionsPage />}
-            />
-            <Route
-              path="transactions/add"
-              element={<TransactionsAddPage />}
-            />
-            <Route
-              path="transactions/:id"
-              element={<TransactionDetailPage />}
-            />
-            <Route
-              path="accounts"
-              element={<AccountsPage />}
-            />
-            <Route
-              path="accounts/add"
-              element={<AccountsAddPage />}
-            />
-            <Route
-              path="accounts/:id"
-              element={<AccountDetailPage />}
-            />
-            <Route
-              path="categories"
-              element={<CategoriesPage />}
-            />
-            <Route
-              path="categories/add"
-              element={<CategoriesAddPage />}
-            />
-            <Route
-              path="categories/:id"
-              element={<CategoryDetailPage />}
-            />
-            <Route
-              path="categories/:id/transactions"
-              element={<CategoryTransactionsPage />}
-            />
-            <Route
-              path="categories/:id/transactions/:transaction-id"
-              element={<CategoryTransactionDetailPage />}
-            />
-            <Route
-              path="settings"
-              element={<SettingsPage />}
-            />
-          </Route>
-        </Route>
-
-        <Route
-          path="*"
-          element={<Navigate to="/" replace />}
-        />
-      </Routes>
-    </BrowserRouter>
+    <Suspense fallback={<Loader />}>
+      <RouterProvider router={router} />
+    </Suspense>
   );
 }
 

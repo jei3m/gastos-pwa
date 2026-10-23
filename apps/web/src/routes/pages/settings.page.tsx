@@ -30,7 +30,7 @@ import DangerZoneSection from '@/components/settings/danger-zone-section';
 import { TypographyH4 } from '@/components/custom/typography';
 import SessionsCard from '@/components/settings/sessions-card';
 
-export default function Settings() {
+export default function SettingsPage() {
   const [activeTab, setActiveTab] =
     useState<string>('expense');
   const isMobile = useIsMobile();

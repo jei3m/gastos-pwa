@@ -24,7 +24,7 @@ import useDebounce from '@/hooks/use-debounce';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
-export default function Transactions() {
+export default function TransactionsPage() {
   const [searchFilter, setSearchFilter] = useState('');
   const debouncedSearchTerm = useDebounce(
     searchFilter,

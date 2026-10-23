@@ -39,7 +39,7 @@ import { useScrollState } from '@/hooks/use-scroll-state';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
-export default function Transactions() {
+export default function CategoryTransactionsPage() {
   const { selectedAccountID } = useAccount();
   const params = useParams();
   const categoryID = params.id as string;

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/lib/toast';
 
-export default function Register() {
+export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ export default function Register() {
 
   useEffect(() => {
     if (session) {
-      void navigate('/pages/transactions', {
+      void navigate('/transactions', {
         replace: true,
       });
     }
@@ -36,7 +36,7 @@ export default function Register() {
       name: name,
       email: email,
       password: password,
-      callbackURL: `${window.location.origin}/pages/transactions`,
+      callbackURL: `${window.location.origin}/transactions`,
     });
 
     if (error) {
@@ -45,7 +45,7 @@ export default function Register() {
       setLoading(false);
     } else {
       toast.success('User is registered successfully!');
-      void navigate('/pages/transactions');
+      void navigate('/transactions');
     }
     setLoading(false);
   }

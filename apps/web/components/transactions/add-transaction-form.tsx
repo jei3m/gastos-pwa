@@ -142,7 +142,7 @@ export default function AddTransactionForm({
       if (isModal && onClose) {
         onClose();
       } else {
-        void navigate('/pages/transactions');
+        void navigate('/transactions');
       }
     },
     onError: (error) => {

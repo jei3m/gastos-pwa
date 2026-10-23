@@ -9,7 +9,7 @@ export default function RootRedirect() {
   useEffect(() => {
     void fetchSession().then(({ session }) => {
       if (session) {
-        void navigate('/pages/transactions', {
+        void navigate('/transactions', {
           replace: true,
         });
       } else {

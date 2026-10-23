@@ -27,8 +27,8 @@ export default function CategoryCard({
 
   const getHref = () => {
     const base = isEdit
-      ? `/pages/categories/${category.id}`
-      : `/pages/categories/${category.id}/transactions`;
+      ? `/categories/${category.id}`
+      : `/categories/${category.id}/transactions`;
     const params = new URLSearchParams();
     if (dateStart) params.set('dateStart', dateStart);
     if (dateEnd) params.set('dateEnd', dateEnd);

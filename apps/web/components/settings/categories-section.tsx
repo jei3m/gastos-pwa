@@ -196,10 +196,7 @@ export default function CategoriesSection({
               </p>
             </div>
           )}
-          <Link
-            className="w-full"
-            to={'/pages/categories/add'}
-          >
+          <Link className="w-full" to={'/categories/add'}>
             <Button className="w-full">
               <Plus size={40} className="-mr-1" /> Add New
               Category

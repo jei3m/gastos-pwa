@@ -26,7 +26,7 @@ import NoSelectedAccountDiv from '@/components/custom/no-selected-account-div';
 import { cn } from '@/lib/utils';
 import { CategoryPieChart } from '@/components/categories/categories-pie-chart-card';
 
-export default function Categories() {
+export default function CategoriesPage() {
   const [categoryType, setCategoryType] =
     useState('expense');
   const { selectedAccountID } = useAccount();
@@ -51,7 +51,7 @@ export default function Categories() {
     const params = new URLSearchParams();
     if (start) params.set('dateStart', start);
     if (end) params.set('dateEnd', end);
-    void navigate(`/pages/categories?${params.toString()}`);
+    void navigate(`/categories?${params.toString()}`);
   };
 
   const calculateBalance = () => {

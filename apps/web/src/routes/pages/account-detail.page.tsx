@@ -45,7 +45,7 @@ import AccountSharingSection from '@/components/accounts/account-sharing-section
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-export default function EditAccount() {
+export default function AccountDetailPage() {
   const navigate = useNavigate();
   const params = useParams();
   const id = params.id as string;
@@ -155,7 +155,7 @@ export default function EditAccount() {
           .responseMessage
       );
       form.reset();
-      void navigate('/pages/settings');
+      void navigate('/settings');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -178,7 +178,7 @@ export default function EditAccount() {
         (data as { responseMessage: string })
           .responseMessage
       );
-      void navigate('/pages/settings');
+      void navigate('/settings');
     },
     onError: (error) => {
       toast.error(error.message);

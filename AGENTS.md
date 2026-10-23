@@ -64,6 +64,12 @@ and `apps/web` keeps `dev`/`build`/`preview`/`lint`/`typecheck` (`@gastos/web`).
 ## Frontend notes
 
 - `@/*` resolves to the web app project root (not `src/`).
+- Route entry points live in `src/routes/**/<name>.page.tsx` (kebab-case) and
+  export `<Name>Page`. Routes are declared in `src/router.tsx` with
+  `createBrowserRouter`; do not adopt file-based routing (dots are URL segments
+  there).
+- URLs are top-level (`/transactions`, `/accounts/:id`); `/pages/*` exists only
+  as a legacy redirect.
 - Features live in `features/<name>/` as `<name>.interface.ts` (types),
   `<name>.tq.functions.ts` (calls), `<name>.tq.options.ts`
   (`queryOptions`/`infiniteQueryOptions`). Follow this shape for new features.

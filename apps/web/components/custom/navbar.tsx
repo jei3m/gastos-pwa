@@ -10,7 +10,7 @@ function Navbar() {
     <div className="pb-12 md:pb-14">
       <nav className="fixed top-0 z-10 flex h-[50px] w-full items-center justify-between border-b-2 bg-white p-2">
         <Link
-          to="/pages/transactions"
+          to="/transactions"
           className="flex items-center space-x-2"
         >
           <img
