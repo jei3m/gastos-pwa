@@ -39,8 +39,8 @@ const AddAccountPage = lazy(
 const AccountDetailPage = lazy(
   () => import('./routes/pages/account-detail.page')
 );
-const CategoriesPage = lazy(
-  () => import('./routes/pages/categories.page')
+const InsightsPage = lazy(
+  () => import('./routes/pages/insights.page')
 );
 const AddCategoryPage = lazy(
   () => import('./routes/pages/add-category.page')
@@ -109,8 +109,8 @@ const router = createBrowserRouter([
                 element: <AccountDetailPage />,
               },
               {
-                path: 'categories',
-                element: <CategoriesPage />,
+                path: 'insights',
+                element: <InsightsPage />,
               },
               {
                 path: 'categories/add',

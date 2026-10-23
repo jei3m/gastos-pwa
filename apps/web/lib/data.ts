@@ -2,8 +2,8 @@ import type { LucideIcon } from 'lucide-react';
 import {
   ArrowLeftRight,
   Landmark,
+  PieChart,
   Settings,
-  Tags,
 } from 'lucide-react';
 
 export interface DockItem {
@@ -40,9 +40,9 @@ export const menuItems: DockItem[] = [
     route: '/accounts',
   },
   {
-    label: 'categories',
-    icon: Tags,
-    route: '/categories',
+    label: 'insights',
+    icon: PieChart,
+    route: '/insights',
   },
   {
     label: 'settings',
