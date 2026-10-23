@@ -40,6 +40,21 @@ main: BEGIN
 
     CASE p_action_type
         WHEN 'create' THEN
+            -- Validate duplicate account name
+            IF EXISTS (
+                SELECT 1
+                FROM accounts
+                WHERE ref_user_id = p_user_id
+                    AND name = p_name
+                LIMIT 1
+            ) THEN
+                SET p_response = JSON_OBJECT(
+                    'responseCode', 409,
+                    'responseMessage', 'An account with this name already exists'
+                );
+                LEAVE main;
+            END IF;
+
             INSERT INTO accounts
             (
                 id,
@@ -121,6 +136,22 @@ main: BEGIN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 403,
                     'responseMessage', 'Only the account owner can update account details'
+                );
+                LEAVE main;
+            END IF;
+
+            -- Validate duplicate account name
+            IF EXISTS (
+                SELECT 1
+                FROM accounts
+                WHERE ref_user_id = p_user_id
+                    AND name = p_name
+                    AND id <> p_id
+                LIMIT 1
+            ) THEN
+                SET p_response = JSON_OBJECT(
+                    'responseCode', 409,
+                    'responseMessage', 'An account with this name already exists'
                 );
                 LEAVE main;
             END IF;

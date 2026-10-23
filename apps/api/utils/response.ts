@@ -18,6 +18,7 @@ export function fail(
   message: string
 ) {
   res.status(status).json({
+    code: status,
     success: false,
     message,
   });

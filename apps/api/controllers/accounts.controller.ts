@@ -62,7 +62,7 @@ export const createAccount = async (
       500,
       error instanceof Error
         ? error.message
-        : 'Failed to Create Tests'
+        : 'Failed to Create Account'
     );
   }
 };
