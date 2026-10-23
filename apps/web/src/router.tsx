@@ -54,6 +54,12 @@ const CategoryTransactionsPage = lazy(
 const SettingsPage = lazy(
   () => import('./routes/pages/settings.page')
 );
+const SettingsAccountsPage = lazy(
+  () => import('./routes/pages/settings-accounts.page')
+);
+const SettingsCategoriesPage = lazy(
+  () => import('./routes/pages/settings-categories.page')
+);
 
 const router = createBrowserRouter([
   {
@@ -125,6 +131,14 @@ const router = createBrowserRouter([
               {
                 path: 'settings',
                 element: <SettingsPage />,
+              },
+              {
+                path: 'settings/accounts',
+                element: <SettingsAccountsPage />,
+              },
+              {
+                path: 'settings/categories',
+                element: <SettingsCategoriesPage />,
               },
             ],
           },

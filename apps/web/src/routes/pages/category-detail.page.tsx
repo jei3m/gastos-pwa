@@ -74,7 +74,7 @@ export default function CategoryDetailPage() {
           .responseMessage
       );
       form.reset();
-      void navigate('/settings');
+      void navigate('/settings/categories');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -94,7 +94,7 @@ export default function CategoryDetailPage() {
         (data as { responseMessage: string })
           .responseMessage
       );
-      void navigate('/settings');
+      void navigate('/settings/categories');
     },
     onError: (error) => {
       toast.error(error.message);

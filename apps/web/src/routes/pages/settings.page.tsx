@@ -17,29 +17,16 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router';
-import { useAccount } from '@/context/account-context';
-import { categoryQueryOptions } from '@/features/categories/categories.tq.options';
-import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-import AccountsSection from '@/components/settings/accounts-section';
-import CategoriesSection from '@/components/settings/categories-section';
 import { authClient } from '@/lib/auth/auth-client';
-import { accountsQueryOptions } from '@/features/accounts/accounts.tq.options';
-import ExportDataCard from '@/components/settings/export-data-card';
 import DangerZoneSection from '@/components/settings/danger-zone-section';
-import { TypographyH4 } from '@/components/custom/typography';
-import SessionsCard from '@/components/settings/sessions-card';
+import DataPrivacySection from '@/components/settings/data-privacy-section/data-privacy-section';
+import SetupPreferencesSection from '@/components/settings/setup-preferences-section';
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] =
-    useState<string>('expense');
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { selectedAccountID } = useAccount();
   const { data: session, isPending } =
     authClient.useSession();
-  const { data: accounts, isPending: isAccountsLoading } =
-    useQuery(accountsQueryOptions());
 
   const handleLogout = async () => {
     await authClient.signOut({
@@ -66,23 +53,6 @@ export default function SettingsPage() {
       return 'N/A';
     }
   };
-
-  const {
-    data: categoriesData,
-    isPending: isCategoriesLoading,
-  } = useQuery(
-    categoryQueryOptions(
-      activeTab,
-      selectedAccountID,
-      !!activeTab,
-      null,
-      null,
-      'list'
-    )
-  );
-  const categories = useMemo(() => {
-    return categoriesData;
-  }, [categoriesData]);
 
   return (
     <main
@@ -200,27 +170,9 @@ export default function SettingsPage() {
         </Card>
       </section>
 
-      <AccountsSection
-        accounts={accounts ?? []}
-        isAccountsLoading={isAccountsLoading}
-        isMobile={isMobile}
-      />
+      <SetupPreferencesSection />
 
-      <CategoriesSection
-        categories={categories ?? []}
-        isCategoriesLoading={isCategoriesLoading}
-        isMobile={isMobile}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-
-      <section className="space-y-4">
-        <TypographyH4 className="font-semibold">
-          Data &amp; Privacy
-        </TypographyH4>
-        <ExportDataCard isSessionPending={isPending} />
-        <SessionsCard isSessionPending={isPending} />
-      </section>
+      <DataPrivacySection isSessionPending={isPending} />
 
       <DangerZoneSection />
     </main>

@@ -155,7 +155,7 @@ export default function AccountDetailPage() {
           .responseMessage
       );
       form.reset();
-      void navigate('/settings');
+      void navigate('/settings/accounts');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -178,7 +178,7 @@ export default function AccountDetailPage() {
         (data as { responseMessage: string })
           .responseMessage
       );
-      void navigate('/settings');
+      void navigate('/settings/accounts');
     },
     onError: (error) => {
       toast.error(error.message);

@@ -84,7 +84,7 @@ export default function AddAccountPage() {
           (data as { responseMessage: string })
             .responseMessage
         );
-        void navigate('/settings');
+        void navigate('/settings/accounts');
       },
       onError: (error) => {
         toast.error(error.message);

@@ -66,7 +66,7 @@ export default function AddCategoryPage() {
             .responseMessage
         );
         form.reset();
-        void navigate('/settings');
+        void navigate('/settings/categories');
       },
       onError: (error) => {
         toast.error(error.message);
