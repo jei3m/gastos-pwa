@@ -77,7 +77,16 @@ export default function AccountSelector() {
               );
             }
             if (selectedAccount) {
-              return selectedAccount.name;
+              return (
+                <>
+                  {selectedAccount.name}
+                  {Boolean(selectedAccount.isShared) && (
+                    <span className="-ml-1 text-xs text-muted-foreground">
+                      (Shared)
+                    </span>
+                  )}
+                </>
+              );
             }
             return null;
           }}
@@ -101,7 +110,7 @@ export default function AccountSelector() {
                     >
                       {account.name}
                       {Boolean(account.isShared) && (
-                        <span className="-ml-1 mt-0.5 text-xs text-muted-foreground">
+                        <span className="-ml-1 text-xs text-muted-foreground">
                           (Shared)
                         </span>
                       )}
