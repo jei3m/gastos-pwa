@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "rewrite": false
+    }
+  },
   "services": {
     "api": {
       "root": "apps/api",
