@@ -1,38 +1,46 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import PulseLoader from '@/components/custom/pulse-loader';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from '@/components/ui/card';
-import { formatAmount } from '@/lib/format-amount';
-import { Skeleton } from '@/components/ui/skeleton';
 import { TypographyH4 } from '@/components/custom/typography';
-import { Separator } from '@/components/ui/separator';
 import { accountsQueryOptions } from '@/features/accounts/accounts.tq.options';
 import { useQuery } from '@tanstack/react-query';
 import type { Account } from '@/features/accounts/accounts.interface';
 import { cn } from '@/lib/utils';
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import { accountTypes } from '@/lib/data';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { CircleCheck, Eye, EyeOff } from 'lucide-react';
+import { Search, SearchX, Wallet, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useScrollState } from '@/hooks/use-scroll-state';
 import { useAccount } from '@/context/account-context';
 import { toast } from '@/lib/toast';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { formatAmount } from '@/lib/format-amount';
+import { NetWorthSection } from '@/components/accounts/net-worth-section';
+import { AccountCard } from '@/components/accounts/account-card';
+import {
+  ACCOUNT_TYPE_ORDER,
+  groupAccountsByType,
+} from '@/features/accounts/accounts.helpers';
+
+function matchesSearch(account: Account, query: string) {
+  if (!query) return true;
+
+  return [account.name].some((value) =>
+    value?.toLowerCase().includes(query)
+  );
+}
 
 export default function AccountsPage() {
-  const [accountType, setAccountType] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [openGroups, setOpenGroups] = useState<string[]>(
+    () => [...ACCOUNT_TYPE_ORDER]
+  );
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const isMobile = useIsMobile();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const isScrolled = useScrollState(scrollRef);
   const { setSelectedAccountID, selectedAccountID } =
     useAccount();
 
@@ -42,234 +50,221 @@ export default function AccountsPage() {
   const { data: accounts, isPending: isAccountsLoading } =
     useQuery(accountsQueryOptions());
 
-  const filteredAccounts =
-    accounts?.filter((account: Account) =>
-      accountType === 'All'
-        ? true
-        : account.type === accountType
-    ) ?? [];
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredAccounts = (accounts ?? []).filter(
+    (account) => matchesSearch(account, normalizedQuery)
+  );
+  const groups = groupAccountsByType(filteredAccounts);
 
-  const calculateNetWorth = () => {
-    if (!accounts) return '0.00';
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.tagName === 'SELECT' ||
+        target?.isContentEditable;
 
-    const accountsToCalculate = isMobile
-      ? filteredAccounts
-      : accounts;
+      if (event.key === '/' && !isTyping) {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
 
-    const netWorth = accountsToCalculate.reduce(
-      (total: number, account: Account) => {
-        const balance = parseFloat(account.totalBalance);
-        return total + (isNaN(balance) ? 0 : balance);
-      },
-      0
-    );
+    window.addEventListener('keydown', handleKeyDown);
+    return () =>
+      window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
-    return netWorth.toLocaleString();
+  const clearSearch = () => {
+    setSearchQuery('');
+    searchInputRef.current?.focus();
   };
 
-  const handleSelectAccount = (
-    id: string,
-    name: string
-  ) => {
-    if (selectedAccountID === id) return;
-    setSelectedAccountID(id);
-    toast.success(`Selected ${name} as Active Account`);
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+
+    const query = value.trim().toLowerCase();
+    if (!query) return;
+
+    const matchingTypes = (accounts ?? [])
+      .filter((account) => matchesSearch(account, query))
+      .map((account) => account.type);
+
+    setOpenGroups((current) => {
+      const next = [
+        ...new Set([...current, ...matchingTypes]),
+      ];
+      return next.length === current.length
+        ? current
+        : next;
+    });
+  };
+
+  const handleSelectAccount = (account: Account) => {
+    if (selectedAccountID === account.id) return;
+    setSelectedAccountID(account.id);
+    toast.success(
+      `Selected ${account.name} as Active Account`
+    );
   };
 
   return (
     <main
-      ref={scrollRef}
       className={cn(
         'flex flex-col space-y-4 md:space-y-6 overflow-y-auto',
         isMobile ? 'h-screen pb-29' : 'pb-4'
       )}
     >
-      {/* Net Worth Section */}
-      <section
-        className={cn(
-          'transition-all ease-in-out',
-          isScrolled && isMobile
-            ? 'fixed w-full top-0 z-10'
-            : 'pt-2 md:pt-4 px-3 flex md:flex-col md:flex-row gap-2 md:gap-4'
-        )}
-      >
-        {/* Total Net Worth Card */}
-        <Card
-          className={cn(
-            isScrolled && isMobile
-              ? '-mt-2 border-0 rounded-none'
-              : 'border-2 my-auto',
-            isMobile ? 'w-full' : 'flex-3'
-          )}
-        >
-          <CardContent>
-            <div className="flex flex-row items-center -mb-0.5">
-              <h3 className="text-gray-600 font-normal text-lg">
-                {isMobile ? 'Total Balance' : 'Net Worth'}
-              </h3>
+      <NetWorthSection
+        accounts={accounts ?? []}
+        isLoading={isAccountsLoading}
+        hidden={Boolean(hideNetWorthTotal)}
+        onToggleHidden={() =>
+          setHideNetWorthTotal(!hideNetWorthTotal)
+        }
+        selectedAccountID={selectedAccountID}
+      />
+
+      <section className="flex flex-col space-y-4 md:space-y-6 px-3 mb-2">
+        <div className="bg-white border-2 p-3 rounded-xl flex items-center justify-between">
+          <TypographyH4>Accounts</TypographyH4>
+          <div className="relative w-54 md:w-64">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              ref={searchInputRef}
+              value={searchQuery}
+              onChange={(event) =>
+                handleSearchChange(event.target.value)
+              }
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  setSearchQuery('');
+                  event.currentTarget.blur();
+                }
+              }}
+              placeholder="Search by name..."
+              aria-label="Search accounts"
+              className="px-8 border-0 bg-gray-200"
+            />
+            {searchQuery ? (
               <Button
+                type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() =>
-                  setHideNetWorthTotal(!hideNetWorthTotal)
-                }
-                className="h-8 w-8 text-gray-600"
+                onClick={clearSearch}
+                className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-gray-600"
               >
-                {hideNetWorthTotal ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                <X className="h-4 w-4" />
+                <span className="sr-only">
+                  Clear search
+                </span>
               </Button>
-            </div>
-            {isAccountsLoading ? (
-              <h1 className="text-2xl font-extrabold flex">
-                <Skeleton className="h-10 w-[50%] bg-gray-300" />
-              </h1>
-            ) : (
-              <h1 className="text-2xl font-extrabold">
-                PHP{' '}
-                {hideNetWorthTotal
-                  ? '********'
-                  : calculateNetWorth()}
-              </h1>
-            )}
-          </CardContent>
-        </Card>
-
-        {isMobile && isScrolled && (
-          <div className="w-full border-t-2 border-black" />
-        )}
-      </section>
-
-      {/* Accounts Section */}
-      <section
-        className={cn(
-          'flex flex-col space-y-2 md:space-y-4 px-3 mb-2',
-          isScrolled && isMobile && 'mt-[76px]'
-        )}
-      >
-        <Tabs
-          value={accountType}
-          onValueChange={setAccountType}
-        >
-          <div className="flex flex-row justify-between items-center w-full">
-            <TypographyH4>Accounts</TypographyH4>
-            <TabsList className="border-black border-2 p-1">
-              {accountTypes.map((type, index) => (
-                <TabsTrigger
-                  className="text-sm md:text-md"
-                  value={type}
-                  key={index}
-                >
-                  {type}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            ) : null}
           </div>
-        </Tabs>
+        </div>
+
         {isAccountsLoading || !accounts ? (
           <PulseLoader />
+        ) : accounts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+            <div className="rounded-full bg-muted p-4 text-muted-foreground">
+              <Wallet size={40} strokeWidth={1.5} />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">
+                No accounts yet
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Create an account to start tracking your
+                finances.
+              </p>
+            </div>
+          </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-2 md:gap-4">
-              {filteredAccounts.map((account: Account) => (
-                <Card
-                  className="border-2 h-full"
-                  key={account.id}
-                  onClick={() =>
-                    handleSelectAccount(
-                      account.id,
-                      account.name
-                    )
-                  }
+            {filteredAccounts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-10 text-center text-muted-foreground">
+                <div className="rounded-full bg-muted p-4">
+                  <SearchX size={40} strokeWidth={1.5} />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">
+                    No accounts found
+                  </p>
+                  <p className="text-sm">
+                    Nothing matches “{searchQuery.trim()}”.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={clearSearch}
                 >
-                  <CardHeader>
-                    {/* Mobile layout */}
-                    <div className="block md:hidden">
-                      {isAccountsLoading ? (
-                        <div className="flex flex-row items-start justify-between">
-                          <div className="w-full">
-                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300 mb-1" />
-                            <Skeleton className="h-3 md:h-4 w-[100px] bg-gray-300" />
-                          </div>
+                  Clear search
+                </Button>
+              </div>
+            ) : (
+              <Accordion
+                multiple
+                value={openGroups}
+                onValueChange={(value) =>
+                  setOpenGroups(value as string[])
+                }
+                className="grid gap-4 md:gap-6"
+              >
+                {groups.map((group) => (
+                  <AccordionItem
+                    key={group.type}
+                    value={group.type}
+                    className="border-0 border-b-0"
+                  >
+                    <AccordionTrigger className="py-0 hover:no-underline">
+                      <div className="flex w-full items-center justify-between gap-3 pr-1">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-md font-semibold">
+                            {group.type}
+                          </span>
+                          <span className="text-md font-semibold text-muted-foreground">
+                            · {group.count}
+                          </span>
                         </div>
-                      ) : (
-                        <div className="flex flex-row items-start justify-between -mb-2">
-                          <div className="w-full">
-                            <div className="-mb-1 text-md md:text-xl font-bold">
-                              {account?.name}
-                            </div>
-                            <div className="text-sm md:text-md text-gray-600">
-                              {account?.type}
-                            </div>
-                          </div>
-                          {selectedAccountID ===
-                            account.id && (
-                            <span className="inline-flex items-center flex-shrink-0 mt-1">
-                              <span className="h-3 w-3 rounded-full bg-green-500 ring-4 ring-green-200 animate-pulse" />
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Desktop layout */}
-                    <div className="hidden md:block">
-                      {isAccountsLoading ? (
-                        <div className="flex flex-row items-center justify-between">
-                          <div className="text-lg md:text-xl font-bold">
-                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
-                          </div>
-                          <div className="text-md text-gray-600 font-normal">
-                            <Skeleton className="h-4 md:h-5 w-[140px] bg-gray-300" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-row items-center justify-between">
-                          <div className="text-lg md:text-xl font-bold">
-                            {account?.name}
-                            {selectedAccountID ===
-                              account.id && (
-                              <Badge
-                                variant="outline"
-                                className="ml-2 text-green-600 border-green-200 bg-green-50"
-                              >
-                                <CircleCheck className="h-3 w-3 mr-1" />
-                                Active
-                              </Badge>
+                        <span className="text-md font-semibold tabular-nums text-muted-foreground">
+                          {hideNetWorthTotal
+                            ? 'PHP ********'
+                            : `PHP ${formatAmount(
+                                group.total,
+                                false
+                              )}`}
+                        </span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pb-0">
+                      <div className="grid grid-cols-2 gap-2 md:gap-4">
+                        {group.accounts.map((account) => (
+                          <AccountCard
+                            key={account.id}
+                            account={account}
+                            isSelected={
+                              selectedAccountID ===
+                              account.id
+                            }
+                            hidden={Boolean(
+                              hideNetWorthTotal
                             )}
-                          </div>
-                          <div className="text-md text-gray-600 font-normal">
-                            {account?.type}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <Separator />
-                  <CardContent className="-mb-2 md:mb-0 space-y-2">
-                    <div className="flex flex-col">
-                      <h3 className="text-gray-600 font-normal text-sm md:text-lg hidden md:block">
-                        Balance
-                      </h3>
-                      {isAccountsLoading ? (
-                        <h1 className="text-2xl md:text-3xl font-extrabold flex">
-                          <Skeleton className="h-10 w-[50%] bg-gray-300" />
-                        </h1>
-                      ) : (
-                        <h1 className="text-lg md:text-2xl font-extrabold mt-0">
-                          PHP{' '}
-                          {formatAmount(
-                            account?.totalBalance
-                          )}
-                        </h1>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                            query={normalizedQuery}
+                            onSelect={() =>
+                              handleSelectAccount(account)
+                            }
+                          />
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
           </>
         )}
       </section>

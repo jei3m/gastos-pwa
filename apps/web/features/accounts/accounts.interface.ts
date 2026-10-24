@@ -55,3 +55,20 @@ export interface EditAccount {
   cancelInvitationIds?: string[];
   removeMemberIds?: string[];
 }
+
+export interface AccountShare {
+  account: Account;
+  value: number;
+  percent: number;
+  color: string;
+}
+
+export interface AccountTypeSummary {
+  type: string;
+  count: number;
+  total: number;
+}
+
+export interface AccountGroup extends AccountTypeSummary {
+  accounts: Account[];
+}
