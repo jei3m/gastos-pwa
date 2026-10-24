@@ -10,6 +10,7 @@ interface PageHeaderProps {
   action?: ReactNode;
   onBack?: () => void;
   className?: string;
+  navigateTo: string;
 }
 
 export default function PageHeader({
@@ -17,6 +18,7 @@ export default function PageHeader({
   description,
   action,
   className,
+  navigateTo,
 }: PageHeaderProps) {
   const navigate = useNavigate();
 
@@ -26,7 +28,7 @@ export default function PageHeader({
         <div className="flex min-w-0 items-start gap-1">
           <div className="min-w-0 space-y-1">
             <div
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(navigateTo)}
               className="flex items-center cursor-pointer"
             >
               <ChevronLeft className="mr-2" size={22} />
