@@ -22,7 +22,7 @@ import {
 import {
   createAccountSchema,
   updateAccountSchema,
-} from '@/lib/schema/accounts.schema';
+} from '@/features/accounts/accounts.schema';
 import {
   deleteAccount,
   editAccount,

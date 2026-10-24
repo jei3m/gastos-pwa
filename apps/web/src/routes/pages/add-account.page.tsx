@@ -23,7 +23,7 @@ import {
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { createAccountSchema } from '@/lib/schema/accounts.schema';
+import { createAccountSchema } from '@/features/accounts/accounts.schema';
 import { toast } from '@/lib/toast';
 import { ApiError } from '@/lib/api';
 import {

@@ -15,7 +15,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 import { createCategory } from '@/features/categories/categories.tq.functions';
-import { createCategorySchema } from '@/lib/schema/categories.schema';
+import { createCategorySchema } from '@/features/categories/categories.schema';
 import { toast } from '@/lib/toast';
 import {
   useMutation,

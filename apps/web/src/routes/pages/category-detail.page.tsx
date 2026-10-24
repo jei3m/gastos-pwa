@@ -18,7 +18,7 @@ import {
   editCategory,
   deleteCategory,
 } from '@/features/categories/categories.tq.functions';
-import { editCategorySchema } from '@/lib/schema/categories.schema';
+import { editCategorySchema } from '@/features/categories/categories.schema';
 import { toast } from '@/lib/toast';
 import { Loader, Trash2 } from 'lucide-react';
 import {

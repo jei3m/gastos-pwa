@@ -22,7 +22,7 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
-import { createTransactionSchema } from '@/lib/schema/transactions.schema';
+import { createTransactionSchema } from '@/features/transactions/transactions.schema';
 import { useAccount } from '@/context/account-context';
 import type { Category } from '@/features/categories/categories.interface';
 import { toast } from '@/lib/toast';
