@@ -50,3 +50,16 @@ export const menuItems: DockItem[] = [
     route: '/settings',
   },
 ];
+
+export const breakdownColorPalette = [
+  '#2563eb',
+  '#10b981',
+  '#f59e0b',
+  '#8b5cf6',
+  '#ec4899',
+  '#06b6d4',
+  '#f97316',
+  '#84cc16',
+  '#6366f1',
+  '#14b8a6',
+];
