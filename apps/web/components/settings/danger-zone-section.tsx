@@ -52,7 +52,7 @@ export default function DangerZoneSection() {
           <div className="flex flex-row items-center justify-between">
             <div className="flex-1">
               <div className="text-md font-medium text-foreground">
-                Export Data
+                Delete Account
               </div>
               <div className="text-sm text-muted-foreground">
                 Download all of your accounts, categories,
