@@ -52,6 +52,7 @@ export default function SettingsCategoriesPage() {
       <PageHeader
         title="Categories"
         description="View and manage all your categories. Select a category to edit its name, description, type, and icon."
+        navigateTo="/settings"
       />
       <section className="space-y-3 md:space-y-4">
         <Tabs
