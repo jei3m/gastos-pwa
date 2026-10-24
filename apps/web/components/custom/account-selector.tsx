@@ -47,6 +47,8 @@ export default function AccountSelector() {
   const disableSelect = [
     pathname.startsWith('/accounts/'),
     pathname.startsWith('/categories/'),
+    pathname.startsWith('/transactions/') &&
+      !pathname.startsWith('/transactions/add'),
   ].includes(true);
 
   return (
