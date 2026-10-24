@@ -6,7 +6,10 @@ import type { Category } from '@/features/categories/categories.interface';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { categoryTypes } from '@/lib/data';
-import { TypographyH4 } from '@/components/custom/typography';
+import {
+  TypographyH4,
+  TypographyH5,
+} from '@/components/custom/typography';
 import PulseLoader from '@/components/custom/pulse-loader';
 import PageHeader from '@/components/custom/page-header';
 import CategoryCard from '@/components/categories/category-card';
@@ -18,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router';
 import { Inbox, Plus } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function SettingsCategoriesPage() {
   const [activeTab, setActiveTab] =
@@ -48,17 +52,6 @@ export default function SettingsCategoriesPage() {
       <PageHeader
         title="Categories"
         description="View and manage all your categories. Select a category to edit its name, description, type, and icon."
-        action={
-          <Link to="/categories/add">
-            <Button size="sm">
-              <Plus />
-              <span className="hidden sm:inline">
-                New Category
-              </span>
-              <span className="sm:hidden">New</span>
-            </Button>
-          </Link>
-        }
       />
       <section className="space-y-3 md:space-y-4">
         <Tabs
@@ -86,7 +79,40 @@ export default function SettingsCategoriesPage() {
         {isCategoriesLoading ? (
           <PulseLoader />
         ) : categories && categories.length > 0 ? (
-          <div className="grid gap-2 md:grid-cols-2 md:gap-4">
+          <div className="grid grid-cols-2 gap-2 md:gap-4">
+            <Link
+              to="/categories/add"
+              className="block min-w-0 h-full"
+            >
+              <Card className="p-[10px] h-full border-dashed hover:bg-gray-100 transition-colors">
+                <CardContent className="flex flex-row items-center h-full -p-1">
+                  <div className="flex flex-row space-x-2 md:space-x-3 items-center flex-1 min-w-0">
+                    <div
+                      className={cn(
+                        'p-2 rounded-lg shrink-0',
+                        activeTab === 'expense'
+                          ? 'bg-red-500/15'
+                          : 'bg-primary/15'
+                      )}
+                    >
+                      <Plus
+                        size={26}
+                        className={cn(
+                          activeTab === 'expense'
+                            ? 'text-red-500'
+                            : 'text-primary'
+                        )}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <TypographyH5 className="font-semibold truncate">
+                        New Category
+                      </TypographyH5>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
             {categories.map((category: Category) => (
               <CategoryCard
                 key={category.id}
