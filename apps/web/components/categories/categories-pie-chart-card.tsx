@@ -14,6 +14,7 @@ import {
 import type { Category } from '@/features/categories/categories.interface';
 import { CalendarDays, Inbox } from 'lucide-react';
 import { format } from 'date-fns';
+import { breakdownColorPalette } from '@/lib/data';
 
 interface CategoryPieChartProps {
   categories: Category[];
@@ -34,30 +35,13 @@ export function CategoryPieChart({
         cat.type.toLowerCase() ===
         categoryType.toLowerCase()
     );
-    const expenseColors = [
-      '#ef4444',
-      '#f97316',
-      '#f59e0b',
-      '#eab308',
-      '#ec4899',
-      '#f43f5e',
-    ];
-    const incomeColors = [
-      '#22c55e',
-      '#10b981',
-      '#84cc16',
-      '#14b8a6',
-      '#06b6d4',
-    ];
-    const colorPalette =
-      categoryType.toLowerCase() === 'expense'
-        ? expenseColors
-        : incomeColors;
 
     const data = filteredCategories
       .map((cat, index) => {
         const color =
-          colorPalette[index % colorPalette.length];
+          breakdownColorPalette[
+            index % breakdownColorPalette.length
+          ];
         return {
           name: cat.name,
           value: cat.totalAmount,
@@ -78,7 +62,9 @@ export function CategoryPieChart({
     };
     filteredCategories.forEach((cat, index) => {
       const color =
-        colorPalette[index % colorPalette.length];
+        breakdownColorPalette[
+          index % breakdownColorPalette.length
+        ];
       config[cat.name] = {
         label: cat.name,
         color: color,
@@ -118,7 +104,7 @@ export function CategoryPieChart({
       <CardContent className="-mb-1 flex-1 flex flex-col items-center">
         {chartData.length > 0 ? (
           <>
-            <div className="relative h-60 w-full -mt-8">
+            <div className="relative h-60 w-full -mt-10">
               <ChartContainer
                 config={chartConfig}
                 className="h-full w-full p-0"
@@ -140,7 +126,7 @@ export function CategoryPieChart({
                 className="pointer-events-none absolute left-1/2 top-1/2 h-[160px] w-[160px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-black"
               />
             </div>
-            <ul className="-mt-6 w-full space-y-3 px-1 py-2">
+            <ul className="-mt-4 w-full grid grid-cols-1 gap-1 md:grid-cols-2 md:gap-x-4">
               {chartData.map((item) => {
                 const percent =
                   total > 0
