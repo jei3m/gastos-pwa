@@ -52,14 +52,14 @@ export const menuItems: DockItem[] = [
 ];
 
 export const breakdownColorPalette = [
-  '#2563eb',
-  '#10b981',
-  '#f59e0b',
-  '#8b5cf6',
-  '#ec4899',
-  '#06b6d4',
-  '#f97316',
-  '#84cc16',
-  '#6366f1',
-  '#14b8a6',
+  '#10b981', // emerald   160°
+  '#f59e0b', // amber      45°
+  '#2563eb', // blue      258°
+  '#ec4899', // pink      330°
+  '#6366f1', // indigo    245°
+  '#84cc16', // lime       85°
+  '#06b6d4', // cyan      190°
+  '#f97316', // orange     25°
+  '#14b8a6', // teal      175°
+  '#8b5cf6', // violet    262°
 ];
