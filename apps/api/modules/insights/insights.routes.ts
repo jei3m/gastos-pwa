@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getInsights } from './insights.controller';
+import { getInsights } from './insights.controller.ts';
 
 const insightsRouter = Router();
 

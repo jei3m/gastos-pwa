@@ -1,5 +1,5 @@
-import { db } from '../../lib/db';
-import { getInsightsQuery } from './insights.sql';
+import { db } from '../../lib/db.ts';
+import { getInsightsQuery } from './insights.sql.ts';
 import type { Request, Response } from 'express';
 import { fail, success } from '../../utils/response.ts';
 
