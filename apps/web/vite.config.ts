@@ -15,6 +15,10 @@ export default defineConfig({
         'favicon.svg',
         'icons/apple-touch-icon.png',
       ],
+      workbox: {
+        navigateFallbackDenylist: [/^\/api/],
+        cleanupOutdatedCaches: true,
+      },
       manifest: {
         name: 'Gastos',
         short_name: 'Gastos',
