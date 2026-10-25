@@ -1,7 +1,7 @@
 {
   "name": "@gastos/api",
-  "version": "1.0.0",
-  "main": "index.ts",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "bun --watch index.ts",
@@ -9,6 +9,15 @@
     "db:migrate": "bun db/migrate.ts",
     "db:routines": "bun db/migrate.ts --routines-only",
     "typecheck": "bun x tsc --noEmit"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.35.1",
+    "better-auth": "1.4.18",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "mysql2": "^3.14.3"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -19,14 +28,5 @@
   },
   "peerDependencies": {
     "typescript": "^7.0.2"
-  },
-  "dependencies": {
-    "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.35.1",
-    "better-auth": "1.4.18",
-    "cors": "^2.8.6",
-    "dotenv": "^18.0.5",
-    "express": "^5.2.1",
-    "mysql2": "^3.14.3"
   }
 }

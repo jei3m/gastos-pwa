@@ -1,12 +1,3 @@
-# Dependencies
-node_modules
-
-# Build output
-dist
-dist-ssr
-out
-*.tgz
-
 # Logs
 logs
 *.log
@@ -16,24 +7,21 @@ yarn-error.log*
 pnpm-debug.log*
 bun-debug.log*
 
-# Environment variables
+node_modules
+dist
+dist-ssr
+*.local
+out
+*.tgz
+
+# dotenv environment variable files
 .env
 .env.*
 !.env.example
 *.local
 .secrets
 
-# Caches
-.cache
-.eslintcache
-*.tsbuildinfo
-
-# Coverage
-coverage
-*.lcov
-report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
-
-# Editor and OS
+# Editor directories and files
 .vscode
 **/.vscode/*
 !**/.vscode/extensions.json
