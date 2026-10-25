@@ -4,7 +4,7 @@
 
 ## Overview
 
-Gastos is a comprehensive budget tracking application designed to help users manage their finances effectively. The app provides a clean, intuitive interface for tracking expenses and income, managing accounts, categorizing transactions, and gaining insights into spending patterns. Built as a Progressive Web App (PWA) with Next.js.
+Gastos is a comprehensive budget tracking application designed to help users manage their finances effectively. The app provides a clean, intuitive interface for tracking expenses and income, managing accounts, categorizing transactions, and gaining insights into spending patterns. Built as a Progressive Web App (PWA) with a Vite+ React frontend (`apps/web`) and a Bun + Express API (`apps/api`) as a Vite+ Bun workspace monorepo.
 
 ## Features
 
@@ -23,10 +23,11 @@ Gastos is a comprehensive budget tracking application designed to help users man
 
 ## Technologies Used
 
-- **Next.js**: React-based framework
+- **Vite+ / React 19**: Unified toolchain and UI framework for the web app
+- **Bun + Express 5**: Runtime and REST API for the backend
 - **TypeScript**: Type-safe JavaScript development
 - **Tailwind CSS**: Utility-first CSS framework for styling
-- **Serwist**: A collection of JavaScript libraries for PWAs
+- **vite-plugin-pwa**: Progressive Web App support
 - **Better Auth**: Authentication solution for user management
 - **TanStack Query**: Server state management and caching
 - **ShadCN**: Accessible UI components built on Radix UI
@@ -36,6 +37,20 @@ Gastos is a comprehensive budget tracking application designed to help users man
 - **Upstash**: Serverless platform to use Redis without infrastructure overhead
 - **Zod**: Schema validation
 - **React Hook Form**: Form management and validation
+
+## Development
+
+A Vite+ Bun workspace monorepo. Run everything from the repo root:
+
+```bash
+vp install          # install the whole workspace (single root bun.lock)
+vp run dev          # web (:5173) + api (:5000) in parallel
+vp check            # format + lint + typecheck across both apps
+vp run typecheck    # per-app type checks
+vp run build        # build the web app
+vp run db:migrate   # apply MySQL schema/tables/views/procedures/triggers
+vp run db:routines   # apply MySQL views/procedures/triggers
+```
 
 ## Usage
 
