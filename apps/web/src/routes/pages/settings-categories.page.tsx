@@ -97,11 +97,11 @@ export default function SettingsCategoriesPage() {
                       )}
                     >
                       <Plus
-                        size={26}
                         className={cn(
                           activeTab === 'expense'
                             ? 'text-red-500'
-                            : 'text-primary'
+                            : 'text-primary',
+                          'size-6.5'
                         )}
                       />
                     </div>
