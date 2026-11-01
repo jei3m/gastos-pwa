@@ -42,7 +42,7 @@ import { accountByIDQueryOptions } from '@/features/accounts/accounts.tq.options
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 import { useAccount } from '@/context/account-context';
 import { Checkbox } from '@/components/ui/checkbox';
-import AccountSharingSection from '@/components/accounts/account-sharing-section';
+// import AccountSharingSection from '@/components/accounts/account-sharing-section';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -81,53 +81,53 @@ export default function AccountDetailPage() {
   const [queuedRemovedMembers, setQueuedRemovedMembers] =
     useState<string[]>([]);
 
-  const handleAddEmail = (email: string) => {
-    if (email && !queuedEmails.includes(email)) {
-      setQueuedEmails([...queuedEmails, email]);
-    }
-  };
+  // const handleAddEmail = (email: string) => {
+  //   if (email && !queuedEmails.includes(email)) {
+  //     setQueuedEmails([...queuedEmails, email]);
+  //   }
+  // };
 
-  const handleRemoveEmail = (email: string) => {
-    setQueuedEmails(
-      queuedEmails.filter((e) => e !== email)
-    );
-  };
+  // const handleRemoveEmail = (email: string) => {
+  //   setQueuedEmails(
+  //     queuedEmails.filter((e) => e !== email)
+  //   );
+  // };
 
-  const handleQueueCancelInvitation = (
-    invitationId: string
-  ) => {
-    if (!queuedCancelledInvites.includes(invitationId)) {
-      setQueuedCancelledInvites([
-        ...queuedCancelledInvites,
-        invitationId,
-      ]);
-    }
-  };
+  // const handleQueueCancelInvitation = (
+  //   invitationId: string
+  // ) => {
+  //   if (!queuedCancelledInvites.includes(invitationId)) {
+  //     setQueuedCancelledInvites([
+  //       ...queuedCancelledInvites,
+  //       invitationId,
+  //     ]);
+  //   }
+  // };
 
-  const handleUnqueueCancelInvitation = (
-    invitationId: string
-  ) => {
-    setQueuedCancelledInvites(
-      queuedCancelledInvites.filter(
-        (id) => id !== invitationId
-      )
-    );
-  };
+  // const handleUnqueueCancelInvitation = (
+  //   invitationId: string
+  // ) => {
+  //   setQueuedCancelledInvites(
+  //     queuedCancelledInvites.filter(
+  //       (id) => id !== invitationId
+  //     )
+  //   );
+  // };
 
-  const handleQueueRemoveMember = (userId: string) => {
-    if (!queuedRemovedMembers.includes(userId)) {
-      setQueuedRemovedMembers([
-        ...queuedRemovedMembers,
-        userId,
-      ]);
-    }
-  };
+  // const handleQueueRemoveMember = (userId: string) => {
+  //   if (!queuedRemovedMembers.includes(userId)) {
+  //     setQueuedRemovedMembers([
+  //       ...queuedRemovedMembers,
+  //       userId,
+  //     ]);
+  //   }
+  // };
 
-  const handleUnqueueRemoveMember = (userId: string) => {
-    setQueuedRemovedMembers(
-      queuedRemovedMembers.filter((id) => id !== userId)
-    );
-  };
+  // const handleUnqueueRemoveMember = (userId: string) => {
+  //   setQueuedRemovedMembers(
+  //     queuedRemovedMembers.filter((id) => id !== userId)
+  //   );
+  // };
 
   const {
     mutate: editAccountMutation,
@@ -360,7 +360,7 @@ export default function AccountDetailPage() {
               )}
             />
             {/* Sharing Section */}
-            {!isAccountPending && account && (
+            {/* {!isAccountPending && account && (
               <AccountSharingSection
                 accountID={id}
                 queuedEmails={queuedEmails}
@@ -383,7 +383,7 @@ export default function AccountDetailPage() {
                   handleUnqueueRemoveMember
                 }
               />
-            )}
+            )} */}
             {isOwner && (
               <div className="flex flex-row justify-between">
                 <Button
