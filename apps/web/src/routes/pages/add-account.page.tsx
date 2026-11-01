@@ -1,4 +1,4 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { createAccount } from '@/features/accounts/accounts.tq.functions';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ import {
 import { accountsQueryOptions } from '@/features/accounts/accounts.tq.options';
 import { Loader } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import AccountSharingSection from '@/components/accounts/account-sharing-section';
+// import AccountSharingSection from '@/components/accounts/account-sharing-section';
 
 export default function AddAccountPage() {
   const navigate = useNavigate();
@@ -51,21 +51,21 @@ export default function AddAccountPage() {
     }
   );
 
-  const [queuedEmails, setQueuedEmails] = useState<
-    string[]
-  >([]);
+  // const [queuedEmails, setQueuedEmails] = useState<
+  //   string[]
+  // >([]);
 
-  const handleAddEmail = (email: string) => {
-    if (email && !queuedEmails.includes(email)) {
-      setQueuedEmails([...queuedEmails, email]);
-    }
-  };
+  // const handleAddEmail = (email: string) => {
+  //   if (email && !queuedEmails.includes(email)) {
+  //     setQueuedEmails([...queuedEmails, email]);
+  //   }
+  // };
 
-  const handleRemoveEmail = (email: string) => {
-    setQueuedEmails(
-      queuedEmails.filter((e) => e !== email)
-    );
-  };
+  // const handleRemoveEmail = (email: string) => {
+  //   setQueuedEmails(
+  //     queuedEmails.filter((e) => e !== email)
+  //   );
+  // };
 
   const { mutate: createAccountMutation, isPending } =
     useMutation({
@@ -74,7 +74,7 @@ export default function AddAccountPage() {
       ) =>
         createAccount({
           ...values,
-          emails: queuedEmails,
+          emails: [],
         }),
       onSuccess: (data) => {
         void queryClient.invalidateQueries({
@@ -200,12 +200,12 @@ export default function AddAccountPage() {
             )}
           />
           {/* Sharing Section */}
-          <AccountSharingSection
+          {/* <AccountSharingSection
             isNewAccount
             queuedEmails={queuedEmails}
             onAddEmail={handleAddEmail}
             onRemoveEmail={handleRemoveEmail}
-          />
+          /> */}
           <div className="flex flex-row justify-between">
             <Button
               onClick={() => {

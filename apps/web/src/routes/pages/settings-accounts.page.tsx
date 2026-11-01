@@ -44,17 +44,17 @@ export default function SettingsAccountsPage() {
             >
               <Card className="h-full border-dashed hover:bg-gray-100 transition-colors">
                 <CardHeader>
-                  <div className="flex flex-row items-center gap-2">
+                  <div className="flex flex-row items-center gap-1 sm:gap-2">
                     <div className="p-2 rounded-lg shrink-0 bg-primary/15">
                       <Plus className="text-primary size-4 md:size-6" />
                     </div>
-                    <div className="truncate text-lg font-bold md:text-xl">
+                    <div className="truncate text-md sm:text-lg md:text-xl font-bold">
                       New Account
                     </div>
                   </div>
                 </CardHeader>
                 <Separator className="-mt-2" />
-                <CardContent className="-mb-2 text-md md:text-lg space-y-2 break-words text-muted-foreground">
+                <CardContent className="-mb-2 text-sm sm:text-md md:text-lg space-y-2 break-words text-muted-foreground">
                   Add New Account
                 </CardContent>
               </Card>
@@ -67,16 +67,16 @@ export default function SettingsAccountsPage() {
                 <Card className="h-full border-2 transition-shadow hover:shadow-md">
                   <CardHeader>
                     <div className="flex flex-row items-center justify-between gap-2">
-                      <div className="truncate text-lg font-bold md:text-xl">
+                      <div className="truncate text-md md:text-lg font-bold md:text-xl">
                         {account.name}
                       </div>
-                      <div className="shrink-0 text-md text-gray-600 font-normal">
+                      <div className="shrink-0 text-sm sm:text-md text-gray-600 font-normal">
                         {account.type}
                       </div>
                     </div>
                   </CardHeader>
                   <Separator className="-mt-2" />
-                  <CardContent className="text-md md:text-lg space-y-2 truncate text-muted-foreground">
+                  <CardContent className="text-sm sm:text-md md:text-lg space-y-2 truncate text-muted-foreground">
                     {account.description}
                   </CardContent>
                 </Card>

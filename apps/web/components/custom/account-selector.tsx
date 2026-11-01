@@ -98,7 +98,7 @@ export default function AccountSelector() {
       <SelectContent>
         <SelectGroup>
           {isAccountsLoading ? (
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col justify-center items-center">
               <Loader className="mt-1 mb-1 h-6 w-6 animate-spin text-gray-600" />
             </div>
           ) : (

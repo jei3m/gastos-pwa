@@ -9,12 +9,12 @@ import {
   notFound,
   errorHandler,
 } from './middleware/error.middleware.ts';
-import accountsRouter from './modules/accounts/accounts.routes.ts';
-import categoriesRouter from './modules/categories/categories.routes.ts';
-import transactionsRouter from './modules/transactions/transactions.routes.ts';
-import invitationsRouter from './modules/invitations/invitations.routes.ts';
-import exportRouter from './modules/export/export.routes.ts';
-import insightsRouter from './modules/insights/insights.routes.ts';
+import accountsRouter from './modules/accounts/accounts.route.ts';
+import categoriesRouter from './modules/categories/categories.route.ts';
+import transactionsRouter from './modules/transactions/transactions.route.ts';
+import invitationsRouter from './modules/invitations/invitations.route.ts';
+import exportRouter from './modules/export/export.route.ts';
+import insightsRouter from './modules/insights/insights.route.ts';
 
 const app = express();
 const PORT = process.env.PORT || 5000;

@@ -1,6 +1,6 @@
 export const getInsightsQuery = () => {
   return `WITH
-    authorized AS (
+    is_account_member_cte AS (
         SELECT 1 AS authorized
         FROM account_members
         WHERE account_id = :accountID
@@ -88,5 +88,5 @@ export const getInsightsQuery = () => {
             JSON_ARRAY()
         ) AS categories
     FROM totals t
-    CROSS JOIN authorized a;`;
+    CROSS JOIN is_account_member_cte ismc;`;
 };

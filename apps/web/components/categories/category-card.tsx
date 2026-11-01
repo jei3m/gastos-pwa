@@ -57,11 +57,11 @@ export default function CategoryCard({
                 getIconById(category.icon)?.icon ||
                   SquareDashed,
                 {
-                  size: 26,
                   className: cn(
                     isExpense(category.type)
                       ? 'text-red-500'
-                      : 'text-primary'
+                      : 'text-primary',
+                    'size-6.5'
                   ),
                 }
               )}
@@ -71,14 +71,14 @@ export default function CategoryCard({
                 {category.name}
               </TypographyH5>
               {showDescription && (
-                <div className="truncate w-full">
+                <div className="text-xs sm:text-sm md:text-lg truncate w-full">
                   {category.description || ''}
                 </div>
               )}
               {!hideAmount && (
                 <div
                   className={cn(
-                    'text-sm md:text-lg font-semibold',
+                    'text-xs sm:text-sm md:text-lg font-semibold',
                     isExpense(category.type)
                       ? 'text-red-500'
                       : 'text-primary'

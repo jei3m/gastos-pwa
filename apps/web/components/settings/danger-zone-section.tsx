@@ -55,8 +55,8 @@ export default function DangerZoneSection() {
                 Delete Account
               </div>
               <div className="text-sm text-muted-foreground">
-                Download all of your accounts, categories,
-                and transactions as a JSON file.
+                Permanently delete your account and all of
+                your data.
               </div>
             </div>
             <div className="ml-4 flex-shrink-0">

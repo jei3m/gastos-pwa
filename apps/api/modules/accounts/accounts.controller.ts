@@ -237,8 +237,8 @@ export const deleteAccount = async (
     if (parsedData.responseCode !== 200) {
       return fail(
         res,
-        parsedData.responseMessage,
-        parsedData.responseCode
+        parsedData.responseCode,
+        parsedData.responseMessage
       );
     }
 
