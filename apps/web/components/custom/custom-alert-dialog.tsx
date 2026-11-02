@@ -1,4 +1,8 @@
-import type { ReactElement, ReactNode } from 'react';
+import type {
+  ComponentProps,
+  ReactElement,
+  ReactNode,
+} from 'react';
 import { Loader } from 'lucide-react';
 import {
   AlertDialog,
@@ -19,6 +23,7 @@ interface AlertDialogProps {
   description: ReactNode;
   body?: ReactNode;
   confirmMessage: ReactNode;
+  confirmVariant?: ComponentProps<typeof Button>['variant'];
   type?: 'button' | 'submit';
   onConfirm: () => void;
 }
@@ -30,6 +35,7 @@ export default function CustomAlertDialog({
   description,
   body,
   confirmMessage,
+  confirmVariant = 'destructive',
   type,
   onConfirm,
 }: AlertDialogProps) {
@@ -55,7 +61,7 @@ export default function CustomAlertDialog({
             Cancel
           </AlertDialogCancel>
           <Button
-            variant="destructive"
+            variant={confirmVariant}
             className="space-x-2"
             type={type || 'button'}
             onClick={onConfirm}
