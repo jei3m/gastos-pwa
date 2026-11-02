@@ -15,6 +15,7 @@ import transactionsRouter from './modules/transactions/transactions.route.ts';
 import invitationsRouter from './modules/invitations/invitations.route.ts';
 import exportRouter from './modules/export/export.route.ts';
 import insightsRouter from './modules/insights/insights.route.ts';
+import usersRouter from './modules/users/user.route.ts';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -82,6 +83,8 @@ app.use(
   rateLimit,
   insightsRouter
 );
+
+app.use('/api/users', requireAuth, rateLimit, usersRouter);
 
 app.use(notFound);
 app.use(errorHandler);
