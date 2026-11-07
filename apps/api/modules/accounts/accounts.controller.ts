@@ -4,8 +4,6 @@ import {
   deleteAccountQuery,
   getAccountByIDQuery,
   getAccountsQuery,
-  getMembersQuery,
-  getPendingInvitationsQuery,
   updateAccountQuery,
 } from './accounts.sql.ts';
 import type { responseRow } from '../../lib/types.ts';
@@ -107,40 +105,9 @@ export const getAccountByID = async (
       }
     );
 
-    const isOwner = rows[0]?.isOwner === 1;
-
-    const [members] = await db.query<RowDataPacket[]>(
-      getMembersQuery(),
-      {
-        accountID: id,
-      }
-    );
-
-    let invitations: RowDataPacket[] = [];
-    if (isOwner) {
-      [invitations] = await db.query<RowDataPacket[]>(
-        getPendingInvitationsQuery(),
-        {
-          accountID: id,
-        }
-      );
-
-      const baseUrl =
-        process.env.ORIGIN_URL || 'http://localhost:5173';
-      invitations = invitations.map(
-        (inv: RowDataPacket) => ({
-          ...inv,
-          inviteLink: `${baseUrl}/pages/invitations/accept?token=${inv.token}`,
-        })
-      );
-    }
-
     return success(res, {
       data: {
         ...rows[0],
-        members,
-        invitations,
-        isOwner,
       },
     });
   } catch (error) {

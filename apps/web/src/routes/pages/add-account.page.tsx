@@ -1,4 +1,4 @@
-// import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { createAccount } from '@/features/accounts/accounts.tq.functions';
 import { Button } from '@/components/ui/button';
@@ -31,13 +31,21 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { accountsQueryOptions } from '@/features/accounts/accounts.tq.options';
+import type { User } from '@/features/user/user.interface';
 import { Loader } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Checkbox } from '@/components/ui/checkbox';
-// import AccountSharingSection from '@/components/accounts/account-sharing-section';
+import { Label } from '@/components/ui/label';
+import AccountMembersField from '@/components/accounts/account-members-field';
 
 export default function AddAccountPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
+  const [membersToInvite, setMembersToInvite] = useState<
+    User[]
+  >([]);
 
   const form = useForm<z.infer<typeof createAccountSchema>>(
     {
@@ -51,22 +59,6 @@ export default function AddAccountPage() {
     }
   );
 
-  // const [queuedEmails, setQueuedEmails] = useState<
-  //   string[]
-  // >([]);
-
-  // const handleAddEmail = (email: string) => {
-  //   if (email && !queuedEmails.includes(email)) {
-  //     setQueuedEmails([...queuedEmails, email]);
-  //   }
-  // };
-
-  // const handleRemoveEmail = (email: string) => {
-  //   setQueuedEmails(
-  //     queuedEmails.filter((e) => e !== email)
-  //   );
-  // };
-
   const { mutate: createAccountMutation, isPending } =
     useMutation({
       mutationFn: (
@@ -74,13 +66,16 @@ export default function AddAccountPage() {
       ) =>
         createAccount({
           ...values,
-          emails: [],
+          emails: membersToInvite.map(
+            (member) => member.email
+          ),
         }),
       onSuccess: (data) => {
         void queryClient.invalidateQueries({
           queryKey: accountsQueryOptions().queryKey,
         });
         form.reset();
+        setMembersToInvite([]);
         toast.success(
           (data as { responseMessage: string })
             .responseMessage
@@ -107,7 +102,12 @@ export default function AddAccountPage() {
   }
 
   return (
-    <main className="flex flex-col space-y-4 p-3">
+    <main
+      className={cn(
+        'flex flex-col space-y-4 p-3 overflow-y-auto',
+        isMobile ? 'h-screen pb-31' : 'pb-4'
+      )}
+    >
       <TypographyH3>Create New Account</TypographyH3>
       <Form {...form}>
         <form
@@ -199,15 +199,32 @@ export default function AddAccountPage() {
               </FormItem>
             )}
           />
-          {/* Sharing Section */}
-          {/* <AccountSharingSection
-            isNewAccount
-            queuedEmails={queuedEmails}
-            onAddEmail={handleAddEmail}
-            onRemoveEmail={handleRemoveEmail}
-          /> */}
+          <div className="grid gap-1">
+            <Label className="text-md font-medium">
+              Account Members
+            </Label>
+            <AccountMembersField
+              membersToInvite={membersToInvite}
+              onInvite={(user) =>
+                setMembersToInvite((prev) => [
+                  ...prev,
+                  user,
+                ])
+              }
+              onRemoveInvite={(userID) =>
+                setMembersToInvite((prev) =>
+                  prev.filter(
+                    (member) => member.id !== userID
+                  )
+                )
+              }
+              isDisabled={isPending}
+            />
+          </div>
+
           <div className="flex flex-row justify-between">
             <Button
+              type="button"
               onClick={() => {
                 form.reset();
                 void navigate(-1);

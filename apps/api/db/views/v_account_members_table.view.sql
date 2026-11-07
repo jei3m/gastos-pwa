@@ -4,8 +4,8 @@
 CREATE OR REPLACE VIEW `v_account_members_table` AS
 /* Select Query */
 SELECT
-	account_id,
-	user_id,
+	ref_accounts_id,
+	ref_user_id,
 	role,
 	joined_at
 FROM

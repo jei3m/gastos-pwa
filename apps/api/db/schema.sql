@@ -79,12 +79,32 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `account_members` (
-  `account_id` char(36) NOT NULL,
-  `user_id` char(36) NOT NULL,
+  `ref_accounts_id` char(36) NOT NULL,
+  `ref_user_id` char(36) NOT NULL,
   `role` enum('owner','editor') NOT NULL DEFAULT 'editor',
   `joined_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`account_id`,`user_id`),
-  CONSTRAINT `account_members_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE
+  PRIMARY KEY (`ref_accounts_id`,`ref_user_id`),
+  KEY `fk_user_id_account_members_idx` (`ref_user_id`),
+  CONSTRAINT `fk_accounts_id_account_members` FOREIGN KEY (`ref_accounts_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_user_id_account_members` FOREIGN KEY (`ref_user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `invitations` (
+  `id` char(36) NOT NULL,
+  `invited_by` char(36) NOT NULL,
+  `status` enum('pending','accepted') DEFAULT 'pending',
+  `token` varchar(255) NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `ref_accounts_id` char(36) NOT NULL,
+  `ref_user_id` varchar(36) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token` (`token`),
+  KEY `fk_ref_user_id_idx` (`ref_user_id`),
+  KEY `fk_ref_accounts_id_idx` (`ref_accounts_id`),
+  CONSTRAINT `fk_ref_accounts_id` FOREIGN KEY (`ref_accounts_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ref_user_id` FOREIGN KEY (`ref_user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `categories` (
@@ -122,18 +142,4 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   KEY `note_idx` (`note`),
   CONSTRAINT `fk_accounts_id_transactions` FOREIGN KEY (`ref_accounts_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_categories_id_transactions` FOREIGN KEY (`ref_categories_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-CREATE TABLE IF NOT EXISTS `invitations` (
-  `id` char(36) NOT NULL,
-  `account_id` char(36) NOT NULL,
-  `invited_email` varchar(255) NOT NULL,
-  `invited_by` char(36) NOT NULL,
-  `status` enum('pending','accepted','declined','expired') DEFAULT 'pending',
-  `token` varchar(255) NOT NULL,
-  `expires_at` timestamp NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

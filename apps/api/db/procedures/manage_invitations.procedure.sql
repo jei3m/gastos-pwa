@@ -5,14 +5,22 @@
 DROP PROCEDURE IF EXISTS `manage_invitations`;
 CREATE PROCEDURE `manage_invitations`(
 
-    IN p_action_type ENUM('invite', 'remove_member', 'cancel_invitation', 'respond_to_invitation'),
-    IN p_account_id CHAR(36),
+    IN p_action_type ENUM(
+        'invite',
+        'remove_member',
+        'cancel_invitation',
+        'respond_to_invitation'
+    ),
+    IN p_accounts_id CHAR(36),
     IN p_user_id CHAR(36),
     IN p_target_user_id CHAR(36),
-    IN p_invitation_id CHAR(36),
+    IN p_invitations_id CHAR(36),
     IN p_invited_email VARCHAR(255),
     IN p_token VARCHAR(36),
-    IN p_invitation_action VARCHAR(10),
+    IN p_invitation_action ENUM(
+        'accept',
+        'decline'
+    ),
     IN p_is_internal BOOLEAN,
 
     OUT p_response JSON
@@ -23,10 +31,10 @@ main: BEGIN
     DECLARE v_invited_user_id CHAR(36);
     DECLARE v_affected_rows INT;
     DECLARE v_invite_status VARCHAR(10);
-    DECLARE v_invite_email VARCHAR(255);
+    DECLARE v_invite_user_id CHAR(36);
     DECLARE v_invite_expires_at DATETIME;
     DECLARE v_invite_account_id CHAR(36);
-    DECLARE v_user_email VARCHAR(255);
+    DECLARE v_is_invited_email_exists TINYINT DEFAULT 0;
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
@@ -42,12 +50,15 @@ main: BEGIN
 
     CASE p_action_type
         WHEN 'invite' THEN
-
-            SELECT role INTO v_member_role
+            -- Get role of user
+            SELECT role
+            INTO v_member_role
             FROM account_members
-            WHERE account_id = p_account_id AND user_id = p_user_id
+            WHERE ref_accounts_id = p_accounts_id
+                AND ref_user_id = p_user_id
             LIMIT 1;
 
+            -- Validate user role
             IF v_member_role IS NULL OR v_member_role <> 'owner' THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 403,
@@ -56,12 +67,19 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-            SELECT id INTO v_invited_user_id
+            -- Get user info from p_invited_email
+            SELECT
+                1,
+                id
+            INTO 
+                v_is_invited_email_exists,
+                v_invited_user_id
             FROM user
             WHERE email = p_invited_email
             LIMIT 1;
 
-            IF v_invited_user_id IS NULL THEN
+            -- Validate invited email if it exists
+            IF v_is_invited_email_exists = 0 THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 404,
                     'responseMessage', 'No user found with this email address'
@@ -69,12 +87,13 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-            SELECT 1 INTO v_affected_rows
-            FROM account_members
-            WHERE account_id = p_account_id AND user_id = v_invited_user_id
-            LIMIT 1;
-
-            IF v_affected_rows = 1 THEN
+            IF EXISTS(
+                SELECT 1
+                FROM account_members
+                WHERE ref_accounts_id = p_accounts_id
+                    AND ref_user_id = v_invited_user_id
+                LIMIT 1
+            ) THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 409,
                     'responseMessage', 'This user is already a member of this account'
@@ -82,14 +101,14 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-            SET v_affected_rows = 0;
-
-            SELECT 1 INTO v_affected_rows
-            FROM invitations
-            WHERE account_id = p_account_id AND invited_email = p_invited_email AND status = 'pending'
-            LIMIT 1;
-
-            IF v_affected_rows = 1 THEN
+            IF EXISTS(
+                SELECT 1
+                FROM invitations
+                WHERE ref_accounts_id = p_accounts_id
+                    AND ref_user_id = v_invited_user_id
+                    AND status = 'pending'
+                LIMIT 1
+            ) THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 409,
                     'responseMessage', 'A pending invitation already exists for this email'
@@ -97,8 +116,28 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-            INSERT INTO invitations (id, account_id, invited_email, invited_by, status, token, expires_at, created_at, updated_at)
-            VALUES (p_invitation_id, p_account_id, p_invited_email, p_user_id, 'pending', p_token, DATE_ADD(NOW(), INTERVAL 7 DAY), NOW(), NOW());
+            INSERT INTO invitations (
+                id,
+                invited_by,
+                status,
+                token,
+                expires_at,
+                created_at,
+                updated_at,
+                ref_accounts_id,
+                ref_user_id
+            )
+            VALUES (
+                p_invitations_id,
+                p_user_id,
+                'pending',
+                p_token,
+                DATE_ADD(NOW(), INTERVAL 7 DAY),
+                NOW(),
+                NOW(),
+                p_accounts_id,
+                v_invited_user_id
+            );
 
             SET v_affected_rows = ROW_COUNT();
 
@@ -106,7 +145,7 @@ main: BEGIN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 200,
                     'responseMessage', 'Invitation created successfully',
-                    'id', p_invitation_id,
+                    'id', p_invitations_id,
                     'token', p_token,
                     'invitedEmail', p_invited_email,
                     'expiresAt', DATE_ADD(NOW(), INTERVAL 7 DAY)
@@ -120,12 +159,15 @@ main: BEGIN
             END IF;
 
         WHEN 'remove_member' THEN
-
-            SELECT role INTO v_member_role
+            -- Get role of user executing the action
+            SELECT role
+            INTO v_member_role
             FROM account_members
-            WHERE account_id = p_account_id AND user_id = p_user_id
+            WHERE ref_accounts_id = p_accounts_id
+                AND ref_user_id = p_user_id
             LIMIT 1;
 
+            -- Validate user role
             IF v_member_role IS NULL OR v_member_role <> 'owner' THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 403,
@@ -134,11 +176,15 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-            SELECT role INTO v_member_role
+            -- Get role of target user (the user being removed)
+            SELECT role
+            INTO v_member_role
             FROM account_members
-            WHERE account_id = p_account_id AND user_id = p_target_user_id
+            WHERE ref_accounts_id = p_accounts_id
+                AND ref_user_id = p_target_user_id
             LIMIT 1;
 
+            -- Validate target user existence
             IF v_member_role IS NULL THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 404,
@@ -147,6 +193,7 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
+            -- Validate target user role
             IF v_member_role = 'owner' THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 403,
@@ -155,8 +202,10 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
+            -- DELETE target user
             DELETE FROM account_members
-            WHERE account_id = p_account_id AND user_id = p_target_user_id
+            WHERE ref_accounts_id = p_accounts_id
+                AND ref_user_id = p_target_user_id
             LIMIT 1;
 
             SET v_affected_rows = ROW_COUNT();
@@ -171,16 +220,20 @@ main: BEGIN
                     'responseCode', 500,
                     'responseMessage', 'Failed to remove member'
                 );
-                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Failed to remove member';
+                LEAVE main;
             END IF;
 
         WHEN 'cancel_invitation' THEN
 
-            SELECT role INTO v_member_role
+            -- Get role of user
+            SELECT role
+            INTO v_member_role
             FROM account_members
-            WHERE account_id = p_account_id AND user_id = p_user_id
+            WHERE ref_accounts_id = p_accounts_id
+                AND ref_user_id = p_user_id
             LIMIT 1;
 
+            -- Validate user role
             IF v_member_role IS NULL OR v_member_role <> 'owner' THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 403,
@@ -189,9 +242,11 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-            UPDATE invitations
-            SET status = 'cancelled', updated_at = NOW()
-            WHERE id = p_invitation_id AND account_id = p_account_id AND status = 'pending'
+            -- UPDATE invitation status to cancelled
+            DELETE FROM invitations
+            WHERE id = p_invitations_id
+                AND ref_accounts_id = p_accounts_id
+                AND status = 'pending'
             LIMIT 1;
 
             SET v_affected_rows = ROW_COUNT();
@@ -210,13 +265,22 @@ main: BEGIN
             END IF;
 
         WHEN 'respond_to_invitation' THEN
-
-            SELECT i.status, i.invited_email, i.expires_at, i.account_id
-            INTO v_invite_status, v_invite_email, v_invite_expires_at, v_invite_account_id
+            -- Get invitation details
+            SELECT
+                i.status,
+                i.ref_user_id,
+                i.expires_at,
+                i.ref_accounts_id
+            INTO
+                v_invite_status,
+                v_invite_user_id,
+                v_invite_expires_at,
+                v_invite_account_id
             FROM invitations i
             WHERE i.token = p_token
             LIMIT 1;
 
+            -- Validate invitation existence
             IF v_invite_status IS NULL THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 404,
@@ -225,6 +289,7 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
+            -- Validate if invitation is not pending
             IF v_invite_status <> 'pending' THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 400,
@@ -233,10 +298,11 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
+            -- Validate invitation expiry
             IF v_invite_expires_at < NOW() THEN
-                UPDATE invitations
-                SET status = 'expired', updated_at = NOW()
+                DELETE FROM invitations
                 WHERE token = p_token
+                    AND ref_user_id = p_user_id
                 LIMIT 1;
 
                 SET p_response = JSON_OBJECT(
@@ -246,69 +312,67 @@ main: BEGIN
                 LEAVE main;
             END IF;
 
-            SELECT email INTO v_user_email
-            FROM user
-            WHERE id = p_user_id
-            LIMIT 1;
-
-            IF v_user_email IS NULL THEN
-                SET p_response = JSON_OBJECT(
-                    'responseCode', 404,
-                    'responseMessage', 'User not found'
-                );
-                LEAVE main;
-            END IF;
-
-            IF LOWER(v_user_email) <> LOWER(v_invite_email) THEN
+            IF v_invite_user_id <> p_user_id THEN
                 SET p_response = JSON_OBJECT(
                     'responseCode', 403,
                     'responseMessage', 'This invitation was sent to a different email address'
                 );
                 LEAVE main;
             END IF;
+            
+            -- Manage invitation action (accept or decline)
+            CASE p_invitation_action
+                WHEN 'accept' THEN
+                    -- INSERT statement
+                    INSERT INTO account_members(
+                        ref_accounts_id,
+                        ref_user_id,
+                        role
+                    )
+                    VALUES(
+                        v_invite_account_id,
+                        p_user_id,
+                        'editor'
+                    );
 
-            IF p_invitation_action = 'accept' THEN
+                    -- Delete statement
+                    DELETE FROM invitations
+                    WHERE token = p_token
+                        AND ref_user_id = p_user_id
+                    LIMIT 1;
 
-                INSERT INTO account_members (account_id, user_id, role)
-                VALUES (v_invite_account_id, p_user_id, 'editor');
+                    -- Return success response
+                    SET p_response = JSON_OBJECT(
+                        'responseCode', 200,
+                        'responseMessage', 'Invitation accepted successfully',
+                        'accountID', v_invite_account_id
+                    );
+                WHEN 'decline' THEN
+                    -- Delete statement
+                    DELETE FROM invitations
+                    WHERE token = p_token
+                        AND ref_user_id = p_user_id
+                    LIMIT 1;
 
-                UPDATE invitations
-                SET status = 'accepted', updated_at = NOW()
-                WHERE token = p_token
-                LIMIT 1;
-
-                SET p_response = JSON_OBJECT(
-                    'responseCode', 200,
-                    'responseMessage', 'Invitation accepted successfully',
-                    'accountID', v_invite_account_id
-                );
-
-            ELSEIF p_invitation_action = 'decline' THEN
-
-                UPDATE invitations
-                SET status = 'declined', updated_at = NOW()
-                WHERE token = p_token
-                LIMIT 1;
-
-                SET p_response = JSON_OBJECT(
-                    'responseCode', 200,
-                    'responseMessage', 'Invitation declined'
-                );
-
-            ELSE
-                SET p_response = JSON_OBJECT(
-                    'responseCode', 400,
-                    'responseMessage', 'Invalid action. Must be accept or decline'
-                );
-                LEAVE main;
-            END IF;
+                    -- Return success response
+                    SET p_response = JSON_OBJECT(
+                        'responseCode', 200,
+                        'responseMessage', 'Invitation declined'
+                    );
+                ELSE
+                    SET p_response = JSON_OBJECT(
+                        'responseCode', 400,
+                        'responseMessage', 'Invalid action. Must be accept or decline'
+                    );
+                    LEAVE main;
+            END CASE;
 
         ELSE
             SET p_response = JSON_OBJECT(
                 'responseCode', 400,
                 'responseMessage', 'Invalid Action Type'
             );
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Unsupported action type';
+            LEAVE main;
     END CASE;
 
     IF NOT p_is_internal THEN

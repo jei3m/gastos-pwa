@@ -40,9 +40,11 @@ import {
 } from '@tanstack/react-query';
 import { accountByIDQueryOptions } from '@/features/accounts/accounts.tq.options';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
+import AccountMembersField from '@/components/accounts/account-members-field';
+import type { User } from '@/features/user/user.interface';
 import { useAccount } from '@/context/account-context';
 import { Checkbox } from '@/components/ui/checkbox';
-// import AccountSharingSection from '@/components/accounts/account-sharing-section';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -71,8 +73,8 @@ export default function AccountDetailPage() {
     }
   );
 
-  const [queuedEmails, setQueuedEmails] = useState<
-    string[]
+  const [membersToInvite, setMembersToInvite] = useState<
+    User[]
   >([]);
   const [
     queuedCancelledInvites,
@@ -81,53 +83,51 @@ export default function AccountDetailPage() {
   const [queuedRemovedMembers, setQueuedRemovedMembers] =
     useState<string[]>([]);
 
-  // const handleAddEmail = (email: string) => {
-  //   if (email && !queuedEmails.includes(email)) {
-  //     setQueuedEmails([...queuedEmails, email]);
-  //   }
-  // };
+  const handleInvite = (user: User) => {
+    setMembersToInvite((prev) => [...prev, user]);
+  };
 
-  // const handleRemoveEmail = (email: string) => {
-  //   setQueuedEmails(
-  //     queuedEmails.filter((e) => e !== email)
-  //   );
-  // };
+  const handleRemoveInvite = (userID: string) => {
+    setMembersToInvite((prev) =>
+      prev.filter((member) => member.id !== userID)
+    );
+  };
 
-  // const handleQueueCancelInvitation = (
-  //   invitationId: string
-  // ) => {
-  //   if (!queuedCancelledInvites.includes(invitationId)) {
-  //     setQueuedCancelledInvites([
-  //       ...queuedCancelledInvites,
-  //       invitationId,
-  //     ]);
-  //   }
-  // };
+  const handleQueueCancelInvitation = (
+    invitationId: string
+  ) => {
+    if (!queuedCancelledInvites.includes(invitationId)) {
+      setQueuedCancelledInvites([
+        ...queuedCancelledInvites,
+        invitationId,
+      ]);
+    }
+  };
 
-  // const handleUnqueueCancelInvitation = (
-  //   invitationId: string
-  // ) => {
-  //   setQueuedCancelledInvites(
-  //     queuedCancelledInvites.filter(
-  //       (id) => id !== invitationId
-  //     )
-  //   );
-  // };
+  const handleUnqueueCancelInvitation = (
+    invitationId: string
+  ) => {
+    setQueuedCancelledInvites(
+      queuedCancelledInvites.filter(
+        (id) => id !== invitationId
+      )
+    );
+  };
 
-  // const handleQueueRemoveMember = (userId: string) => {
-  //   if (!queuedRemovedMembers.includes(userId)) {
-  //     setQueuedRemovedMembers([
-  //       ...queuedRemovedMembers,
-  //       userId,
-  //     ]);
-  //   }
-  // };
+  const handleQueueRemoveMember = (userId: string) => {
+    if (!queuedRemovedMembers.includes(userId)) {
+      setQueuedRemovedMembers([
+        ...queuedRemovedMembers,
+        userId,
+      ]);
+    }
+  };
 
-  // const handleUnqueueRemoveMember = (userId: string) => {
-  //   setQueuedRemovedMembers(
-  //     queuedRemovedMembers.filter((id) => id !== userId)
-  //   );
-  // };
+  const handleUnqueueRemoveMember = (userId: string) => {
+    setQueuedRemovedMembers(
+      queuedRemovedMembers.filter((id) => id !== userId)
+    );
+  };
 
   const {
     mutate: editAccountMutation,
@@ -138,7 +138,9 @@ export default function AccountDetailPage() {
     ) =>
       editAccount(id, {
         ...values,
-        emails: queuedEmails,
+        emails: membersToInvite.map(
+          (member) => member.email
+        ),
         cancelInvitationIds: queuedCancelledInvites,
         removeMemberIds: queuedRemovedMembers,
       }),
@@ -213,7 +215,7 @@ export default function AccountDetailPage() {
 
     return () => {
       // eslint-disable-next-line react/set-state-in-effect
-      setQueuedEmails([]);
+      setMembersToInvite([]);
       setQueuedCancelledInvites([]);
       setQueuedRemovedMembers([]);
     };
@@ -359,31 +361,37 @@ export default function AccountDetailPage() {
                 </FormItem>
               )}
             />
-            {/* Sharing Section */}
-            {/* {!isAccountPending && account && (
-              <AccountSharingSection
-                accountID={id}
-                queuedEmails={queuedEmails}
-                onAddEmail={handleAddEmail}
-                onRemoveEmail={handleRemoveEmail}
-                queuedCancelledInvites={
-                  queuedCancelledInvites
-                }
-                onQueueCancelInvitation={
-                  handleQueueCancelInvitation
-                }
-                onUnqueueCancelInvitation={
-                  handleUnqueueCancelInvitation
-                }
-                queuedRemovedMembers={queuedRemovedMembers}
-                onQueueRemoveMember={
-                  handleQueueRemoveMember
-                }
-                onUnqueueRemoveMember={
-                  handleUnqueueRemoveMember
-                }
-              />
-            )} */}
+            {!isAccountPending && account && (
+              <div className="grid gap-1.5">
+                <Label className="text-md font-medium">
+                  Account Members
+                </Label>
+                <AccountMembersField
+                  account={account}
+                  membersToInvite={membersToInvite}
+                  onInvite={handleInvite}
+                  onRemoveInvite={handleRemoveInvite}
+                  isDisabled={isLoading}
+                  canManage={isOwner}
+                  queuedRemovedMembers={
+                    queuedRemovedMembers
+                  }
+                  queuedCancelledInvites={
+                    queuedCancelledInvites
+                  }
+                  onRemoveMember={handleQueueRemoveMember}
+                  onUndoRemoveMember={
+                    handleUnqueueRemoveMember
+                  }
+                  onCancelInvitation={
+                    handleQueueCancelInvitation
+                  }
+                  onUndoCancelInvitation={
+                    handleUnqueueCancelInvitation
+                  }
+                />
+              </div>
+            )}
             {isOwner && (
               <div className="flex flex-row justify-between">
                 <Button

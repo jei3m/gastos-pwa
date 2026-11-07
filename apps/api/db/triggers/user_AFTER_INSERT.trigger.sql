@@ -30,8 +30,8 @@ main: BEGIN
 
         INSERT INTO account_members
         (
-            account_id,
-            user_id,
+            ref_accounts_id,
+            ref_user_id,
             role,
             joined_at
         )

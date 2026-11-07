@@ -18,16 +18,17 @@ export const respondToInvitationQuery = () => {
 export const getInvitationByTokenQuery = () => {
   return `SELECT
             i.id,
-            i.account_id AS accountID,
-            i.invited_email AS invitedEmail,
+            i.ref_accounts_id AS accountID,
+            iu.email AS invitedEmail,
             i.status,
             i.expires_at AS expiresAt,
             a.name AS accountName,
             u.name AS inviterName,
             u.email AS inviterEmail
           FROM v_invitations_table i
-          JOIN accounts a ON i.account_id = a.id
+          JOIN accounts a ON i.ref_accounts_id = a.id
           JOIN user u ON i.invited_by = u.id
+          JOIN user iu ON i.ref_user_id = iu.id
           WHERE i.token = :token
           LIMIT 1`;
 };

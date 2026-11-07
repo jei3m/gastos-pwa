@@ -7,6 +7,9 @@ const dbDir = import.meta.dir;
 
 const routinesOnly = Bun.argv.includes('--routines-only');
 
+const now = new Date();
+const today = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+
 const runFile = async (label: string, path: string) => {
   const sql = await readFile(path, 'utf8');
   if (!sql.trim()) {
@@ -18,13 +21,23 @@ const runFile = async (label: string, path: string) => {
   console.log(`- ${label}: done`);
 };
 
-const runFolder = async (folder: string) => {
+const runFolder = async (
+  folder: string,
+  onOrBefore?: string
+) => {
   const dir = join(dbDir, folder);
   const files = (await readdir(dir))
     .filter((file) => file.endsWith('.sql'))
     .sort();
 
   for (const file of files) {
+    const date = file.match(/^(\d{8})/)?.[1];
+    if (onOrBefore && date && date > onOrBefore) {
+      console.log(
+        `- ${folder}/${file}: dated in the future, skipped`
+      );
+      continue;
+    }
     await runFile(`${folder}/${file}`, join(dir, file));
   }
 };
@@ -34,6 +47,7 @@ const main = async () => {
     await runFile('schema', join(dbDir, 'schema.sql'));
   }
 
+  await runFolder('migrations', today);
   await runFolder('views');
   await runFolder('procedures');
   await runFolder('triggers');

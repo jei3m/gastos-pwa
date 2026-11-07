@@ -96,8 +96,8 @@ export const getTransactionsQuery = () => {
 			AND EXISTS (
 				SELECT 1
 				FROM account_members am
-				WHERE am.account_id = :accountID
-					AND am.user_id = :userID
+				WHERE am.ref_accounts_id = :accountID
+					AND am.ref_user_id = :userID
 				LIMIT 1
 			)
 		GROUP BY
@@ -147,8 +147,8 @@ export const getTransactionsCountQuery = () => {
 			AND EXISTS (
 				SELECT 1
 				FROM account_members am
-				WHERE am.account_id = :accountID
-					AND am.user_id = :userID
+				WHERE am.ref_accounts_id = :accountID
+					AND am.ref_user_id = :userID
 				LIMIT 1
 			);`;
 };
@@ -179,8 +179,8 @@ export const getTransactionByIDQuery = () => {
 			AND EXISTS (
 				SELECT 1
 				FROM account_members am
-				WHERE am.account_id = t.ref_accounts_id
-					AND am.user_id = :userID
+				WHERE am.ref_accounts_id = t.ref_accounts_id
+					AND am.ref_user_id = :userID
 				LIMIT 1
 			)
 		LIMIT 1;`;
@@ -216,8 +216,8 @@ export const getTransactionsByCategoryQuery = () => {
 				AND EXISTS (
 					SELECT 1
 					FROM account_members am
-					WHERE am.account_id = t.ref_accounts_id
-						AND am.user_id = :userID
+					WHERE am.ref_accounts_id = t.ref_accounts_id
+						AND am.ref_user_id = :userID
 				)
 			GROUP BY
 				t.id,
@@ -292,8 +292,8 @@ export const getTransactionsByCategoryCountQuery = () => {
 				AND EXISTS (
 					SELECT 1
 					FROM account_members am
-					WHERE am.account_id = t.ref_accounts_id
-						AND am.user_id = :userID
+					WHERE am.ref_accounts_id = t.ref_accounts_id
+						AND am.ref_user_id = :userID
 					LIMIT 1
 				)
 		) AS date_groups;`;

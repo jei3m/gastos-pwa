@@ -5,14 +5,14 @@ CREATE OR REPLACE VIEW `v_invitations_table` AS
 /* Select Query */
 SELECT
 	id,
-	account_id,
-	invited_email,
 	invited_by,
 	status,
 	token,
 	expires_at,
 	created_at,
-	updated_at
+	updated_at,
+	ref_accounts_id,
+	ref_user_id
 FROM
     invitations;
 /* END Select Query */

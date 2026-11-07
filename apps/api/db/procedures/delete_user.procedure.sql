@@ -11,7 +11,6 @@ CREATE PROCEDURE `delete_user`(
 )
 main: BEGIN
 
-    DECLARE v_user_email VARCHAR(255);
     DECLARE v_affected_rows INT;
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -21,12 +20,6 @@ main: BEGIN
     END;
 
     START TRANSACTION;
-
-    SELECT email
-    INTO v_user_email
-    FROM user
-    WHERE id = p_user_id
-    LIMIT 1;
 
     DELETE FROM transactions
     WHERE ref_accounts_id IN (
@@ -49,7 +42,7 @@ main: BEGIN
 
     DELETE FROM invitations
     WHERE invited_by = p_user_id
-        OR (invited_email = v_user_email AND status = 'pending');
+        OR ref_user_id = p_user_id;
 
     DELETE FROM accounts
     WHERE ref_user_id = p_user_id;

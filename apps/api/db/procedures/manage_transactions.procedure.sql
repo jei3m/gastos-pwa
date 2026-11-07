@@ -48,7 +48,7 @@ main: BEGIN
             WHERE
                 id = p_ref_accounts_id
                 AND (ref_user_id = p_ref_user_id
-                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                    OR id IN (SELECT ref_accounts_id FROM account_members WHERE ref_user_id = p_ref_user_id))
             LIMIT 1;
             -- Validate total_balance
             IF v_total_balance + (p_amount * CASE WHEN p_type = 'income' THEN 1 ELSE -1 END) < 0 THEN
@@ -94,7 +94,7 @@ main: BEGIN
                 WHERE
                     id = p_ref_accounts_id
                     AND (ref_user_id = p_ref_user_id
-                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                        OR id IN (SELECT ref_accounts_id FROM account_members WHERE ref_user_id = p_ref_user_id))
                 LIMIT 1;
 
 				SET p_response = JSON_OBJECT(
@@ -145,7 +145,7 @@ main: BEGIN
             WHERE
                 id = v_ref_accounts_id
                 AND (ref_user_id = p_ref_user_id
-                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                    OR id IN (SELECT ref_accounts_id FROM account_members WHERE ref_user_id = p_ref_user_id))
             LIMIT 1;
 
             -- Calculate v_new_balance
@@ -189,7 +189,7 @@ main: BEGIN
                 WHERE
                     id = v_ref_accounts_id
                     AND (ref_user_id = p_ref_user_id
-                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                        OR id IN (SELECT ref_accounts_id FROM account_members WHERE ref_user_id = p_ref_user_id))
                 LIMIT 1;
 
                 SET p_response = JSON_OBJECT(
@@ -221,9 +221,9 @@ main: BEGIN
                 AND (
                     ref_user_id = p_ref_user_id
                     OR ref_accounts_id IN (
-                        SELECT account_id
+                        SELECT ref_accounts_id
                         FROM account_members
-                        WHERE user_id = p_ref_user_id
+                        WHERE ref_user_id = p_ref_user_id
                             AND role = 'owner'
                     )
                 )
@@ -250,9 +250,9 @@ main: BEGIN
                 AND (
                     ref_user_id = p_ref_user_id
                     OR id IN (
-                        SELECT account_id
+                        SELECT ref_accounts_id
                         FROM account_members
-                        WHERE user_id = p_ref_user_id
+                        WHERE ref_user_id = p_ref_user_id
                     )
                 )
             LIMIT 1;
@@ -290,9 +290,9 @@ main: BEGIN
                     AND (
                         ref_user_id = p_ref_user_id
                         OR id IN (
-                            SELECT account_id
+                            SELECT ref_accounts_id
                             FROM account_members
-                            WHERE user_id = p_ref_user_id
+                            WHERE ref_user_id = p_ref_user_id
                         )
                     )
                 LIMIT 1;

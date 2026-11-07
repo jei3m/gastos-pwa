@@ -3,8 +3,8 @@ export const getInsightsQuery = () => {
     is_account_member_cte AS (
         SELECT 1 AS authorized
         FROM account_members
-        WHERE account_id = :accountID
-            AND user_id = :userID
+        WHERE ref_accounts_id = :accountID
+            AND ref_user_id = :userID
     ),
     totals AS (
         SELECT
@@ -47,8 +47,8 @@ export const getInsightsQuery = () => {
         JOIN categories c
             ON t.ref_categories_id = c.id
         JOIN account_members cm
-            ON cm.account_id = :accountID
-            AND cm.user_id = c.ref_user_id
+            ON cm.ref_accounts_id = :accountID
+            AND cm.ref_user_id = c.ref_user_id
         WHERE t.ref_accounts_id = :accountID
             AND (
                 :dateStart IS NULL
