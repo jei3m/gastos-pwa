@@ -77,13 +77,16 @@ main: BEGIN
             SET v_affected_rows = ROW_COUNT();
 
             IF v_affected_rows > 0 THEN
-                INSERT INTO account_members
-                (
-                    account_id,
-                    user_id,
+                INSERT INTO account_members(
+                    ref_accounts_id,
+                    ref_user_id,
                     role
                 )
-                VALUES (p_id, p_user_id, 'owner');
+                VALUES (
+                    p_id,
+                    p_user_id,
+                    'owner'
+                );
 
                 IF p_emails IS NOT NULL AND JSON_LENGTH(p_emails) > 0 THEN
                     SET v_idx = 0;
@@ -127,9 +130,11 @@ main: BEGIN
             END IF;
 
 		WHEN 'update' THEN
-            SELECT role INTO v_member_role
+            SELECT role
+            INTO v_member_role
             FROM account_members
-            WHERE account_id = p_id AND user_id = p_user_id
+            WHERE ref_accounts_id = p_id
+                AND ref_user_id = p_user_id
             LIMIT 1;
 
             IF v_member_role IS NULL OR v_member_role <> 'owner' THEN
@@ -265,9 +270,11 @@ main: BEGIN
             END IF;
 
         WHEN 'delete' THEN
-            SELECT role INTO v_member_role
+            SELECT role
+            INTO v_member_role
             FROM account_members
-            WHERE account_id = p_id AND user_id = p_user_id
+            WHERE ref_accounts_id = p_id
+                AND ref_user_id = p_user_id
             LIMIT 1;
 
             IF v_member_role IS NULL OR v_member_role <> 'owner' THEN

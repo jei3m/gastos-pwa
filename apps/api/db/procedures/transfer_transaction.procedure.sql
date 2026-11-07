@@ -58,7 +58,7 @@ main: BEGIN
             WHERE
                 id = p_ref_accounts_id
                 AND (ref_user_id = p_ref_user_id
-                    OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                    OR id IN (SELECT ref_accounts_id FROM account_members WHERE ref_user_id = p_ref_user_id))
             LIMIT 1;
 
             -- Validate total_balance
@@ -164,7 +164,7 @@ main: BEGIN
                 WHERE
                     id = p_ref_accounts_id
                     AND (ref_user_id = p_ref_user_id
-                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                        OR id IN (SELECT ref_accounts_id FROM account_members WHERE ref_user_id = p_ref_user_id))
                 LIMIT 1;
 
 				-- Get name of receiving account
@@ -334,7 +334,7 @@ main: BEGIN
                 WHERE
                     id = v_ref_accounts_id
                     AND (ref_user_id = p_ref_user_id
-                        OR id IN (SELECT account_id FROM account_members WHERE user_id = p_ref_user_id))
+                        OR id IN (SELECT ref_accounts_id FROM account_members WHERE ref_user_id = p_ref_user_id))
                 LIMIT 1;
 
 				IF (p_amount <> v_amount) OR (v_ref_transfer_to_accounts_id <> p_ref_transfer_to_accounts_id) THEN
