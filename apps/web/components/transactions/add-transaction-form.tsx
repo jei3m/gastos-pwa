@@ -1,4 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  createElement,
+} from 'react';
 import type { Key } from 'react';
 import { useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
@@ -32,7 +37,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ChevronDown, Loader } from 'lucide-react';
+import {
+  ChevronDown,
+  Loader,
+  SquareDashed,
+} from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { transactionTypes } from '@/lib/data';
 import {
@@ -56,6 +65,7 @@ import { categoryQueryOptions } from '@/features/categories/categories.tq.option
 import type { Account } from '@/features/accounts/accounts.interface';
 import CustomAlertDialog from '@/components/custom/custom-alert-dialog';
 import { cn } from '@/lib/utils';
+import { getIconById } from '@/lib/icons';
 
 interface AddTransactionFormProps {
   isModal?: boolean;
@@ -73,6 +83,9 @@ export default function AddTransactionForm({
   const navigate = useNavigate();
   const { selectedAccountID, accounts } = useAccount();
   const queryClient = useQueryClient();
+  const isExpense = (type: string) => {
+    return type.toLowerCase() === 'expense';
+  };
 
   const filteredAccounts =
     accounts?.filter(
@@ -269,6 +282,24 @@ export default function AddTransactionForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="note"
+            disabled={isLoading}
+            render={({ field }) => (
+              <FormItem className="-space-y-1">
+                <FormLabel>Note</FormLabel>
+                <FormControl>
+                  <Input
+                    required
+                    placeholder="Transaction note..."
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {transactionType !== 'transfer' ? (
             <FormField
               control={form.control}
@@ -285,7 +316,7 @@ export default function AddTransactionForm({
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Category..." />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent columns={2}>
                         {categories && (
                           <>
                             {categories.map(
@@ -297,6 +328,21 @@ export default function AddTransactionForm({
                                   key={index}
                                   value={category.id}
                                 >
+                                  {createElement(
+                                    getIconById(
+                                      category.icon
+                                    )?.icon || SquareDashed,
+                                    {
+                                      className: cn(
+                                        isExpense(
+                                          category.type
+                                        )
+                                          ? 'text-red-500'
+                                          : 'text-primary',
+                                        'size-5'
+                                      ),
+                                    }
+                                  )}
                                   {category.name}
                                 </SelectItem>
                               )
@@ -379,24 +425,6 @@ export default function AddTransactionForm({
               />
             </div>
           )}
-          <FormField
-            control={form.control}
-            name="note"
-            disabled={isLoading}
-            render={({ field }) => (
-              <FormItem className="-space-y-1">
-                <FormLabel>Note</FormLabel>
-                <FormControl>
-                  <Input
-                    required
-                    placeholder="Transaction note..."
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className="flex flex-row space-x-2">
             <FormField
               control={form.control}

@@ -133,6 +133,7 @@ function SelectContent({
   align = 'center',
   alignOffset = 0,
   alignItemWithTrigger = false,
+  columns = 1,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
@@ -142,7 +143,9 @@ function SelectContent({
     | 'side'
     | 'sideOffset'
     | 'alignItemWithTrigger'
-  >) {
+  > & {
+    columns?: number;
+  }) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
@@ -162,7 +165,17 @@ function SelectContent({
           {...props}
         >
           <SelectScrollUpButton />
-          <SelectPrimitive.List>
+          <SelectPrimitive.List
+            data-slot="select-list"
+            className={cn(columns > 1 && 'grid gap-1')}
+            style={
+              columns > 1
+                ? {
+                    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                  }
+                : undefined
+            }
+          >
             {children}
           </SelectPrimitive.List>
           <SelectScrollDownButton />

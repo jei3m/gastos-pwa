@@ -1,4 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  createElement,
+} from 'react';
 import type { Key } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Button } from '@/components/ui/button';
@@ -39,6 +44,7 @@ import {
   ChevronDown,
   ChevronLeft,
   Loader,
+  SquareDashed,
   Trash2,
 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
@@ -74,6 +80,7 @@ import {
   AvatarImage,
 } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { getIconById } from '@/lib/icons';
 
 interface EditTransactionFormProps {
   isModal?: boolean;
@@ -107,6 +114,9 @@ export default function EditTransactionForm({
   const id =
     (params.transactionID as string) ||
     (params.id as string);
+  const isExpense = (type: string) => {
+    return type.toLowerCase() === 'expense';
+  };
 
   const filteredAccounts =
     accounts?.filter(
@@ -420,6 +430,25 @@ export default function EditTransactionForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="note"
+            disabled={isDisabled}
+            render={({ field }) => (
+              <FormItem className="-space-y-1">
+                <FormLabel>Note</FormLabel>
+                <FormControl>
+                  <Input
+                    required
+                    placeholder="Transaction note..."
+                    {...field}
+                    readOnly={isReadonly}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {transactionType !== 'transfer' ? (
             <FormField
               control={form.control}
@@ -443,7 +472,7 @@ export default function EditTransactionForm({
                       >
                         <SelectValue placeholder="Select Category..." />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent columns={2}>
                         {categories && (
                           <>
                             {categories.map(
@@ -452,6 +481,21 @@ export default function EditTransactionForm({
                                   key={category.id}
                                   value={category.id}
                                 >
+                                  {createElement(
+                                    getIconById(
+                                      category.icon
+                                    )?.icon || SquareDashed,
+                                    {
+                                      className: cn(
+                                        isExpense(
+                                          category.type
+                                        )
+                                          ? 'text-red-500'
+                                          : 'text-primary',
+                                        'size-5'
+                                      ),
+                                    }
+                                  )}
                                   {category.name}
                                 </SelectItem>
                               )
@@ -551,25 +595,6 @@ export default function EditTransactionForm({
               />
             </div>
           )}
-          <FormField
-            control={form.control}
-            name="note"
-            disabled={isDisabled}
-            render={({ field }) => (
-              <FormItem className="-space-y-1">
-                <FormLabel>Note</FormLabel>
-                <FormControl>
-                  <Input
-                    required
-                    placeholder="Transaction note..."
-                    {...field}
-                    readOnly={isReadonly}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className="flex flex-row space-x-2">
             <FormField
               control={form.control}
