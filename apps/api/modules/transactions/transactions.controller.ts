@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import type { RowDataPacket } from 'mysql2';
 import { db } from '../../lib/db.ts';
 import { success, fail } from '../../utils/response.ts';
