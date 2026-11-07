@@ -1,3 +1,6 @@
+import type { ReactNode } from 'react';
+import type { User } from '../user/user.interface';
+
 export interface Account {
   id: string;
   name: string;
@@ -20,7 +23,9 @@ export interface AccountMember {
 export interface Invitation {
   id: string;
   accountID: string;
-  invitedEmail: string;
+  image: string;
+  name: string;
+  email: string;
   invitedBy: string;
   status: 'pending' | 'accepted' | 'declined' | 'expired';
   token: string;
@@ -71,4 +76,29 @@ export interface AccountTypeSummary {
 
 export interface AccountGroup extends AccountTypeSummary {
   accounts: Account[];
+}
+
+export interface MemberRowProps {
+  name: string;
+  email: string;
+  image?: string | null;
+  badge?: ReactNode;
+  action?: ReactNode;
+  lineThrough?: boolean;
+  className?: string;
+}
+
+export interface AccountMembersFieldProps {
+  membersToInvite: User[];
+  onInvite: (user: User) => void;
+  onRemoveInvite: (userID: string) => void;
+  isDisabled?: boolean;
+  canManage?: boolean;
+  account?: AccountDetails | null;
+  queuedRemovedMembers?: string[];
+  queuedCancelledInvites?: string[];
+  onRemoveMember?: (userID: string) => void;
+  onUndoRemoveMember?: (userID: string) => void;
+  onCancelInvitation?: (invitationID: string) => void;
+  onUndoCancelInvitation?: (invitationID: string) => void;
 }
