@@ -430,6 +430,25 @@ export default function EditTransactionForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="note"
+            disabled={isDisabled}
+            render={({ field }) => (
+              <FormItem className="-space-y-1">
+                <FormLabel>Note</FormLabel>
+                <FormControl>
+                  <Input
+                    required
+                    placeholder="Transaction note..."
+                    {...field}
+                    readOnly={isReadonly}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {transactionType !== 'transfer' ? (
             <FormField
               control={form.control}
@@ -576,25 +595,6 @@ export default function EditTransactionForm({
               />
             </div>
           )}
-          <FormField
-            control={form.control}
-            name="note"
-            disabled={isDisabled}
-            render={({ field }) => (
-              <FormItem className="-space-y-1">
-                <FormLabel>Note</FormLabel>
-                <FormControl>
-                  <Input
-                    required
-                    placeholder="Transaction note..."
-                    {...field}
-                    readOnly={isReadonly}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className="flex flex-row space-x-2">
             <FormField
               control={form.control}
